@@ -3100,16 +3100,58 @@ function runAutoFill() {
     .catch(function () { return null; })
     .then(function (r) {
       data.awayMatches = r;
-      setAutofillStatus('⏳ Récupération confrontations...', 'info');
-      // H2H : on cherche un match récent entre eux pour avoir l'endpoint
+      setAutofillStatus('⏳ Calcul des confrontations directes...', 'info');
+
+      // H2H : on filtre directement depuis les matchs déjà récupérés
+      // (les matchs de l'équipe domicile où l'adversaire est l'équipe extérieure)
+      // On combine les matchs des deux équipes pour avoir un historique plus large
       var hMatches = (data.homeMatches && data.homeMatches.matches) || [];
-      var h2hMatch = hMatches.find(function (m) {
+      var aMatches = (data.awayMatches && data.awayMatches.matches) || [];
+
+      // Tous les matchs des deux équipes combinés (dédupliqués par ID)
+      var allMatchesById = {};
+      hMatches.concat(aMatches).forEach(function (m) {
+        if (m && m.id) allMatchesById[m.id] = m;
+      });
+      var allMatches = Object.values(allMatchesById);
+
+      // Filtrer uniquement les confrontations entre les deux équipes
+      var h2hMatches = allMatches.filter(function (m) {
         var hId = m.homeTeam && m.homeTeam.id;
         var aId = m.awayTeam && m.awayTeam.id;
         return (hId === homeId && aId === awayId) || (hId === awayId && aId === homeId);
-      });
-      if (h2hMatch) {
-        return afApiCall('/matches/' + h2hMatch.id + '/head2head?limit=10', 'h2h_' + h2hMatch.id);
+      }).filter(function (m) {
+        return m.status === 'FINISHED';
+      }).sort(function (a, b) {
+        return new Date(b.utcDate) - new Date(a.utcDate);
+      }).slice(0, 10); // Garder les 10 plus récents
+
+      // Construire un objet compatible avec computeH2H
+      data.h2h = h2hMatches.length > 0 ? { matches: h2hMatches } : null;
+
+      // Si on n'a pas assez de H2H dans les 15 derniers matchs,
+      // on tente un appel API dédié pour avoir un historique plus profond
+      if (h2hMatches.length < 3) {
+        var cacheKey = 'h2h_direct_' + Math.min(homeId, awayId) + '_' + Math.max(homeId, awayId);
+        return afApiCall('/teams/' + homeId + '/matches?status=FINISHED&limit=50', cacheKey)
+          .then(function (r) {
+            var deepMatches = (r && r.matches) || [];
+            var deepH2H = deepMatches.filter(function (m) {
+              var hId = m.homeTeam && m.homeTeam.id;
+              var aId = m.awayTeam && m.awayTeam.id;
+              return (hId === homeId && aId === awayId) || (hId === awayId && aId === homeId);
+            }).filter(function (m) {
+              return m.status === 'FINISHED';
+            }).sort(function (a, b) {
+              return new Date(b.utcDate) - new Date(a.utcDate);
+            }).slice(0, 10);
+
+            if (deepH2H.length > h2hMatches.length) {
+              data.h2h = { matches: deepH2H };
+            }
+            return null;
+          })
+          .catch(function () { return null; });
       }
       return null;
     })
@@ -3263,20 +3305,40 @@ function renderForm(side) {
   }
 }
 
-// Calcul H2H
+// Calcul H2H — homeId = équipe qui joue à domicile dans le match analysé
 function computeH2H(matches, homeId) {
-  var hw = 0, d = 0, aw = 0;
+  var hw = 0, d = 0, aw = 0, gtot = 0, btts = 0, over25 = 0;
+  var n = 0;
   matches.forEach(function (m) {
     if (m.status !== 'FINISHED') return;
     var ft = m.score && m.score.fullTime;
     if (!ft || ft.home == null || ft.away == null) return;
+
+    // Identifier qui était à domicile dans ce match H2H
     var matchHomeId = m.homeTeam && m.homeTeam.id;
-    var thisHomeIsHome = matchHomeId === homeId;
-    if (ft.home > ft.away) thisHomeIsHome ? hw++ : aw++;
-    else if (ft.home < ft.away) thisHomeIsHome ? aw++ : hw++;
+    var hg = ft.home; // buts de l'équipe à domicile dans CE match H2H
+    var ag = ft.away; // buts de l'équipe à l'extérieur dans CE match H2H
+
+    // Résultat vu du point de vue de homeId (équipe domicile du match analysé)
+    var homeIdWasHome = matchHomeId === homeId;
+    var homeGoals = homeIdWasHome ? hg : ag;
+    var awayGoals = homeIdWasHome ? ag : hg;
+
+    n++;
+    gtot += (hg + ag);
+    if (homeGoals > awayGoals) hw++;
+    else if (homeGoals < awayGoals) aw++;
     else d++;
+    if (hg > 0 && ag > 0) btts++;
+    if (hg + ag > 2.5) over25++;
   });
-  return { homeWins: hw, draws: d, awayWins: aw };
+  if (n === 0) return null;
+  return {
+    n: n,
+    homeWins: hw, draws: d, awayWins: aw,
+    homeWinRate: hw / n, drawRate: d / n, awayWinRate: aw / n,
+    avgTotal: gtot / n, bttsRate: btts / n, over25Rate: over25 / n
+  };
 }
 
 // Initialisation au chargement
@@ -3951,7 +4013,7 @@ async function launchAI(home,away,betType,odds,betProb,conf,edge,win,draw,lose) 
     "Réponds en JSON: {\"verdict\":\"GO\"|\"ATTENDS\"|\"NO GO\",\"analyse\":\"3-4 phrases\",\"forces\":[\"f1\",\"f2\",\"f3\"],\"risques\":[\"r1\",\"r2\"],\"conseil\":\"conseil de mise\",\"warning\":\"avertissement ou null\"}";
 
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('/api/groq', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -4371,7 +4433,7 @@ async function launchTennisAI(p1,p2,surface,format,betType,odds,betProb,pWinP1,c
   var surfaces = {hard:'surface dure',clay:'terre battue',grass:'gazon',indoor:'indoor'};
   var msg = "Tennis: "+p1+" vs "+p2+". Surface: "+surfaces[surface]+". Format: "+(format==="bo5"?"Bo5":"Bo3")+". Pari: "+betType+(odds?" @"+odds:"")+". Win proba: "+p1+"="+pct(pWinP1)+", "+p2+"="+pct(1-pWinP1)+". Proba pari: "+pct(betProb)+". Forme: "+tForm1.join("-")+" vs "+tForm2.join("-")+". Edge: "+(edge!==null?parseFloat(edge).toFixed(1)+"%":"N/A")+". Confiance: "+conf+". JSON attendu: {verdict,analyse,forces,risques,conseil,warning}";
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('/api/groq', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -4992,7 +5054,7 @@ async function launchBasketAI() {
     ". Réponds en JSON: {verdict:GO|ATTENDS|NO GO, analyse:string, forces:[s,s,s], risques:[s,s], conseil:string, warning:string|null}";
 
   try {
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
+    var res=await fetch('/api/groq',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -5551,7 +5613,7 @@ async function launchHockeyAI() {
     ". JSON: {verdict:GO|ATTENDS|NO GO, analyse:string, forces:[s,s,s], risques:[s,s], conseil:string, warning:string|null}";
 
   try {
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
+    var res=await fetch('/api/groq',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -6110,7 +6172,7 @@ async function launchMMAai() {
     ". Confiance: "+d.conf+". "+d.rounds+" rounds."+
     " JSON: {verdict:GO|ATTENDS|NO GO, analyse:string, forces:[s,s,s], risques:[s,s], conseil:string, warning:string|null}";
   try {
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
+    var res=await fetch('/api/groq',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -6662,7 +6724,7 @@ async function launchRugbyAI() {
     ". Confiance: "+d.conf+
     ". JSON: {verdict:GO|ATTENDS|NO GO, analyse:string, forces:[s,s,s], risques:[s,s], conseil:string, warning:string|null}";
   try {
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
+    var res=await fetch('/api/groq',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -7330,7 +7392,7 @@ async function launchTendancesAI() {
     " JSON: {verdict:string, tendance_principale:string, meilleur_pari:string, analyse:string, warning:string|null}";
 
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('/api/groq', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
@@ -8850,7 +8912,7 @@ async function launchTennisAI(p1,p2,surface,format,pw1,pw2,betProb,betLabel,edge
     " | Forme "+p1+": "+tForm1.join("-")+" / "+p2+": "+tForm2.join("-") +
     " | JSON: {verdict:GO|ATTENDS|NO GO,analyse:string,forces:[],risques:[],conseil:string,warning:string}";
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages',{
+    var res = await fetch('/api/groq',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,
         system:'Expert analyse tennis et paris sportifs. Réponds uniquement en JSON valide.',
