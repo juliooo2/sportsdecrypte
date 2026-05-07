@@ -186,21 +186,36 @@ input::placeholder{color:var(--txt2)}
 <div class="content active" id="step1">
   <div class="card">
     <div class="card-title">⚽ INFOS DU MATCH</div>
+
+    <!-- AUTO-FILL BANNER -->
+    <div id="autofill-banner" style="background:linear-gradient(135deg,rgba(0,229,184,0.08),rgba(124,77,255,0.08));border:1px solid rgba(0,229,184,0.25);border-radius:12px;padding:12px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:11px;letter-spacing:2px;color:var(--green);font-weight:700;margin-bottom:3px">⚡ AUTO-REMPLISSAGE</div>
+          <div style="font-size:11px;color:var(--txt2);line-height:1.4">Sélectionne les équipes ci-dessous, puis clique pour récupérer auto les stats (buts, classement, forme, H2H).</div>
+        </div>
+        <button id="btn-autofill" type="button" onclick="runAutoFill()" style="background:linear-gradient(135deg,var(--green),var(--purple));color:#000;border:none;padding:10px 16px;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer;letter-spacing:1px;white-space:nowrap" disabled>🔄 AUTO-REMPLIR</button>
+      </div>
+      <div id="autofill-status" style="display:none;font-size:11px;color:var(--txt2);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)"></div>
+    </div>
+
     <div class="vs-row" style="margin-bottom:14px">
-      <div>
+      <div style="position:relative">
         <div class="lbl">🏠 DOMICILE</div>
-        <input type="text" id="p-home" placeholder="Ex: PSG" style="text-align:center;font-weight:700">
+        <input type="text" id="p-home" placeholder="Tape pour rechercher..." style="text-align:center;font-weight:700" autocomplete="off" oninput="onTeamInput('home')" onfocus="onTeamInput('home')" onblur="setTimeout(function(){hideSuggestions('home')},200)">
+        <div id="sug-home" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-top:4px;max-height:200px;overflow-y:auto;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.4)"></div>
       </div>
       <div class="vs-mid">VS</div>
-      <div>
+      <div style="position:relative">
         <div class="lbl">✈️ EXTÉRIEUR</div>
-        <input type="text" id="p-away" placeholder="Ex: Lyon" style="text-align:center;font-weight:700">
+        <input type="text" id="p-away" placeholder="Tape pour rechercher..." style="text-align:center;font-weight:700" autocomplete="off" oninput="onTeamInput('away')" onfocus="onTeamInput('away')" onblur="setTimeout(function(){hideSuggestions('away')},200)">
+        <div id="sug-away" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-top:4px;max-height:200px;overflow-y:auto;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.4)"></div>
       </div>
     </div>
     <div class="grid2" style="margin-bottom:12px">
       <div>
         <div class="lbl">🏆 COMPÉTITION</div>
-        <select id="p-comp">
+        <select id="p-comp" onchange="onCompChange()">
           <option value="ligue1">Ligue 1</option>
           <option value="premier">Premier League</option>
           <option value="liga">La Liga</option>
@@ -2822,6 +2837,476 @@ var hForm = ['?','?','?','?','?'];
 var aForm = ['?','?','?','?','?'];
 var cycle = {'?':'V','V':'N','N':'D','D':'?'};
 
+// ═══════════════════════════════════════════════════════
+// AUTO-FILL MODULE — Football-Data.org v4
+// ═══════════════════════════════════════════════════════
+
+var FD_API_KEY = ''; // Clé gérée côté serveur dans api/football-data.js
+var FD_API_BASE = '/api/football-data'; // Proxy Vercel — pas d'appel direct
+
+// Map des codes de competition predict.html → code Football-Data
+var COMP_MAPPING = {
+  'ligue1': 'FL1',
+  'premier': 'PL',
+  'liga': 'PD',
+  'bundesliga': 'BL1',
+  'seriea': 'SA',
+  'ucl': 'CL',
+  'uel': 'EL',
+  'other': null
+};
+
+// Cache local 24h
+var AF_CACHE_PREFIX = 'sd_predict_af_';
+var AF_CACHE_TTL = 24 * 60 * 60 * 1000;
+
+// Selected teams state
+var afSelected = { home: null, away: null };
+var afTeamsList = []; // équipes de la compétition active
+var afLastApiCall = 0;
+var AF_RATE_LIMIT_MS = 6500; // 10 req/min
+
+function afCacheGet(key) {
+  try {
+    var raw = localStorage.getItem(AF_CACHE_PREFIX + key);
+    if (!raw) return null;
+    var entry = JSON.parse(raw);
+    if (Date.now() - entry.t > AF_CACHE_TTL) {
+      localStorage.removeItem(AF_CACHE_PREFIX + key);
+      return null;
+    }
+    return entry.data;
+  } catch (e) { return null; }
+}
+function afCacheSet(key, data) {
+  try {
+    localStorage.setItem(AF_CACHE_PREFIX + key, JSON.stringify({ t: Date.now(), data: data }));
+  } catch (e) { /* localStorage full, ignore */ }
+}
+
+function afRateWait() {
+  var now = Date.now();
+  var since = now - afLastApiCall;
+  if (since < AF_RATE_LIMIT_MS) {
+    return new Promise(function (resolve) { setTimeout(resolve, AF_RATE_LIMIT_MS - since); });
+  }
+  return Promise.resolve();
+}
+
+function afApiCall(endpoint, cacheKey) {
+  if (cacheKey) {
+    var cached = afCacheGet(cacheKey);
+    if (cached) return Promise.resolve(cached);
+  }
+  return afRateWait().then(function () {
+    afLastApiCall = Date.now();
+    // Appel vers le proxy Vercel : /api/football-data?path=/competitions/PL/teams
+    var url = FD_API_BASE + '?path=' + encodeURIComponent(endpoint);
+    return fetch(url);
+  }).then(function (res) {
+    if (res.status === 429) throw new Error('Rate limit. Patiente une minute.');
+    if (res.status === 403) throw new Error('Compétition non disponible (plan gratuit).');
+    if (!res.ok) throw new Error('API ' + res.status);
+    return res.json();
+  }).then(function (data) {
+    if (cacheKey) afCacheSet(cacheKey, data);
+    return data;
+  });
+}
+
+// Chargement de la liste des équipes pour une compétition
+function afLoadTeams(compCode) {
+  if (!compCode) return Promise.resolve([]);
+  return afApiCall('/competitions/' + compCode + '/teams', 'teams_' + compCode)
+    .then(function (data) {
+      return (data.teams || []).map(function (t) {
+        return {
+          id: t.id,
+          name: t.name,
+          shortName: t.shortName || t.name,
+          tla: t.tla || '',
+          crest: t.crest || ''
+        };
+      });
+    });
+}
+
+// Helper de matching nom → équipe (recherche fuzzy simple)
+function afMatchTeam(query, teams) {
+  if (!query || !teams || teams.length === 0) return [];
+  var q = query.toLowerCase().trim();
+  if (q.length < 1) return [];
+  // Score chaque équipe
+  return teams.map(function (t) {
+    var name = (t.name || '').toLowerCase();
+    var sn = (t.shortName || '').toLowerCase();
+    var tla = (t.tla || '').toLowerCase();
+    var score = 0;
+    if (name === q || sn === q || tla === q) score = 100;
+    else if (name.indexOf(q) === 0 || sn.indexOf(q) === 0) score = 80;
+    else if (name.indexOf(q) !== -1 || sn.indexOf(q) !== -1) score = 60;
+    else if (tla.indexOf(q) !== -1) score = 50;
+    else {
+      // Match par mots
+      var words = q.split(/\s+/);
+      var allMatch = words.every(function (w) {
+        return name.indexOf(w) !== -1 || sn.indexOf(w) !== -1;
+      });
+      if (allMatch) score = 40;
+    }
+    return { team: t, score: score };
+  })
+  .filter(function (x) { return x.score > 0; })
+  .sort(function (a, b) { return b.score - a.score; })
+  .slice(0, 8)
+  .map(function (x) { return x.team; });
+}
+
+// ─── UI : Auto-complétion ───
+function onCompChange() {
+  var compVal = document.getElementById('p-comp').value;
+  var compCode = COMP_MAPPING[compVal];
+  // Reset selection
+  afSelected = { home: null, away: null };
+  afTeamsList = [];
+  hideSuggestions('home');
+  hideSuggestions('away');
+  document.getElementById('p-home').value = '';
+  document.getElementById('p-away').value = '';
+  document.getElementById('btn-autofill').disabled = true;
+
+  if (!compCode) {
+    setAutofillStatus('ℹ️ Compétition non couverte par l\'API — saisie manuelle.', 'info');
+    setTimeout(function () { hideAutofillStatus(); }, 3000);
+    return;
+  }
+
+  setAutofillStatus('⏳ Chargement des équipes...', 'info');
+  afLoadTeams(compCode).then(function (teams) {
+    afTeamsList = teams;
+    if (teams.length > 0) {
+      setAutofillStatus('✓ ' + teams.length + ' équipes disponibles', 'ok');
+      setTimeout(function () { hideAutofillStatus(); }, 2000);
+    } else {
+      setAutofillStatus('⚠️ Aucune équipe trouvée pour cette compétition', 'err');
+    }
+  }).catch(function (err) {
+    setAutofillStatus('⚠️ ' + err.message + ' — ressaie ou saisis manuellement', 'err');
+  });
+}
+
+function onTeamInput(side) {
+  var compVal = document.getElementById('p-comp').value;
+  var compCode = COMP_MAPPING[compVal];
+  if (!compCode) { hideSuggestions(side); return; }
+
+  // Charge la liste si pas encore fait
+  if (afTeamsList.length === 0) {
+    afLoadTeams(compCode).then(function (teams) {
+      afTeamsList = teams;
+      onTeamInput(side); // re-trigger
+    }).catch(function () { /* silent */ });
+    return;
+  }
+
+  var q = document.getElementById('p-' + side).value;
+  if (!q || q.length < 1) { hideSuggestions(side); return; }
+  var matches = afMatchTeam(q, afTeamsList);
+  showSuggestions(side, matches);
+}
+
+function showSuggestions(side, matches) {
+  var box = document.getElementById('sug-' + side);
+  if (!matches || matches.length === 0) { box.style.display = 'none'; return; }
+  var html = matches.map(function (t) {
+    var safeName = (t.name || '').replace(/'/g, "\\'");
+    return '<div onclick="selectTeam(\'' + side + '\',' + t.id + ',\'' + safeName + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:13px;color:var(--txt);transition:background 0.1s" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'" onmouseout="this.style.background=\'transparent\'">' +
+      (t.crest ? '<img src="' + t.crest + '" style="width:18px;height:18px;object-fit:contain;flex-shrink:0">' : '<div style="width:18px;height:18px;flex-shrink:0"></div>') +
+      '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + t.name + '</span>' +
+      (t.tla ? '<span style="font-size:10px;color:var(--txt2);background:rgba(255,255,255,0.05);padding:2px 5px;border-radius:4px">' + t.tla + '</span>' : '') +
+    '</div>';
+  }).join('');
+  box.innerHTML = html;
+  box.style.display = 'block';
+}
+
+function hideSuggestions(side) {
+  var box = document.getElementById('sug-' + side);
+  if (box) box.style.display = 'none';
+}
+
+function selectTeam(side, teamId, teamName) {
+  var team = afTeamsList.find(function (t) { return t.id === teamId; });
+  if (!team) return;
+  afSelected[side] = team;
+  document.getElementById('p-' + side).value = team.name;
+  hideSuggestions(side);
+  // Activer le bouton si les deux équipes sont sélectionnées
+  if (afSelected.home && afSelected.away) {
+    document.getElementById('btn-autofill').disabled = false;
+  }
+}
+
+// ─── Status banner ───
+function setAutofillStatus(msg, kind) {
+  var el = document.getElementById('autofill-status');
+  if (!el) return;
+  var color = kind === 'ok' ? 'var(--green)' : kind === 'err' ? 'var(--red)' : 'var(--txt2)';
+  el.style.color = color;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideAutofillStatus() {
+  var el = document.getElementById('autofill-status');
+  if (el) el.style.display = 'none';
+}
+
+// ─── AUTO-FILL : récupération + remplissage des champs ───
+function runAutoFill() {
+  if (!afSelected.home || !afSelected.away) {
+    setAutofillStatus('⚠️ Sélectionne d\'abord les deux équipes', 'err');
+    return;
+  }
+
+  var homeId = afSelected.home.id;
+  var awayId = afSelected.away.id;
+  var compVal = document.getElementById('p-comp').value;
+  var compCode = COMP_MAPPING[compVal];
+
+  var btn = document.getElementById('btn-autofill');
+  btn.disabled = true;
+  btn.textContent = '⏳ ANALYSE...';
+  setAutofillStatus('⏳ Récupération des stats — patiente ~20 secondes (rate limit API)...', 'info');
+
+  // 4 appels API séquentiels (rate limit oblige) :
+  //   1) classement de la compétition
+  //   2) 15 derniers matchs domicile
+  //   3) 15 derniers matchs extérieur
+  //   4) head-to-head
+  var data = {};
+  afApiCall('/competitions/' + compCode + '/standings', 'stand_' + compCode)
+    .catch(function () { return null; })
+    .then(function (r) {
+      data.standings = r;
+      setAutofillStatus('⏳ Récupération matchs domicile...', 'info');
+      return afApiCall('/teams/' + homeId + '/matches?status=FINISHED&limit=15', 'team_' + homeId);
+    })
+    .catch(function () { return null; })
+    .then(function (r) {
+      data.homeMatches = r;
+      setAutofillStatus('⏳ Récupération matchs extérieur...', 'info');
+      return afApiCall('/teams/' + awayId + '/matches?status=FINISHED&limit=15', 'team_' + awayId);
+    })
+    .catch(function () { return null; })
+    .then(function (r) {
+      data.awayMatches = r;
+      setAutofillStatus('⏳ Récupération confrontations...', 'info');
+      // H2H : on cherche un match récent entre eux pour avoir l'endpoint
+      var hMatches = (data.homeMatches && data.homeMatches.matches) || [];
+      var h2hMatch = hMatches.find(function (m) {
+        var hId = m.homeTeam && m.homeTeam.id;
+        var aId = m.awayTeam && m.awayTeam.id;
+        return (hId === homeId && aId === awayId) || (hId === awayId && aId === homeId);
+      });
+      if (h2hMatch) {
+        return afApiCall('/matches/' + h2hMatch.id + '/head2head?limit=10', 'h2h_' + h2hMatch.id);
+      }
+      return null;
+    })
+    .catch(function () { return null; })
+    .then(function (r) {
+      data.h2h = r;
+      // ─── Calcul et remplissage ───
+      applyAutoFillData(data, homeId, awayId);
+      btn.disabled = false;
+      btn.textContent = '🔄 AUTO-REMPLIR';
+      setAutofillStatus('✅ Stats récupérées et appliquées ! Tu peux passer à l\'étape suivante.', 'ok');
+    })
+    .catch(function (err) {
+      btn.disabled = false;
+      btn.textContent = '🔄 AUTO-REMPLIR';
+      setAutofillStatus('❌ Erreur : ' + err.message, 'err');
+      console.error('[AutoFill]', err);
+    });
+}
+
+// Calculs des stats à partir des matchs et application aux champs
+function applyAutoFillData(data, homeId, awayId) {
+  var homeMatches = (data.homeMatches && data.homeMatches.matches) || [];
+  var awayMatches = (data.awayMatches && data.awayMatches.matches) || [];
+
+  // ── 1. Stats domicile à domicile ──
+  var hHome = computeTeamStats(homeMatches, homeId, 'home');
+  var hAll = computeTeamStats(homeMatches, homeId, 'all');
+  if (hHome.played > 0) {
+    setVal('h-att', hHome.gf.toFixed(2));
+    setVal('h-def', hHome.ga.toFixed(2));
+  } else if (hAll.played > 0) {
+    setVal('h-att', hAll.gf.toFixed(2));
+    setVal('h-def', hAll.ga.toFixed(2));
+  }
+
+  // ── 2. Stats extérieur à extérieur ──
+  var aAway = computeTeamStats(awayMatches, awayId, 'away');
+  var aAll = computeTeamStats(awayMatches, awayId, 'all');
+  if (aAway.played > 0) {
+    setVal('a-att', aAway.gf.toFixed(2));
+    setVal('a-def', aAway.ga.toFixed(2));
+  } else if (aAll.played > 0) {
+    setVal('a-att', aAll.gf.toFixed(2));
+    setVal('a-def', aAll.ga.toFixed(2));
+  }
+
+  // ── 3. Forme L5 ──
+  var hForm5 = computeFormL5(homeMatches, homeId);
+  var aForm5 = computeFormL5(awayMatches, awayId);
+  if (hForm5.length === 5) {
+    hForm = hForm5;
+    renderForm('home');
+  }
+  if (aForm5.length === 5) {
+    aForm = aForm5;
+    renderForm('away');
+  }
+
+  // ── 4. Classement ──
+  if (data.standings && data.standings.standings) {
+    var totalStanding = data.standings.standings.find(function (s) { return s.type === 'TOTAL'; });
+    if (totalStanding && totalStanding.table) {
+      var hRow = totalStanding.table.find(function (r) { return r.team.id === homeId; });
+      var aRow = totalStanding.table.find(function (r) { return r.team.id === awayId; });
+      if (hRow) setVal('h-rank', hRow.position);
+      if (aRow) setVal('a-rank', aRow.position);
+    }
+  }
+
+  // ── 5. H2H ──
+  if (data.h2h && data.h2h.matches) {
+    var h2h = computeH2H(data.h2h.matches, homeId);
+    setVal('h2h-h', h2h.homeWins);
+    setVal('h2h-d', h2h.draws);
+    setVal('h2h-a', h2h.awayWins);
+  }
+}
+
+function setVal(id, val) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.value = val;
+    // Trigger event pour les éventuels listeners
+    var ev = new Event('input', { bubbles: true });
+    el.dispatchEvent(ev);
+  }
+}
+
+// Calcul stats équipe sur une période ('all', 'home', 'away')
+function computeTeamStats(matches, teamId, scope) {
+  var played = 0, gf = 0, ga = 0;
+  matches.forEach(function (m) {
+    if (m.status !== 'FINISHED') return;
+    var ft = m.score && m.score.fullTime;
+    if (!ft || ft.home == null || ft.away == null) return;
+    var isHome = m.homeTeam && m.homeTeam.id === teamId;
+    if (scope === 'home' && !isHome) return;
+    if (scope === 'away' && isHome) return;
+    var teamGoals = isHome ? ft.home : ft.away;
+    var oppGoals = isHome ? ft.away : ft.home;
+    played++;
+    gf += teamGoals;
+    ga += oppGoals;
+  });
+  return {
+    played: played,
+    gf: played > 0 ? gf / played : 0,
+    ga: played > 0 ? ga / played : 0
+  };
+}
+
+// Calcul forme L5 (V/N/D des 5 derniers matchs)
+function computeFormL5(matches, teamId) {
+  // Tri du plus récent au plus ancien
+  var sorted = matches.slice().filter(function (m) {
+    return m.status === 'FINISHED';
+  }).sort(function (a, b) {
+    return new Date(b.utcDate) - new Date(a.utcDate);
+  });
+  var form = [];
+  for (var i = 0; i < Math.min(5, sorted.length); i++) {
+    var m = sorted[i];
+    var ft = m.score && m.score.fullTime;
+    if (!ft || ft.home == null || ft.away == null) continue;
+    var isHome = m.homeTeam && m.homeTeam.id === teamId;
+    var teamG = isHome ? ft.home : ft.away;
+    var oppG = isHome ? ft.away : ft.home;
+    if (teamG > oppG) form.push('V');
+    else if (teamG === oppG) form.push('N');
+    else form.push('D');
+  }
+  // Inverser pour avoir le plus ancien en premier (cohérent avec l'UI hForm[0..4])
+  form.reverse();
+  // Compléter à 5
+  while (form.length < 5) form.unshift('?');
+  return form;
+}
+
+// Met à jour visuellement les boutons forme
+function renderForm(side) {
+  var arr = side === 'home' ? hForm : aForm;
+  var prefix = side === 'home' ? 'hf' : 'af';
+  for (var i = 0; i < 5; i++) {
+    var btn = document.getElementById(prefix + i);
+    if (btn) {
+      var v = arr[i];
+      btn.textContent = v;
+      btn.className = 'fb' + (v === 'V' ? ' W' : v === 'N' ? ' N' : v === 'D' ? ' D' : '');
+    }
+  }
+}
+
+// Calcul H2H
+function computeH2H(matches, homeId) {
+  var hw = 0, d = 0, aw = 0;
+  matches.forEach(function (m) {
+    if (m.status !== 'FINISHED') return;
+    var ft = m.score && m.score.fullTime;
+    if (!ft || ft.home == null || ft.away == null) return;
+    var matchHomeId = m.homeTeam && m.homeTeam.id;
+    var thisHomeIsHome = matchHomeId === homeId;
+    if (ft.home > ft.away) thisHomeIsHome ? hw++ : aw++;
+    else if (ft.home < ft.away) thisHomeIsHome ? aw++ : hw++;
+    else d++;
+  });
+  return { homeWins: hw, draws: d, awayWins: aw };
+}
+
+// Initialisation au chargement
+window.addEventListener('DOMContentLoaded', function () {
+  // Charger silencieusement les équipes pour la compétition par défaut
+  // En cas d'erreur, on n'affiche RIEN — le user pourra recliquer plus tard
+  setTimeout(function () {
+    var compVal = document.getElementById('p-comp');
+    if (!compVal) return;
+    var compCode = COMP_MAPPING[compVal.value];
+    if (!compCode) return;
+    afLoadTeams(compCode).then(function (teams) {
+      afTeamsList = teams;
+      // Affichage discret seulement en cas de succès
+      if (teams.length > 0) {
+        setAutofillStatus('✓ ' + teams.length + ' équipes chargées', 'ok');
+        setTimeout(function () { hideAutofillStatus(); }, 1800);
+      }
+    }).catch(function (err) {
+      // Silencieux au démarrage — on retentera quand l'utilisateur tapera
+      console.log('[AutoFill] Pré-chargement différé:', err.message);
+    });
+  }, 500);
+});
+
+// ═══════════════════════════════════════════════════════
+// FIN AUTO-FILL MODULE
+// ═══════════════════════════════════════════════════════
+
+
 // ═══════════════ NAV ═══════════════
 function goStep(n) {
   for (var i = 1; i <= 4; i++) {
@@ -2857,6 +3342,13 @@ function resetAll() {
     var af = document.getElementById('af'+i);
     if (hf) { hf.textContent = '?'; hf.className = 'fb'; }
     if (af) { af.textContent = '?'; af.className = 'fb'; }
+  }
+  // Reset auto-fill state
+  if (typeof afSelected !== 'undefined') {
+    afSelected = { home: null, away: null };
+    var afBtn = document.getElementById('btn-autofill');
+    if (afBtn) afBtn.disabled = true;
+    hideAutofillStatus();
   }
   goStep(1);
 }
