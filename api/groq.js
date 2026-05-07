@@ -25,43 +25,34 @@ export default async function handler(req, res) {
   try {
     var body = req.body;
 
-    // Convertir le format Anthropic → format Groq si nécessaire
-    // (ton predict envoie au format Anthropic, on traduit ici)
-    var groqBody;
+    // Toujours convertir depuis le format Anthropic vers le format Groq
+    // (ton predict envoie au format Anthropic avec model claude-*)
+    var messages = [];
 
-    if (body.messages && body.model) {
-      // Déjà au format OpenAI/Groq — on passe tel quel
-      groqBody = body;
-    } else {
-      // Format Anthropic → convertir en format Groq (compatible OpenAI)
-      var messages = [];
-
-      // Ajouter le system prompt si présent
-      if (body.system) {
-        messages.push({ role: 'system', content: body.system });
-      }
-
-      // Convertir les messages Anthropic
-      (body.messages || []).forEach(function (m) {
-        if (typeof m.content === 'string') {
-          messages.push({ role: m.role, content: m.content });
-        } else if (Array.isArray(m.content)) {
-          // Extraire le texte des blocs de contenu Anthropic
-          var text = m.content
-            .filter(function (b) { return b.type === 'text'; })
-            .map(function (b) { return b.text; })
-            .join('\n');
-          messages.push({ role: m.role, content: text });
-        }
-      });
-
-      groqBody = {
-        model: 'llama-3.3-70b-versatile',
-        messages: messages,
-        max_tokens: body.max_tokens || 1024,
-        temperature: 0.3
-      };
+    // Ajouter le system prompt si présent
+    if (body.system) {
+      messages.push({ role: 'system', content: body.system });
     }
+
+    // Convertir les messages
+    (body.messages || []).forEach(function (m) {
+      if (typeof m.content === 'string') {
+        messages.push({ role: m.role, content: m.content });
+      } else if (Array.isArray(m.content)) {
+        var text = m.content
+          .filter(function (b) { return b.type === 'text'; })
+          .map(function (b) { return b.text; })
+          .join('\n');
+        messages.push({ role: m.role, content: text });
+      }
+    });
+
+    var groqBody = {
+      model: 'llama-3.3-70b-versatile',
+      messages: messages,
+      max_tokens: body.max_tokens || 1024,
+      temperature: 0.3
+    };
 
     var response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
