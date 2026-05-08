@@ -6064,7 +6064,7 @@
     const systemPrompt = ("Tu es un expert en analyse de paris sportifs. Tu aides les parieurs à prendre de meilleures décisions. \nTon profil utilisateur : Bankroll actuelle "+(fmt(current))+" "+(currency)+", ROI global "+(roi)+"%, Win rate "+(wr)+"%, "+(settled.length)+" paris enregistrés.\n"+(odds ? ("Cote proposée : @"+(odds)+"") : '')+"\n"+(stake ? ("Mise envisagée : "+(stake)+" "+(currency)+" ("+(((parseFloat(stake)/current)*100).toFixed(1))+"% de bankroll)") : '')+"\n\nRéponds UNIQUEMENT en JSON valide avec cette structure exacte :\n{\n  \"verdict\": \"GO\" | \"ATTENDS\" | \"NO GO\",\n  \"score\": 0-100,\n  \"resume\": \"Résumé en 1 phrase percutante\",\n  \"points_forts\": [\"point 1\", \"point 2\", \"point 3\"],\n  \"points_faibles\": [\"point 1\", \"point 2\"],\n  \"mise_conseille\": \"conseil de mise en 1 phrase\",\n  \"conclusion\": \"Conclusion actionnable en 2-3 phrases maximum\"\n}");
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/groq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -7727,7 +7727,7 @@ function renderAdvancedStats() {
     const systemPrompt = ("Tu es un coach expert en paris sportifs et gestion de bankroll. Reponds en francais de facon precise. Donnees parieur: " + ctx);
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/groq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
