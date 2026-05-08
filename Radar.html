@@ -313,6 +313,100 @@
   .toast.success { border-color: var(--green); }
   .toast.error { border-color: var(--red); }
 
+  /* SUMMARY BAR */
+  .summary-bar {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 10px 14px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    align-items: center;
+  }
+  .summary-chip {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  .summary-excellent { background: rgba(16,185,129,0.15); color: var(--green); }
+  .summary-bon { background: rgba(245,200,66,0.15); color: var(--gold); }
+  .summary-correct { background: rgba(245,158,11,0.15); color: var(--orange); }
+  .summary-total { color: var(--text-dim); margin-left: auto; }
+
+  /* SLIDER FILTRE */
+  .slider-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .slider-label { font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+  .slider-value {
+    font-family: monospace; font-size: 13px; font-weight: 700;
+    color: var(--gold); min-width: 36px; text-align: center;
+  }
+  input[type="range"] {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 4px; background: var(--border-2);
+    border-radius: 2px; outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--gold); cursor: pointer;
+  }
+
+  /* FORME RÉCENTE */
+  .form-row {
+    display: flex; gap: 4px; align-items: center;
+    margin-top: 8px; margin-bottom: 2px;
+  }
+  .form-dot {
+    width: 20px; height: 20px; border-radius: 4px;
+    font-size: 9px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .form-v { background: rgba(16,185,129,0.2); color: var(--green); }
+  .form-n { background: rgba(245,200,66,0.2); color: var(--gold); }
+  .form-d { background: rgba(239,68,68,0.2); color: var(--red); }
+  .form-q { background: rgba(255,255,255,0.05); color: var(--text-faint); }
+  .form-label { font-size: 10px; color: var(--text-faint); margin-right: 2px; }
+
+  /* SCORE BAR */
+  .score-bar-wrap {
+    height: 4px; background: var(--border);
+    border-radius: 2px; overflow: hidden;
+    margin-top: 6px;
+  }
+  .score-bar-fill {
+    height: 100%; border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* TOP 3 BUTTON */
+  .btn-top3 {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    color: #000; border: none;
+    padding: 8px 14px; border-radius: 8px;
+    font-weight: 800; font-size: 12px;
+    cursor: pointer; letter-spacing: 0.5px;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .btn-top3:hover { opacity: 0.85; }
+  .btn-top3.active {
+    background: var(--bg-3);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+  }
+
   @media (max-width: 600px) {
     .container { padding: 12px; }
     .controls-row { flex-direction: column; align-items: stretch; }
@@ -377,7 +471,31 @@
     <div class="filter-chip" data-market="OU">Over / Under</div>
     <div class="filter-chip" data-market="BTTS">BTTS</div>
     <div class="filter-chip" data-market="DC">Double Chance</div>
+    <button class="btn-top3" id="top3Btn" onclick="toggleTop3()">🏆 Top 3 du jour</button>
   </div>
+
+  <!-- Slider score minimum -->
+  <div class="slider-row">
+    <span class="slider-label">Score min.</span>
+    <input type="range" id="scoreSlider" min="0" max="90" step="5" value="0" oninput="onSliderChange(this.value)">
+    <span class="slider-value" id="sliderVal">0</span>
+    <span class="slider-label" style="color:var(--text-faint)">/ 100</span>
+  </div>
+
+  <!-- Slider cote minimum -->
+  <div class="slider-row">
+    <span class="slider-label">Cote min.</span>
+    <input type="range" id="oddsSlider" min="1" max="5" step="0.1" value="1" oninput="onOddsSliderChange(this.value)">
+    <span class="slider-value" id="oddsSliderVal" style="color:var(--gold)">Tout</span>
+  </div>
+
+  <!-- Disclaimer cotes -->
+  <div id="oddsDisclaimer" style="display:none;background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.2);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text-dim);margin-bottom:12px;line-height:1.5">
+    ⚠️ <strong style="color:var(--gold)">Cotes estimées par notre modèle</strong> — pas des cotes bookmaker réelles. Elles représentent la valeur théorique selon nos calculs. Compare-les avec les cotes de ton bookmaker pour détecter les value bets.
+  </div>
+
+  <!-- Summary bar (cachée au départ) -->
+  <div class="summary-bar" id="summaryBar" style="display:none"></div>
 
   <div class="tabs">
     <button class="tab active" data-tab="matches">Matchs <span class="tab-badge" id="badgeMatches">0</span></button>
@@ -427,6 +545,9 @@ var state = {
   matches: [],
   currentTab: 'matches',
   marketFilter: 'all',
+  scoreMin: 0,
+  oddsMin: 0,
+  top3Mode: false,
   favorites: loadJSON(STORAGE_KEYS.favorites, []),
   savedBets: loadJSON(STORAGE_KEYS.savedBets, []),
   lastApiCallTime: 0,
@@ -707,6 +828,67 @@ function scoreLevel(score) {
   return { label: 'À éviter', cls: 'score-eviter' };
 }
 
+function onSliderChange(val) {
+  state.scoreMin = parseInt(val, 10);
+  document.getElementById('sliderVal').textContent = val;
+  renderMatches();
+}
+
+function onOddsSliderChange(val) {
+  var v = parseFloat(val);
+  state.oddsMin = v <= 1.1 ? 0 : v;
+  var label = v <= 1.1 ? 'Tout' : '@' + v.toFixed(1) + '+';
+  document.getElementById('oddsSliderVal').textContent = label;
+  // Afficher/cacher le disclaimer quand on utilise le filtre cote
+  var disclaimer = document.getElementById('oddsDisclaimer');
+  if (disclaimer) disclaimer.style.display = state.oddsMin > 0 ? 'block' : 'none';
+  renderMatches();
+}
+
+function toggleTop3() {
+  state.top3Mode = !state.top3Mode;
+  var btn = document.getElementById('top3Btn');
+  btn.className = state.top3Mode ? 'btn-top3 active' : 'btn-top3';
+  btn.textContent = state.top3Mode ? '🏆 Top 3 actif' : '🏆 Top 3 du jour';
+  renderMatches();
+}
+
+function renderSummaryBar(list) {
+  var excellent = 0, bon = 0, correct = 0, total = 0;
+  list.forEach(function(m) {
+    var bets = m._filteredBets || m.bets;
+    if (!bets || !bets.length) return;
+    var top = bets[0];
+    total++;
+    var lvl = scoreLevel(top.score).label;
+    if (lvl === 'Excellent') excellent++;
+    else if (lvl === 'Bon') bon++;
+    else if (lvl === 'Correct') correct++;
+  });
+  var bar = document.getElementById('summaryBar');
+  if (!bar) return;
+  if (total === 0) { bar.style.display = 'none'; return; }
+  var html = '';
+  if (excellent > 0) html += '<span class="summary-chip summary-excellent">🟢 ' + excellent + ' Excellent' + (excellent > 1 ? 's' : '') + '</span>';
+  if (bon > 0) html += '<span class="summary-chip summary-bon">🟡 ' + bon + ' Bon' + (bon > 1 ? 's' : '') + '</span>';
+  if (correct > 0) html += '<span class="summary-chip summary-correct">🟠 ' + correct + ' Correct' + (correct > 1 ? 's' : '') + '</span>';
+  html += '<span class="summary-total">' + total + ' match' + (total > 1 ? 's' : '') + ' analysé' + (total > 1 ? 's' : '') + '</span>';
+  bar.innerHTML = html;
+  bar.style.display = 'flex';
+}
+
+function formDot(letter) {
+  var cls = letter === 'V' ? 'form-v' : letter === 'N' ? 'form-n' : letter === 'D' ? 'form-d' : 'form-q';
+  return '<div class="form-dot ' + cls + '">' + escapeHtml(letter) + '</div>';
+}
+
+function scoreBarColor(score) {
+  if (score >= 75) return 'var(--green)';
+  if (score >= 60) return 'var(--gold)';
+  if (score >= 45) return 'var(--orange)';
+  return 'var(--red)';
+}
+
 function computeBets(home, away, h2h) {
   if (!home || !away) return [];
   var bets = [];
@@ -760,6 +942,18 @@ function computeBets(home, away, h2h) {
     score: probToScore(1 - bttsBase), detail: 'Tendance récente: ' + Math.round((1 - bttsBase) * 100) + '%' });
 
   bets.sort(function (a, b) { return b.score - a.score; });
+
+  // Ajouter la cote juste calculée pour chaque pari (1 / probabilité)
+  bets.forEach(function (b) {
+    var prob = b.score / 100;
+    if (prob >= 0.01) {
+      // Marge bookmaker typique de 5% intégrée pour réalisme
+      b.fairOdds = (1 / prob * 0.95).toFixed(2);
+    } else {
+      b.fairOdds = null;
+    }
+  });
+
   return bets;
 }
 
@@ -783,8 +977,35 @@ function analyzeMatch(match) {
       var awayMatches = (data.away && data.away.matches) || [];
       var homeAll = summarizeMatches(homeMatches, homeId);
       var awayAll = summarizeMatches(awayMatches, awayId);
-      var homeL5 = summarizeMatches(lastNMatches(homeMatches, 5), homeId);
-      var awayL5 = summarizeMatches(lastNMatches(awayMatches, 5), awayId);
+      var homeL5Matches = lastNMatches(homeMatches, 5);
+      var awayL5Matches = lastNMatches(awayMatches, 5);
+      var homeL5 = summarizeMatches(homeL5Matches, homeId);
+      var awayL5 = summarizeMatches(awayL5Matches, awayId);
+
+      // Extraire la forme V/N/D pour l'affichage visuel
+      if (homeL5) {
+        homeL5._form = homeL5Matches.filter(function(m){ return m.status === 'FINISHED'; })
+          .slice(0, 5).map(function(m) {
+            var ft = m.score && m.score.fullTime;
+            if (!ft || ft.home == null || ft.away == null) return '?';
+            var isHome = m.homeTeam && m.homeTeam.id === homeId;
+            var tg = isHome ? ft.home : ft.away;
+            var og = isHome ? ft.away : ft.home;
+            return tg > og ? 'V' : tg === og ? 'N' : 'D';
+          });
+      }
+      if (awayL5) {
+        awayL5._form = awayL5Matches.filter(function(m){ return m.status === 'FINISHED'; })
+          .slice(0, 5).map(function(m) {
+            var ft = m.score && m.score.fullTime;
+            if (!ft || ft.home == null || ft.away == null) return '?';
+            var isHome = m.homeTeam && m.homeTeam.id === awayId;
+            var tg = isHome ? ft.home : ft.away;
+            var og = isHome ? ft.away : ft.home;
+            return tg > og ? 'V' : tg === og ? 'N' : 'D';
+          });
+      }
+
       var homeBlend = blendStats(homeAll, homeL5);
       var awayBlend = blendStats(awayAll, awayL5);
       var h2h = summarizeH2H(data.h2h, homeId);
@@ -953,11 +1174,42 @@ function renderMatches() {
     list = state.matches;
   }
 
+  // Filtre marché
   if (state.marketFilter !== 'all') {
     list = list.map(function (m) {
       var filtered = m.bets.filter(function (b) { return b.market === state.marketFilter; });
       return Object.assign({}, m, { _filteredBets: filtered });
     });
+  }
+
+  // Tri par score décroissant (top bet de chaque match)
+  list = list.slice().sort(function (a, b) {
+    var aTop = (a._filteredBets || a.bets)[0];
+    var bTop = (b._filteredBets || b.bets)[0];
+    var aScore = aTop ? aTop.score : 0;
+    var bScore = bTop ? bTop.score : 0;
+    return bScore - aScore;
+  });
+
+  // Filtre score minimum
+  if (state.scoreMin > 0) {
+    list = list.filter(function (m) {
+      var top = (m._filteredBets || m.bets)[0];
+      return top && top.score >= state.scoreMin;
+    });
+  }
+
+  // Filtre cote minimum
+  if (state.oddsMin > 0) {
+    list = list.filter(function (m) {
+      var top = (m._filteredBets || m.bets)[0];
+      return top && top.fairOdds && parseFloat(top.fairOdds) >= state.oddsMin;
+    });
+  }
+
+  // Mode Top 3
+  if (state.top3Mode) {
+    list = list.slice(0, 3);
   }
 
   document.getElementById('badgeMatches').textContent = state.matches.length;
@@ -967,8 +1219,15 @@ function renderMatches() {
     }).length;
   document.getElementById('badgeSaved').textContent = state.savedBets.length;
 
+  // Summary bar
+  renderSummaryBar(list);
+
   if (list.length === 0) {
-    content.innerHTML = '<div class="empty">Aucun match à afficher.</div>';
+    var emptyMsg = 'Aucun match à afficher';
+    if (state.scoreMin > 0 && state.oddsMin > 0) emptyMsg += ' (score ≥ ' + state.scoreMin + ' et cote ≥ @' + state.oddsMin.toFixed(1) + ')';
+    else if (state.scoreMin > 0) emptyMsg += ' avec un score ≥ ' + state.scoreMin;
+    else if (state.oddsMin > 0) emptyMsg += ' avec une cote ≥ @' + state.oddsMin.toFixed(1);
+    content.innerHTML = '<div class="empty">' + emptyMsg + '.</div>';
     return;
   }
 
@@ -987,7 +1246,10 @@ function renderMatches() {
       var bl = scoreLevel(b.score);
       return '<div class="bet-row">' +
         '<span class="bet-name">' + escapeHtml(b.name) + '</span>' +
-        '<span class="bet-score ' + bl.cls + '">' + b.score + '</span>' +
+        '<div style="display:flex;align-items:center;gap:6px">' +
+          (b.fairOdds ? '<span style="font-size:11px;color:var(--gold);font-weight:700">@' + b.fairOdds + '</span>' : '') +
+          '<span class="bet-score ' + bl.cls + '">' + b.score + '</span>' +
+        '</div>' +
       '</div>';
     }).join('');
 
@@ -997,29 +1259,54 @@ function renderMatches() {
     var homeName = match.homeTeam.shortName || match.homeTeam.name;
     var awayName = match.awayTeam.shortName || match.awayTeam.name;
 
+    // Forme récente depuis stats.homeL5 / awayL5
+    var homeFormHtml = '';
+    var awayFormHtml = '';
+    if (m.stats && m.stats.homeL5 && m.stats.homeL5._form) {
+      homeFormHtml = m.stats.homeL5._form.map(formDot).join('');
+    }
+    if (m.stats && m.stats.awayL5 && m.stats.awayL5._form) {
+      awayFormHtml = m.stats.awayL5._form.map(formDot).join('');
+    }
+
+    // Barre de score
+    var scoreBarHtml = '<div class="score-bar-wrap">' +
+      '<div class="score-bar-fill" style="width:' + topBet.score + '%;background:' + scoreBarColor(topBet.score) + '"></div>' +
+      '</div>';
+
     return '<div class="match" data-idx="' + idx + '">' +
       '<div class="match-header">' +
         '<span class="match-league">' + escapeHtml(compName) + ' · ' + escapeHtml(compArea) + '</span>' +
         '<span class="match-time">' + formatTime(match.utcDate) + '</span>' +
       '</div>' +
       '<div class="match-teams">' +
-        '<div class="team home">' +
-          '<div class="team-logo">' + (homeCrest ? '<img src="' + escapeHtml(homeCrest) + '" alt="">' : '') + '</div>' +
-          '<span>' + escapeHtml(homeName) + '</span>' +
-          '<span class="star ' + (homeFav ? 'active' : '') + '" data-fav-team="' + match.homeTeam.id + '">★</span>' +
+        '<div style="display:flex;flex-direction:column;gap:4px;flex:1">' +
+          '<div class="team home">' +
+            '<div class="team-logo">' + (homeCrest ? '<img src="' + escapeHtml(homeCrest) + '" alt="">' : '') + '</div>' +
+            '<span>' + escapeHtml(homeName) + '</span>' +
+            '<span class="star ' + (homeFav ? 'active' : '') + '" data-fav-team="' + match.homeTeam.id + '">★</span>' +
+          '</div>' +
+          (homeFormHtml ? '<div class="form-row"><span class="form-label">Forme</span>' + homeFormHtml + '</div>' : '') +
         '</div>' +
         '<span class="vs">VS</span>' +
-        '<div class="team away">' +
-          '<span class="star ' + (awayFav ? 'active' : '') + '" data-fav-team="' + match.awayTeam.id + '">★</span>' +
-          '<span>' + escapeHtml(awayName) + '</span>' +
-          '<div class="team-logo">' + (awayCrest ? '<img src="' + escapeHtml(awayCrest) + '" alt="">' : '') + '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:4px;flex:1;align-items:flex-end">' +
+          '<div class="team away">' +
+            '<span class="star ' + (awayFav ? 'active' : '') + '" data-fav-team="' + match.awayTeam.id + '">★</span>' +
+            '<span>' + escapeHtml(awayName) + '</span>' +
+            '<div class="team-logo">' + (awayCrest ? '<img src="' + escapeHtml(awayCrest) + '" alt="">' : '') + '</div>' +
+          '</div>' +
+          (awayFormHtml ? '<div class="form-row" style="justify-content:flex-end"><span class="form-label">Forme</span>' + awayFormHtml + '</div>' : '') +
         '</div>' +
       '</div>' +
       '<div class="top-pick">' +
         '<div class="pick-info">' +
           '<div class="pick-label">Top Pick · ' + escapeHtml(topBet.market) + '</div>' +
           '<div class="pick-bet">' + escapeHtml(topBet.name) + '</div>' +
-          '<div class="pick-detail">' + escapeHtml(topBet.detail) + '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-top:3px">' +
+            '<div class="pick-detail">' + escapeHtml(topBet.detail) + '</div>' +
+            (topBet.fairOdds ? '<div style="background:rgba(245,200,66,0.12);border:1px solid rgba(245,200,66,0.3);border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;color:var(--gold);white-space:nowrap">@' + topBet.fairOdds + ' <span style="font-size:9px;font-weight:400;opacity:0.7">estimée</span></div>' : '') +
+          '</div>' +
+          scoreBarHtml +
         '</div>' +
         '<div class="score-badge">' +
           '<div class="score-num ' + lvl.cls + '">' + topBet.score + '</div>' +
@@ -1260,6 +1547,9 @@ function init() {
     });
   });
   setInterval(updateRateUi, 5000);
+
+  // Sync slider display on load
+  document.getElementById('sliderVal').textContent = '0';
 }
 
 init();
