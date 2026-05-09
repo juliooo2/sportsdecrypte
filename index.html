@@ -744,6 +744,20 @@
   .ai-mode-card.selected { background:rgba(176,110,243,0.1); border-color:rgba(176,110,243,0.35); }
   .ai-mode-icon { font-size:26px; flex-shrink:0; }
   .ai-mode-info { flex:1; }
+  .coach-chip {
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: var(--text2);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+  }
+  .coach-chip:hover { background: rgba(124,58,237,0.22); color: var(--text); }
   .ai-mode-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
   .ai-mode-desc { font-size:10px; color:var(--text3); line-height:1.4; }
   .ai-mode-card.selected .ai-mode-title { color:var(--purple); }
@@ -2041,56 +2055,6 @@
       <!-- Dynamic input area -->
       <div id="ai-input-area"></div>
 
-      <!-- Clear future launch message -->
-      <div style="background:linear-gradient(135deg,rgba(176,110,243,0.1),rgba(176,110,243,0.03));border:1px solid rgba(176,110,243,0.25);border-radius:20px;padding:20px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-          <div style="font-size:28px;">⏳</div>
-          <div>
-            <div style="font-family:Bebas Neue,cursive;font-size:18px;letter-spacing:2px;color:var(--purple);">EN COURS DE DÉVELOPPEMENT</div>
-            <div style="font-size:10px;color:rgba(176,110,243,0.5);font-weight:700;letter-spacing:1px;">DISPONIBLE PROCHAINEMENT</div>
-          </div>
-        </div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:16px;">
-          Ces 5 modes d'analyse IA sont <strong style="color:var(--text);">entièrement développés</strong> et prêts à être activés. Ils seront disponibles dans une <strong style="color:var(--purple);">version Pro</strong> qui arrive prochainement.<br><br>
-          En attendant, toutes les autres fonctionnalités de l'app restent <strong style="color:var(--green);">100% gratuites</strong> — le moteur GO/NO GO, Kelly, Value Bet, Conseils, Stats avancées, et bien plus.
-        </div>
-
-        <!-- Progress indicator -->
-        <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <div style="font-size:9px;letter-spacing:2px;color:var(--text3);font-weight:700;">AVANCEMENT</div>
-            <div style="font-size:11px;font-weight:700;color:var(--purple);">90%</div>
-          </div>
-          <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
-            <div style="height:100%;width:90%;background:linear-gradient(90deg,var(--purple),#c084fc);border-radius:3px;"></div>
-          </div>
-          <div style="font-size:10px;color:var(--text3);margin-top:6px;">Interface ✅ · Prompts ✅ · Connexion API ⏳</div>
-        </div>
-
-        <!-- What's free now -->
-        <div style="margin-bottom:14px;">
-          <div style="font-size:9px;letter-spacing:2px;color:var(--green);font-weight:700;margin-bottom:8px;">CE QUE TU PEUX FAIRE DÈS MAINTENANT</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-            <div onclick="navTo('screen-gng',null)" style="background:rgba(0,229,184,0.08);border:1px solid rgba(0,229,184,0.2);border-radius:10px;padding:10px;cursor:pointer;text-align:center;">
-              <div style="font-size:18px;margin-bottom:3px;">🧠</div>
-              <div style="font-size:9px;font-weight:700;color:var(--green);">GO/NO GO</div>
-              <div style="font-size:8px;color:var(--text3);">Analyse de match</div>
-            </div>
-            <div onclick="navTo('screen-advice',document.querySelectorAll('.nav-item')[3])" style="background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.15);border-radius:10px;padding:10px;cursor:pointer;text-align:center;">
-              <div style="font-size:18px;margin-bottom:3px;">💡</div>
-              <div style="font-size:9px;font-weight:700;color:var(--gold);">CONSEILS IA</div>
-              <div style="font-size:8px;color:var(--text3);">Analyse automatique</div>
-            </div>
-          </div>
-        </div>
-
-        <a href="https://www.tiktok.com/@sportsdecrypte" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--purple),#c084fc);border:none;border-radius:14px;padding:14px;font-family:Bebas Neue,cursive;font-size:15px;letter-spacing:3px;color:#fff;">
-          📲 SUIVRE POUR ÊTRE NOTIFIÉ
-        </a>
-      </div>
-
-    </div>
-  </div>
 </div>
 
 <!-- STATS -->
@@ -2367,40 +2331,45 @@
 <!-- SCREEN COACH IA                        -->
 <!-- ══════════════════════════════════════ -->
 <div class="screen" id="screen-coach">
-  <div style="padding:20px 20px 0">
+  <div style="padding:20px 20px 0;display:flex;flex-direction:column;height:100%">
 
     <!-- HEADER -->
-    <div style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(124,58,237,0.03));border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:18px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-        <div style="width:44px;height:44px;border-radius:14px;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🤖</div>
-        <div>
-          <div style="font-family:Bebas Neue,cursive;font-size:20px;letter-spacing:2px;color:var(--text)">COACH IA</div>
-          <div style="font-size:11px;color:var(--text2)">Analyse ta bankroll · Conseils personnalisés</div>
+    <div style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(124,58,237,0.03));border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:16px;margin-bottom:12px;flex-shrink:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🤖</div>
+          <div>
+            <div style="font-family:Bebas Neue,cursive;font-size:18px;letter-spacing:2px;color:var(--text)">COACH IA</div>
+            <div style="font-size:10px;color:var(--text2)">Analyse ta bankroll · Conseils personnalisés</div>
+          </div>
         </div>
+        <button id="coach-reset-btn" onclick="resetCoachIA()" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:6px 10px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap">🔄 Nouvelle conv.</button>
       </div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6">Je connais <strong style="color:var(--text)">toutes tes données</strong> — bankroll, ROI, sports, paris récents. Pose-moi n'importe quelle question sur ta gestion.</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.5">Je connais <strong style="color:var(--text)">toutes tes données</strong> — bankroll, ROI, sports, paris récents.</div>
     </div>
 
-    <!-- QUESTIONS RAPIDES -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--text3);margin-bottom:10px">💬 QUESTIONS RAPIDES</div>
-      <div style="display:flex;flex-direction:column;gap:8px" id="coach-quick-questions">
-        <button onclick="askCoachIA('Analyse ma bankroll et dis-moi si ma gestion est bonne.')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">📊 Analyse ma gestion de bankroll</button>
-        <button onclick="askCoachIA('Sur quel sport je performe le mieux et pourquoi ?')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">🏆 Sur quel sport je performe le mieux ?</button>
-        <button onclick="askCoachIA('Est-ce que je mise trop par rapport à ma bankroll ?')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">💰 Est-ce que je mise trop ?</button>
-        <button onclick="askCoachIA('Mon ROI est négatif ce mois, qu analyse tu et quels conseils tu me donnes ?')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">📉 Mon ROI est négatif, que faire ?</button>
-        <button onclick="askCoachIA('Quels types de paris devrais-je éviter selon mes statistiques ?')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">🚫 Quels paris dois-je éviter ?</button>
-        <button onclick="askCoachIA('Donne-moi un plan d action pour améliorer mon ROI sur le prochain mois.')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">🎯 Plan d'action pour améliorer mon ROI</button>
+    <!-- MESSAGES (zone scrollable) -->
+    <div id="coach-messages" style="flex:1;overflow-y:auto;margin-bottom:10px;padding-bottom:4px"></div>
+
+    <!-- SUGGESTIONS CHIPS (toujours visibles) -->
+    <div style="flex-shrink:0;margin-bottom:8px">
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+        <button onclick="askCoachIA('Analyse ma bankroll et dis-moi si ma gestion est bonne.')" class="coach-chip">📊 Bankroll</button>
+        <button onclick="askCoachIA('Sur quel sport je performe le mieux et pourquoi ?')" class="coach-chip">🏆 Meilleur sport</button>
+        <button onclick="askCoachIA('Est-ce que je mise trop par rapport à ma bankroll ?')" class="coach-chip">💰 Mises trop élevées ?</button>
+        <button onclick="askCoachIA('Mon ROI est négatif ce mois, qu analyse tu et quels conseils tu me donnes ?')" class="coach-chip">📉 ROI négatif</button>
+        <button onclick="askCoachIA('Quels types de paris devrais-je éviter selon mes statistiques ?')" class="coach-chip">🚫 Paris à éviter</button>
+        <button onclick="askCoachIA('Donne-moi un plan d action pour améliorer mon ROI sur le prochain mois.')" class="coach-chip">🎯 Plan d'action</button>
+        <button onclick="askCoachIA('Quelle est ma série actuelle et que cela signifie-t-il ?')" class="coach-chip">🔥 Ma série</button>
+        <button onclick="askCoachIA('Quel est mon taux de réussite par type de pari ?')" class="coach-chip">📈 Win rate</button>
+        <button onclick="askCoachIA('Combien puis-je miser ce soir sans risquer ma bankroll ?')" class="coach-chip">🎲 Mise du soir</button>
       </div>
     </div>
-
-    <!-- MESSAGES -->
-    <div id="coach-messages" style="margin-bottom:14px"></div>
 
     <!-- INPUT -->
-    <div style="position:sticky;bottom:80px;background:var(--bg);padding:10px 0">
+    <div style="flex-shrink:0;padding-bottom:90px">
       <div style="display:flex;gap:8px;align-items:flex-end">
-        <textarea id="coach-input" rows="2" placeholder="Pose ta question..." style="flex:1;resize:none;border-radius:12px;padding:10px 14px;font-size:13px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);font-family:inherit"></textarea>
+        <textarea id="coach-input" rows="2" placeholder="Pose ta question..." style="flex:1;resize:none;border-radius:12px;padding:10px 14px;font-size:13px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);font-family:inherit" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendCoachIA();}"></textarea>
         <button onclick="sendCoachIA()" style="width:44px;height:44px;border-radius:12px;background:var(--purple);border:none;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">→</button>
       </div>
     </div>
@@ -4959,47 +4928,159 @@
   function renderAIInputArea(mode) {
     const area = document.getElementById('ai-input-area');
     if (!area) return;
-
     const MODES = {
-      match: {
-        icon:'🎯',
-        title:'Analyse de match',
-        placeholder:'Décris le match en détail :\n- Les deux équipes\n- Forme récente, blesones\n- Contexte (derby, enjeu...)\n- La cote proposée\n\nEx: PSG joue contre Lyon ce soir. PSG 4 victoires de suite, Mbappé absent. Lyon sort d\'une défaite. Cote PSG @1.65.',
-        hint:'GO / ATTENDS / NO GO · Points forts & risques · Conseil de mise',
-        height:'120px'
-      },
-      coach: {
-        icon:'🧠',
-        title:'Coach personnel',
-        placeholder:'Dis-moi ce que tu veux améliorer, ou laisse vide pour une analyse complète de ton profil.\n\nEx: "Je perds souvent en tennis, aide-moi à comprendre pourquoi" ou laisse vide.',
-        hint:'Analyse complète · Points forts & faiblesses · Plan 30 jours personnalisé',
-        height:'80px'
-      },
-      postmatch: {
-        icon:'🔍',
-        title:'Analyse post-match',
-        placeholder:'Décris le pari que tu viens de perdre :\n- Le match et ton pronostic\n- Pourquoi tu as misé\n- Ce qui s\'est passé\n\nEx: J\'ai misé on PSG victoire @1.65, ils ont perdu 2-1. J\'avais misé parce que...',
-        hint:'Analyse des erreurs · Patterns · Conseils pour éviter',
-        height:'100px'
-      },
-      suggestions: {
-        icon:'💡',
-        title:'Suggestions du jour',
-        placeholder:'Optionnel : précise ce que tu cherches.\n\nEx: "Je veux parier ce soir on du football" ou laisse vide pour des suggestions générales basées on ton profil.',
-        hint:'Basé on tes stats · Ton sport fort · Ta tranche de cotes gagnante',
-        height:'70px'
-      },
-      chat: {
-        icon:'💬',
-        title:'Conversation libre',
-        placeholder:'Pose n\'importe quelle question on tes stats, ta méthode, tes performances...\n\nEx: "Pourquoi mon ROI est négatif en tennis ?" ou "Est-ce que je joue trop souvent ?" ou "Comment améliorer ma discipline ?"',
-        hint:'Toutes tes données analysées · Réponse personnalisée',
-        height:'100px'
-      }
+      match: { icon:'🎯', title:'Analyse de match', placeholder:'Décris le match :\n- Les deux équipes, forme récente, blessés\n- Contexte (derby, enjeu...)\n- La cote proposée\n\nEx: PSG vs Lyon, PSG 4V de suite, Mbappé absent. Cote PSG @1.65.', hint:'GO / ATTENDS / NO GO · Points forts & risques · Conseil de mise', height:'120px', btnLabel:'🎯 Analyser ce match' },
+      coach: { icon:'🧠', title:'Coach personnel', placeholder:'Dis-moi ce que tu veux améliorer, ou laisse vide pour une analyse complète.\n\nEx: Je perds souvent en tennis, aide-moi', hint:'Analyse complète · Points forts & faiblesses · Plan 30 jours', height:'80px', btnLabel:'🧠 Analyser mon profil' },
+      postmatch: { icon:'🔍', title:'Analyse post-match', placeholder:'Décris le pari :\n- Le match et ton pronostic\n- Pourquoi tu as misé\n- Ce qui se passa\n\nEx: PSG @1.65, ils ont perdu 2-1 parce que...', hint:'Analyse des erreurs · Patterns · Conseils pour éviter', height:'100px', btnLabel:'🔍 Analyser ce pari' },
+      suggestions: { icon:'💡', title:'Suggestions du jour', placeholder:'Optionnel : précise ce que tu cherches.\n\nEx: Je veux parier ce soir sur du football', hint:'Basé sur tes stats · Ton sport fort · Ta tranche de cotes gagnante', height:'70px', btnLabel:'💡 Générer des suggestions' },
+      chat: { icon:'💬', title:'Conversation libre', placeholder:'Pose ta question sur tes stats, ta méthode...\n\nEx: Pourquoi mon ROI est négatif en tennis ?', hint:'Toutes tes données analysées · Réponse personnalisée', height:'100px', btnLabel:'💬 Envoyer' }
     };
-
     const m = MODES[mode];
-    area.innerHTML = ("\n      <div class=\"ai-input-card\">\n        <div class=\"ai-input-label\">"+(m.icon)+" "+(m.title.toUpperCase())+"</div>\n        <textarea class=\"ai-textarea\" id=\"ai-mode-input\" placeholder=\""+(m.placeholder)+"\" style=\"height:"+(m.height)+";\"></textarea>\n        <div style=\"font-size:10px;color:rgba(176,110,243,0.5);line-height:1.5;\">✨ "+(m.hint)+"</div>\n      </div>\n      <div style=\"background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:14px;padding:14px;display:flex;align-items:center;gap:10px;\">\n        <div style=\"font-size:20px;opacity:0.4;\">⏳</div>\n        <div style=\"font-size:11px;color:var(--text3);line-height:1.5;flex:1;\">Ce mode sera disponible prochainement. En attendant, utilise le moteur <strong style=\"color:var(--green);\">GO/NO GO</strong> pour analyser tes matchs.</div>\n        <div onclick=\"navTo('screen-gng',null)\" style=\"flex-shrink:0;background:rgba(0,229,184,0.1);border:1px solid rgba(0,229,184,0.2);border-radius:10px;padding:7px 12px;font-family:Bebas Neue,cursive;font-size:11px;color:var(--green);cursor:pointer;white-space:nowrap;\">GO/NO GO →</div>\n      </div>");
+    area.innerHTML = '<div class="ai-input-card">'
+      + '<div class="ai-input-label">' + m.icon + ' ' + m.title.toUpperCase() + '</div>'
+      + '<textarea class="ai-textarea" id="ai-mode-input" placeholder="' + m.placeholder.replace(/\n/g,'&#10;').replace(/"/g,'&quot;') + '" style="height:' + m.height + '"></textarea>'
+      + '<div style="font-size:10px;color:rgba(176,110,243,0.5);line-height:1.5;margin-bottom:10px">✨ ' + m.hint + '</div>'
+      + '<button onclick="sendAIAnalysis()" style="width:100%;background:linear-gradient(135deg,var(--purple),#c084fc);border:none;border-radius:14px;padding:14px;font-family:Bebas Neue,cursive;font-size:14px;letter-spacing:2px;color:#fff;cursor:pointer">' + m.btnLabel + '</button>'
+      + '</div>'
+      + '<div id="ai-result-area" style="margin-top:10px"></div>';
+  }
+
+  async function sendAIAnalysis() {
+    const mode = currentAIMode;
+    const input = document.getElementById('ai-mode-input');
+    const resultArea = document.getElementById('ai-result-area');
+    if (!resultArea) return;
+    const userText = input ? input.value.trim() : '';
+    const profile = getProfileSummary();
+
+    // ─── PROMPTS V2 — Prompt engineering pro ───────────────────────────────
+    const PROMPTS = {
+
+      // MODE 1 : Analyse de match
+      // Objectif : verdict clair + structured output + chiffres précis
+      match: 'Tu es un analyste pro en paris sportifs avec 15 ans d\'expérience.\n\n'
+        + '=== PROFIL DU PARIEUR ===\n' + profile + '\n\n'
+        + '=== MATCH À ANALYSER ===\n' + (userText || 'Aucune description fournie — fais une analyse générale.') + '\n\n'
+        + '=== INSTRUCTIONS ===\n'
+        + 'Réponds EXACTEMENT dans ce format, sans t\'en écarter :\n\n'
+        + '**VERDICT : [GO ✅ / ATTENDS ⏸️ / NO GO ❌]**\n\n'
+        + '**POINTS FORTS**\n'
+        + '• [point 1]\n'
+        + '• [point 2]\n'
+        + '• [point 3 si pertinent]\n\n'
+        + '**RISQUES**\n'
+        + '• [risque principal]\n'
+        + '• [risque secondaire si pertinent]\n\n'
+        + '**MISE CONSEILLÉE**\n'
+        + '[X]% de la bankroll (soit environ [Y]€ pour une bankroll de [Z]€)\n\n'
+        + 'Règles : sois direct, utilise les données du profil pour personnaliser, '
+        + 'donne toujours un % de mise précis, max 180 mots au total.',
+
+      // MODE 2 : Coach personnel
+      // Objectif : analyse profonde + plan d'action concret avec délai
+      coach: 'Tu es un coach mental et stratégique spécialisé en paris sportifs.\n'
+        + 'Tu combines psychologie comportementale et analyse statistique.\n\n'
+        + '=== PROFIL COMPLET ===\n' + profile + '\n\n'
+        + (userText
+          ? '=== QUESTION SPÉCIFIQUE ===\n"' + userText + '"\n\n'
+            + 'Réponds à cette question en te basant sur le profil. Sois précis et personnalisé.\n\n'
+          : '=== DEMANDE ===\nAnalyse complète du profil — ce qui va, ce qui ne va pas, plan d\'action.\n\n')
+        + '=== FORMAT DE RÉPONSE ===\n'
+        + '**DIAGNOSTIC** : [1-2 phrases sur le profil global]\n\n'
+        + '**CE QUI VA BIEN ✅**\n'
+        + '• [force 1 avec chiffre si possible]\n'
+        + '• [force 2]\n\n'
+        + '**CE QUI FREINE ⚠️**\n'
+        + '• [problème 1 concret]\n'
+        + '• [problème 2 concret]\n\n'
+        + '**PLAN 7 JOURS 🎯**\n'
+        + '• Jour 1-3 : [action précise]\n'
+        + '• Jour 4-7 : [action précise]\n\n'
+        + 'Ton : bienveillant, honnête, jamais condescendant. Max 280 mots.',
+
+      // MODE 3 : Analyse post-match
+      // Objectif : distinguer variance vs erreur + leçon actionnable
+      postmatch: 'Tu es un analyste de décision spécialisé en paris sportifs.\n'
+        + 'Ta spécialité : distinguer les BONNES décisions malchanceuses '
+        + 'des MAUVAISES décisions chanceuses.\n\n'
+        + '=== PROFIL DU PARIEUR ===\n' + profile + '\n\n'
+        + '=== PARI À ANALYSER ===\n' + (userText || 'Aucun détail fourni — analyse les patterns du profil.') + '\n\n'
+        + '=== FORMAT DE RÉPONSE ===\n'
+        + '**VERDICT DÉCISIONNEL**\n'
+        + '✅ Bonne décision / ❌ Mauvaise décision / ⚠️ Décision discutable\n'
+        + '(peu importe le résultat final)\n\n'
+        + '**ANALYSE**\n'
+        + '[2-3 phrases : la décision était-elle justifiée par les infos disponibles avant le match ?]\n\n'
+        + '**ERREUR IDENTIFIÉE** (si applicable)\n'
+        + '[Type d\'erreur : biais émotionnel / données insuffisantes / sur-confiance / etc.]\n\n'
+        + '**LEÇON CONCRÈTE**\n'
+        + '→ [Une seule règle simple à appliquer pour éviter cette erreur]\n\n'
+        + 'Important : ne juge pas le résultat, juge la DÉCISION. Max 200 mots.',
+
+      // MODE 4 : Suggestions du jour
+      // Objectif : conseils hyper personnalisés basés sur les vraies stats
+      suggestions: 'Tu es un data analyst en paris sportifs.\n'
+        + 'Tu analyses les patterns statistiques pour identifier les opportunités.\n\n'
+        + '=== PROFIL ET STATISTIQUES ===\n' + profile + '\n\n'
+        + (userText
+          ? '=== CONTRAINTE DU JOUR ===\n"' + userText + '"\n\n'
+          : '=== MISSION ===\nTrouver le profil de pari optimal pour ce parieur aujourd\'hui.\n\n')
+        + '=== FORMAT DE RÉPONSE ===\n'
+        + '**PROFIL DE PARI OPTIMAL**\n'
+        + '🏆 Sport : [sport basé sur le meilleur ROI du profil]\n'
+        + '🎯 Type de pari : [ex: 1X2, Over/Under, etc.]\n'
+        + '📊 Tranche de cotes : [ex: @1.60 - @2.20]\n'
+        + '💰 Mise : [X]% de la bankroll max\n\n'
+        + '**POURQUOI CE PROFIL ?**\n'
+        + '[2 phrases basées sur les vraies stats du profil]\n\n'
+        + '**SIGNAL D\'ALARME**\n'
+        + '🚨 [1 chose à éviter absolument aujourd\'hui basée sur les patterns]\n\n'
+        + 'Important : ne mentionne JAMAIS de matchs spécifiques. '
+        + 'Base-toi uniquement sur les stats du profil. Max 160 mots.',
+
+      // MODE 5 : Conversation libre
+      // Objectif : réponse contextuelle ultra-personnalisée
+      chat: 'Tu es un assistant expert en paris sportifs et gestion de bankroll.\n'
+        + 'Tu as accès au profil complet de ce parieur et tu réponds de façon '
+        + 'personnalisée, directe et utile — jamais générique.\n\n'
+        + '=== PROFIL COMPLET ===\n' + profile + '\n\n'
+        + '=== QUESTION ===\n"' + (userText || 'Donne-moi un bilan global de mon profil de parieur.') + '"\n\n'
+        + '=== INSTRUCTIONS ===\n'
+        + '- Réponds directement à la question posée\n'
+        + '- Utilise les données réelles du profil (cite des chiffres)\n'
+        + '- Structure ta réponse avec des titres en gras si c\'est long\n'
+        + '- Termine par UNE recommandation concrète\n'
+        + '- Max 220 mots, langage naturel et accessible\n'
+        + '- Si la question est hors sujet (pas lié aux paris), '
+        + 'redirige poliment vers ce que tu peux faire.'
+    };
+    // ───────────────────────────────────────────────────────────────────────
+
+    resultArea.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:14px;background:rgba(176,110,243,0.06);border:1px solid rgba(176,110,243,0.15);border-radius:14px;font-size:13px;color:var(--text2)"><div style="width:18px;height:18px;border:2px solid rgba(176,110,243,0.3);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0"></div><span>Analyse en cours...</span></div>';
+    try {
+      const res = await fetch('/api/groq', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 700,
+          system: 'Tu es un expert en paris sportifs et gestion de bankroll. '
+            + 'Tu réponds TOUJOURS en français. '
+            + 'Tu utilises les données réelles du profil pour personnaliser chaque réponse. '
+            + 'Tu ne donnes jamais de conseils génériques — tout est basé sur les chiffres fournis. '
+            + 'Tu respectes scrupuleusement le format demandé dans chaque prompt.',
+          messages: [{ role: 'user', content: PROMPTS[mode] }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content && data.content[0] ? data.content[0].text : 'Pas de réponse.';
+      resultArea.innerHTML = '<div style="background:rgba(176,110,243,0.06);border:1px solid rgba(176,110,243,0.2);border-radius:14px;padding:16px">'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div style="width:28px;height:28px;border-radius:8px;background:rgba(176,110,243,0.2);display:flex;align-items:center;justify-content:center;font-size:14px">🤖</div><div style="font-size:10px;letter-spacing:2px;color:var(--purple);font-weight:700">ANALYSE IA</div></div>'
+        + '<div style="font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap">' + text.replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--text)">$1</strong>') + '</div>'
+        + '</div>';
+    } catch(e) {
+      resultArea.innerHTML = '<div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:14px;padding:14px;font-size:12px;color:var(--red)">Erreur : ' + (e.message||'inconnue') + '</div>';
+    }
   }
 
   // Initialize AI input area on tab switch is handled in the main switchCalcTab above
@@ -7614,10 +7695,30 @@ function renderAdvancedStats() {
     }
   })();
 
-  var coachHistory = [];
+  var COACH_STORAGE_KEY = 'sd_coach_history';
+
+  var coachHistory = (function() {
+    try {
+      var saved = localStorage.getItem(COACH_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch(e) { return []; }
+  })();
+
+  function saveCoachHistory() {
+    try {
+      localStorage.setItem(COACH_STORAGE_KEY, JSON.stringify(coachHistory.slice(-50)));
+    } catch(e) {}
+  }
+
+  function resetCoachIA() {
+    if (!coachHistory.length) return;
+    if (!confirm('Effacer la conversation et repartir de zéro ?')) return;
+    coachHistory = [];
+    saveCoachHistory();
+    renderCoachMessages();
+  }
 
   function renderCoachScreen() {
-    // Render existing messages
     renderCoachMessages();
   }
 
@@ -7625,7 +7726,11 @@ function renderAdvancedStats() {
     var container = document.getElementById('coach-messages');
     if (!container) return;
     if (!coachHistory.length) {
-      container.innerHTML = '';
+      container.innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--text3);font-size:13px;line-height:1.8">'
+        + '<div style="font-size:32px;margin-bottom:10px">🤖</div>'
+        + '<div>Bonjour ! Je connais toutes tes stats.</div>'
+        + '<div style="margin-top:4px">Choisis une suggestion ou pose ta question.</div>'
+        + '</div>';
       return;
     }
     var html = '';
@@ -7633,16 +7738,21 @@ function renderAdvancedStats() {
       if (msg.role === 'user') {
         html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px">'
           + '<div style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.2);border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:85%;font-size:13px;color:var(--text)">'
-          + msg.content + '</div></div>';
+          + escHtml(msg.content) + '</div></div>';
       } else {
         html += '<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">'
           + '<div style="width:32px;height:32px;border-radius:10px;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🤖</div>'
           + '<div style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:4px 16px 16px 16px;padding:12px 14px;max-width:85%;font-size:13px;color:var(--text2);line-height:1.6">'
-          + msg.content.replace(/\n/g, "<br>") + '</div></div>';
+          + msg.content.replace(/\n/g, '<br>') + '</div></div>';
       }
     });
     container.innerHTML = html;
     container.scrollTop = container.scrollHeight;
+  }
+
+  function escHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   function buildBankrollContext() {
