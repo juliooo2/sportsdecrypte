@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backtest — SportsDecrypté</title>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #0f0f18;
+  --bg3: #161622;
+  --border: #1e1e2e;
+  --border2: #2a2a3e;
+  --txt: #f0f0ff;
+  --txt2: #8888aa;
+  --txt3: #444466;
+  --gold: #f5c842;
+  --green: #10b981;
+  --red: #ef4444;
+  --orange: #f59e0b;
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --win: rgba(16,185,129,0.12);
+  --win-border: rgba(16,185,129,0.25);
+  --loss: rgba(239,68,68,0.08);
+  --loss-border: rgba(239,68,68,0.2);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+
+/* HEADER */
+.header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.header-back {
+  width: 36px; height: 36px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 10px; display: flex; align-items: center;
+  justify-content: center; cursor: pointer; font-size: 16px;
+  text-decoration: none; color: var(--txt2);
+  flex-shrink: 0; transition: all 0.15s;
+}
+.header-back:hover { border-color: var(--gold); color: var(--gold); }
+.header-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--purple), #a78bfa);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.header-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+.header-sub { font-size: 11px; color: var(--txt2); margin-top: 1px; }
+
+/* CONTROLS */
+.controls {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.controls-title {
+  font-size: 10px; letter-spacing: 2px; color: var(--txt3);
+  font-weight: 700; margin-bottom: 12px;
+}
+.controls-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.ctrl-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+.ctrl-label { font-size: 10px; letter-spacing: 1px; color: var(--txt3); font-weight: 600; text-transform: uppercase; }
+input[type="date"], select {
+  background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--txt); padding: 9px 12px; border-radius: 10px;
+  font-size: 13px; font-family: inherit; outline: none;
+  transition: border-color 0.15s; color-scheme: dark;
+}
+input[type="date"]:focus, select:focus { border-color: var(--purple); }
+
+/* QUICK PERIOD CHIPS */
+.period-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.period-chip {
+  padding: 5px 11px; border-radius: 20px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  font-size: 11px; color: var(--txt2); cursor: pointer;
+  transition: all 0.15s; user-select: none;
+}
+.period-chip:hover { border-color: var(--purple); color: var(--txt); }
+.period-chip.active {
+  background: rgba(139,92,246,0.15);
+  border-color: var(--purple); color: #a78bfa; font-weight: 700;
+}
+
+/* BUTTONS */
+.btn {
+  background: linear-gradient(135deg, var(--purple), #a78bfa);
+  color: #fff; border: none; padding: 10px 18px;
+  border-radius: 10px; font-weight: 700; font-size: 13px;
+  cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+  font-family: inherit; letter-spacing: 0.3px; white-space: nowrap;
+}
+.btn:hover { opacity: 0.88; }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-secondary {
+  background: var(--bg3); color: var(--txt2);
+  border: 1px solid var(--border2);
+}
+
+/* SUMMARY CARDS */
+.summary-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px; margin-bottom: 16px;
+}
+.summary-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px;
+  text-align: center; transition: border-color 0.15s;
+}
+.summary-card.highlight-green { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); }
+.summary-card.highlight-red { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+.summary-card.highlight-gold { border-color: rgba(245,200,66,0.3); background: rgba(245,200,66,0.05); }
+.summary-value {
+  font-size: 26px; font-weight: 800; line-height: 1.1;
+  margin-bottom: 4px; font-variant-numeric: tabular-nums;
+}
+.summary-label { font-size: 10px; color: var(--txt2); letter-spacing: 1px; text-transform: uppercase; }
+.summary-sub { font-size: 10px; color: var(--txt3); margin-top: 2px; }
+
+/* MARKET BREAKDOWN */
+.market-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px; margin-bottom: 16px;
+}
+.market-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px;
+}
+.market-name {
+  font-size: 11px; font-weight: 700; color: var(--txt2);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+}
+.market-bar-wrap {
+  height: 6px; background: var(--border2); border-radius: 3px;
+  overflow: hidden; margin: 6px 0;
+}
+.market-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+.market-stats {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.market-acc { font-size: 15px; font-weight: 800; }
+.market-count { font-size: 10px; color: var(--txt3); }
+
+/* TIMELINE */
+.timeline-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.section-title {
+  font-size: 10px; letter-spacing: 2px; color: var(--txt3);
+  font-weight: 700; text-transform: uppercase;
+}
+.match-row {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px;
+  margin-bottom: 8px; transition: border-color 0.15s;
+}
+.match-row.win {
+  background: var(--win); border-color: var(--win-border);
+}
+.match-row.loss {
+  background: var(--loss); border-color: var(--loss-border);
+}
+.match-row-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 6px;
+}
+.match-league { font-size: 10px; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.5px; }
+.match-date { font-size: 10px; color: var(--txt3); font-variant-numeric: tabular-nums; }
+.match-teams {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; margin-bottom: 8px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.match-score {
+  font-size: 12px; color: var(--txt2);
+  background: var(--bg3); border-radius: 6px; padding: 2px 8px;
+  flex-shrink: 0; font-variant-numeric: tabular-nums;
+}
+.bets-list { display: flex; flex-direction: column; gap: 4px; }
+.bet-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; padding: 5px 8px;
+  background: rgba(255,255,255,0.03); border-radius: 7px;
+}
+.bet-result {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; flex-shrink: 0; font-weight: 800;
+}
+.bet-result.win { background: rgba(16,185,129,0.2); color: var(--green); }
+.bet-result.loss { background: rgba(239,68,68,0.15); color: var(--red); }
+.bet-result.na { background: rgba(255,255,255,0.06); color: var(--txt3); }
+.bet-name { flex: 1; color: var(--txt2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bet-score-badge {
+  font-size: 11px; font-weight: 700;
+  font-variant-numeric: tabular-nums; flex-shrink: 0;
+}
+.bet-odds { font-size: 11px; color: var(--gold); flex-shrink: 0; }
+.bet-pnl { font-size: 11px; font-weight: 700; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+/* ROI CHART */
+.roi-chart {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px; margin-bottom: 16px;
+}
+.roi-chart-inner {
+  height: 80px; position: relative; overflow: hidden;
+}
+.roi-line-svg { width: 100%; height: 100%; }
+
+/* EMPTY / LOADER */
+.empty, .loader {
+  padding: 40px 20px; text-align: center; color: var(--txt2);
+  background: var(--bg2); border: 1px dashed var(--border);
+  border-radius: 14px; margin-bottom: 16px;
+}
+.spin {
+  display: inline-block; width: 20px; height: 20px;
+  border: 2px solid var(--border2); border-top-color: var(--purple);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  margin-right: 8px; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* DISCLAIMER */
+.disclaimer {
+  background: rgba(245,200,66,0.06);
+  border: 1px solid rgba(245,200,66,0.2);
+  border-radius: 10px; padding: 10px 14px;
+  font-size: 11px; color: var(--txt2); line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* FILTER ROW */
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.filter-chip {
+  padding: 5px 12px; border-radius: 20px;
+  background: var(--bg2); border: 1px solid var(--border);
+  font-size: 11px; color: var(--txt2); cursor: pointer;
+  transition: all 0.15s; user-select: none;
+}
+.filter-chip:hover { border-color: var(--border2); color: var(--txt); }
+.filter-chip.active {
+  background: rgba(139,92,246,0.12);
+  border-color: var(--purple); color: #a78bfa; font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .container { padding: 14px 12px 60px; }
+  .controls-row { flex-direction: column; }
+  .ctrl-group { min-width: 0; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <a href="Radar.html" class="header-back">←</a>
+    <div class="header-icon">📊</div>
+    <div>
+      <div class="header-title">Backtest <span style="color:var(--purple)">Radar</span></div>
+      <div class="header-sub">Validez la précision du modèle sur les matchs passés</div>
+    </div>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    ⚠️ <strong style="color:var(--gold)">Cotes estimées par notre modèle</strong> — pas des cotes bookmaker réelles.
+    Le ROI théorique est calculé en supposant que tu aurais misé 1 unité sur chaque top pick détecté.
+    C'est un indicateur de qualité du modèle, pas une garantie de performance future.
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="controls-title">⚙️ Paramètres du backtest</div>
+
+    <!-- Quick period chips -->
+    <div style="margin-bottom:12px">
+      <div class="ctrl-label" style="margin-bottom:6px">Période rapide</div>
+      <div class="period-chips">
+        <div class="period-chip active" data-days="7" onclick="selectPeriod(this,7)">7 jours</div>
+        <div class="period-chip" data-days="14" onclick="selectPeriod(this,14)">14 jours</div>
+        <div class="period-chip" data-days="30" onclick="selectPeriod(this,30)">30 jours</div>
+        <div class="period-chip" data-days="0" onclick="selectPeriod(this,0)">Personnalisé</div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <div class="ctrl-group" id="date-from-group">
+        <label class="ctrl-label" for="dateFrom">Du</label>
+        <input type="date" id="dateFrom">
+      </div>
+      <div class="ctrl-group" id="date-to-group">
+        <label class="ctrl-label" for="dateTo">Au</label>
+        <input type="date" id="dateTo">
+      </div>
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="leagueSelect">Compétition</label>
+        <select id="leagueSelect">
+          <option value="ALL_TOP">Top 5 + CL</option>
+          <option value="PL">Premier League</option>
+          <option value="PD">La Liga</option>
+          <option value="BL1">Bundesliga</option>
+          <option value="SA">Serie A</option>
+          <option value="FL1">Ligue 1</option>
+          <option value="CL">Champions League</option>
+          <option value="DED">Eredivisie</option>
+          <option value="PPL">Primeira Liga</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="marketFilter">Marché</label>
+        <select id="marketFilter">
+          <option value="all">Tous</option>
+          <option value="1N2">1N2</option>
+          <option value="OU">Over/Under</option>
+          <option value="BTTS">BTTS</option>
+          <option value="DC">Double Chance</option>
+        </select>
+      </div>
+      <div style="align-self:flex-end">
+        <button class="btn" id="runBtn" onclick="runBacktest()">⚡ Lancer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results"></div>
+
+</div>
+
+<script>
+'use strict';
+
+var API_BASE = '/api/football-data';
+var TOP5_PLUS_CL = ['PL','PD','BL1','SA','FL1','CL'];
+
+var CACHE_PREFIX = 'sd_bt_';
+var CACHE_TTL = 24 * 60 * 60 * 1000;
+
+var state = {
+  lastCall: 0,
+  callsThisMin: []
+};
+
+/* ── Cache ── */
+function cGet(key) {
+  try {
+    var r = localStorage.getItem(CACHE_PREFIX + key);
+    if (!r) return null;
+    var e = JSON.parse(r);
+    if (Date.now() - e.t > CACHE_TTL) { localStorage.removeItem(CACHE_PREFIX + key); return null; }
+    return e.d;
+  } catch(e) { return null; }
+}
+function cSet(key, data) {
+  try { localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ t: Date.now(), d: data })); }
+  catch(e) {}
+}
+
+/* ── Rate limit ── */
+function rateWait() {
+  var now = Date.now();
+  state.callsThisMin = state.callsThisMin.filter(function(t) { return now - t < 60000; });
+  if (state.callsThisMin.length >= 9) {
+    var oldest = state.callsThisMin[0];
+    return new Promise(function(resolve) { setTimeout(resolve, 60000 - (now - oldest) + 500); });
+  }
+  var since = now - state.lastCall;
+  if (since < 6500) {
+    return new Promise(function(resolve) { setTimeout(resolve, 6500 - since); });
+  }
+  return Promise.resolve();
+}
+
+/* ── API ── */
+function apiCall(endpoint, cacheKey) {
+  if (cacheKey) {
+    var c = cGet(cacheKey);
+    if (c) return Promise.resolve(c);
+  }
+  return rateWait().then(function() {
+    state.lastCall = Date.now();
+    state.callsThisMin.push(Date.now());
+    return fetch(API_BASE + '?path=' + encodeURIComponent(endpoint));
+  }).then(function(res) {
+    if (!res.ok) throw new Error('API ' + res.status);
+    return res.json();
+  }).then(function(data) {
+    if (cacheKey) cSet(cacheKey, data);
+    return data;
+  });
+}
+
+/* ── Période ── */
+function selectPeriod(el, days) {
+  document.querySelectorAll('.period-chip').forEach(function(c) { c.classList.remove('active'); });
+  el.classList.add('active');
+  var df = document.getElementById('dateFrom');
+  var dt = document.getElementById('dateTo');
+  var today = new Date();
+  dt.value = today.toISOString().slice(0,10);
+  if (days > 0) {
+    var from = new Date(today.getTime() - (days-1) * 86400000);
+    df.value = from.toISOString().slice(0,10);
+  }
+}
+
+/* ── Init dates ── */
+function initDates() {
+  var today = new Date();
+  var from = new Date(today.getTime() - 6 * 86400000);
+  document.getElementById('dateTo').value = today.toISOString().slice(0,10);
+  document.getElementById('dateFrom').value = from.toISOString().slice(0,10);
+}
+
+/* ── Modèle Poisson ── */
+function poissonP(lambda, k) {
+  var r = Math.exp(-lambda);
+  for (var i = 1; i <= k; i++) r *= lambda / i;
+  return r;
+}
+
+var DC_RHO = -0.13;
+function dcCorrection(i, j, lH, lA) {
+  if (i===0 && j===0) return 1 - lH * lA * DC_RHO;
+  if (i===1 && j===0) return 1 + lA * DC_RHO;
+  if (i===0 && j===1) return 1 + lH * DC_RHO;
+  if (i===1 && j===1) return 1 - DC_RHO;
+  return 1;
+}
+
+function computeBets(home, away) {
+  if (!home || !away) return [];
+  var avg = 1.35, homeAdv = 1.15;
+  var lH = Math.max(0.3, Math.min(5, home.avgGF * away.avgGA / avg * homeAdv));
+  var lA = Math.max(0.3, Math.min(5, away.avgGF * home.avgGA / avg));
+
+  var win=0, draw=0, lose=0, btts=0, over=0, over15=0;
+  var max=8;
+  for (var i=0;i<=max;i++) {
+    for (var j=0;j<=max;j++) {
+      var p = poissonP(lH,i) * poissonP(lA,j) * dcCorrection(i,j,lH,lA);
+      if (i>j) win+=p; else if (i===j) draw+=p; else lose+=p;
+      if (i>0&&j>0) btts+=p;
+      if (i+j>2) over+=p;
+      if (i+j>1) over15+=p;
+    }
+  }
+  var total = win+draw+lose;
+  if (total>0) { win/=total; draw/=total; lose/=total; }
+
+  var bets = [];
+  bets.push({ market:'1N2', name:'Victoire Domicile', prob:win, score:Math.round(win*100), fairOdds:(1/win*0.95).toFixed(2) });
+  bets.push({ market:'1N2', name:'Match Nul', prob:draw, score:Math.round(draw*100), fairOdds:(1/draw*0.95).toFixed(2) });
+  bets.push({ market:'1N2', name:'Victoire Extérieur', prob:lose, score:Math.round(lose*100), fairOdds:(1/lose*0.95).toFixed(2) });
+  bets.push({ market:'DC', name:'DC 1X', prob:win+draw, score:Math.round((win+draw)*100), fairOdds:(1/((win+draw))*0.95).toFixed(2) });
+  bets.push({ market:'DC', name:'DC X2', prob:away+draw, score:Math.round((lose+draw)*100), fairOdds:(1/((lose+draw))*0.95).toFixed(2) });
+  bets.push({ market:'OU', name:'Over 2.5', prob:over, score:Math.round(over*100), fairOdds:(1/over*0.95).toFixed(2) });
+  bets.push({ market:'OU', name:'Under 2.5', prob:1-over, score:Math.round((1-over)*100), fairOdds:(1/(1-over)*0.95).toFixed(2) });
+  bets.push({ market:'BTTS', name:'BTTS Oui', prob:btts, score:Math.round(btts*100), fairOdds:(1/btts*0.95).toFixed(2) });
+  bets.push({ market:'BTTS', name:'BTTS Non', prob:1-btts, score:Math.round((1-btts)*100), fairOdds:(1/(1-btts)*0.95).toFixed(2) });
+  bets.sort(function(a,b){ return b.score-a.score; });
+  return bets;
+}
+
+function summarizeMatches(matches, teamId) {
+  if (!matches || !matches.length) return null;
+  var gf=0, ga=0, n=0;
+  matches.forEach(function(m) {
+    if (m.status !== 'FINISHED') return;
+    var ft = m.score && m.score.fullTime;
+    if (!ft || ft.home==null || ft.away==null) return;
+    var isHome = m.homeTeam && m.homeTeam.id === teamId;
+    gf += isHome ? ft.home : ft.away;
+    ga += isHome ? ft.away : ft.home;
+    n++;
+  });
+  if (!n) return null;
+  return { avgGF: gf/n, avgGA: ga/n, played: n };
+}
+
+function lastN(matches, n) {
+  return matches.slice().sort(function(a,b) {
+    return new Date(b.utcDate) - new Date(a.utcDate);
+  }).slice(0, n);
+}
+
+/* ── Vérification du résultat réel ── */
+function checkBet(bet, match) {
+  var ft = match.score && match.score.fullTime;
+  if (!ft || ft.home==null || ft.away==null) return null;
+  var hg = ft.home, ag = ft.away;
+  var total = hg + ag;
+
+  if (bet.market === '1N2') {
+    if (bet.name === 'Victoire Domicile') return hg > ag;
+    if (bet.name === 'Match Nul') return hg === ag;
+    if (bet.name === 'Victoire Extérieur') return ag > hg;
+  }
+  if (bet.market === 'DC') {
+    if (bet.name === 'DC 1X') return hg >= ag;
+    if (bet.name === 'DC X2') return ag >= hg;
+  }
+  if (bet.market === 'OU') {
+    if (bet.name === 'Over 2.5') return total > 2.5;
+    if (bet.name === 'Under 2.5') return total <= 2.5;
+    if (bet.name === 'Over 1.5') return total > 1.5;
+    if (bet.name === 'Under 1.5') return total <= 1.5;
+  }
+  if (bet.market === 'BTTS') {
+    if (bet.name === 'BTTS Oui') return hg > 0 && ag > 0;
+    if (bet.name === 'BTTS Non') return hg === 0 || ag === 0;
+  }
+  return null;
+}
+
+/* ── BACKTEST PRINCIPAL ── */
+function runBacktest() {
+  var dateFrom = document.getElementById('dateFrom').value;
+  var dateTo = document.getElementById('dateTo').value;
+  var league = document.getElementById('leagueSelect').value;
+  var marketF = document.getElementById('marketFilter').value;
+
+  if (!dateFrom || !dateTo) { alert('Sélectionne une période'); return; }
+  if (new Date(dateFrom) > new Date(dateTo)) { alert('La date de début doit être avant la date de fin'); return; }
+
+  var btn = document.getElementById('runBtn');
+  btn.disabled = true; btn.textContent = '⏳ Analyse...';
+
+  var results = document.getElementById('results');
+  results.innerHTML = '<div class="loader"><span class="spin"></span>Récupération des matchs passés...</div>';
+
+  var compCodes = league === 'ALL_TOP' ? TOP5_PLUS_CL : [league];
+
+  // Récupérer tous les matchs TERMINÉS sur la période
+  var allMatches = [];
+  var fetchChain = Promise.resolve();
+  var idx = 0;
+
+  compCodes.forEach(function(code) {
+    fetchChain = fetchChain.then(function() {
+      results.innerHTML = '<div class="loader"><span class="spin"></span>Récupération ' + code + ' (' + (++idx) + '/' + compCodes.length + ')...</div>';
+      return apiCall('/competitions/' + code + '/matches?dateFrom=' + dateFrom + '&dateTo=' + dateTo,
+        'bt_matches_' + code + '_' + dateFrom + '_' + dateTo)
+        .then(function(data) {
+          var finished = (data.matches || []).filter(function(m) { return m.status === 'FINISHED'; });
+          allMatches = allMatches.concat(finished);
+        })
+        .catch(function(e) { console.warn(code, e.message); });
+    });
+  });
+
+  fetchChain.then(function() {
+    if (!allMatches.length) {
+      results.innerHTML = '<div class="empty">Aucun match terminé trouvé sur cette période.</div>';
+      btn.disabled = false; btn.textContent = '⚡ Lancer';
+      return;
+    }
+
+    results.innerHTML = '<div class="loader"><span class="spin"></span>Analyse de ' + allMatches.length + ' matchs...<br><small>(rate limit — ~' + Math.ceil(allMatches.length*20/60) + ' min estimé)</small></div>';
+
+    // Limiter à 15 matchs max pour ne pas saturer l'API
+    var MAX = Math.min(allMatches.length, 15);
+    var slice = allMatches.slice(0, MAX);
+    if (allMatches.length > MAX) {
+      showToast('⚠️ ' + allMatches.length + ' matchs trouvés, ' + MAX + ' analysés (limite API)');
+    }
+
+    var analyzed = [];
+    var chain2 = Promise.resolve();
+    var done = 0;
+
+    slice.forEach(function(match) {
+      chain2 = chain2.then(function() {
+        done++;
+        results.innerHTML = '<div class="loader"><span class="spin"></span>Match ' + done + '/' + slice.length + ' : '
+          + esc((match.homeTeam.shortName||match.homeTeam.name)) + ' vs '
+          + esc((match.awayTeam.shortName||match.awayTeam.name)) + '</div>';
+
+        var homeId = match.homeTeam.id;
+        var awayId = match.awayTeam.id;
+
+        return apiCall('/teams/' + homeId + '/matches?status=FINISHED&limit=10', 'bt_team_' + homeId)
+          .catch(function() { return null; })
+          .then(function(hd) {
+            return apiCall('/teams/' + awayId + '/matches?status=FINISHED&limit=10', 'bt_team_' + awayId)
+              .catch(function() { return null; })
+              .then(function(ad) {
+                var hm = (hd && hd.matches) || [];
+                var am = (ad && ad.matches) || [];
+                var hStats = summarizeMatches(lastN(hm, 8), homeId);
+                var aStats = summarizeMatches(lastN(am, 8), awayId);
+                var bets = computeBets(hStats, aStats);
+
+                // Filtrer par marché si demandé
+                var filteredBets = marketF === 'all' ? bets
+                  : bets.filter(function(b) { return b.market === marketF; });
+
+                // Vérifier les résultats réels
+                var enriched = filteredBets.map(function(b) {
+                  var won = checkBet(b, match);
+                  return Object.assign({}, b, { won: won });
+                });
+
+                analyzed.push({
+                  match: match,
+                  bets: enriched,
+                  topBet: enriched[0] || null
+                });
+              });
+          });
+      });
+    });
+
+    chain2.then(function() {
+      renderResults(analyzed, marketF);
+      btn.disabled = false; btn.textContent = '⚡ Lancer';
+    }).catch(function(err) {
+      results.innerHTML = '<div class="empty" style="color:var(--red)">Erreur : ' + esc(err.message) + '</div>';
+      btn.disabled = false; btn.textContent = '⚡ Lancer';
+    });
+  });
+}
+
+/* ── RENDU DES RÉSULTATS ── */
+function renderResults(analyzed, marketF) {
+  var results = document.getElementById('results');
+  if (!analyzed.length) {
+    results.innerHTML = '<div class="empty">Aucun résultat à afficher.</div>';
+    return;
+  }
+
+  // ── Calculs globaux ──
+  var totalPredictions = 0, correctPredictions = 0;
+  var roi = 0; // ROI théorique (1 unité par top pick)
+  var byMarket = {};
+
+  analyzed.forEach(function(a) {
+    if (!a.topBet || a.topBet.won === null) return;
+    totalPredictions++;
+    var won = a.topBet.won;
+    if (won) {
+      correctPredictions++;
+      roi += parseFloat(a.topBet.fairOdds) - 1;
+    } else {
+      roi -= 1;
+    }
+    var m = a.topBet.market;
+    if (!byMarket[m]) byMarket[m] = { total: 0, correct: 0 };
+    byMarket[m].total++;
+    if (won) byMarket[m].correct++;
+  });
+
+  var accuracy = totalPredictions > 0 ? (correctPredictions / totalPredictions * 100) : 0;
+  var roiPct = totalPredictions > 0 ? (roi / totalPredictions * 100) : 0;
+  var accColor = accuracy >= 60 ? 'var(--green)' : accuracy >= 50 ? 'var(--gold)' : 'var(--red)';
+  var roiColor = roiPct >= 0 ? 'var(--green)' : 'var(--red)';
+
+  var html = '';
+
+  // ── Cards résumé ──
+  html += '<div class="summary-grid">';
+  html += '<div class="summary-card ' + (accuracy>=60?'highlight-green':accuracy>=50?'highlight-gold':'highlight-red') + '">';
+  html += '<div class="summary-value" style="color:' + accColor + '">' + accuracy.toFixed(1) + '%</div>';
+  html += '<div class="summary-label">Précision</div>';
+  html += '<div class="summary-sub">' + correctPredictions + '/' + totalPredictions + ' top picks</div></div>';
+
+  html += '<div class="summary-card ' + (roiPct>=0?'highlight-green':'highlight-red') + '">';
+  html += '<div class="summary-value" style="color:' + roiColor + '">' + (roiPct>=0?'+':'') + roiPct.toFixed(1) + '%</div>';
+  html += '<div class="summary-label">ROI théorique</div>';
+  html += '<div class="summary-sub">1 unité/top pick</div></div>';
+
+  html += '<div class="summary-card">';
+  html += '<div class="summary-value" style="color:var(--purple)">' + analyzed.length + '</div>';
+  html += '<div class="summary-label">Matchs analysés</div>';
+  html += '<div class="summary-sub">sur la période</div></div>';
+
+  var avgScore = analyzed.reduce(function(s,a){ return s + (a.topBet?a.topBet.score:0); }, 0) / Math.max(1, analyzed.length);
+  html += '<div class="summary-card">';
+  html += '<div class="summary-value" style="color:var(--gold)">' + avgScore.toFixed(0) + '</div>';
+  html += '<div class="summary-label">Score moyen</div>';
+  html += '<div class="summary-sub">top pick (0-100)</div></div>';
+  html += '</div>';
+
+  // ── ROI Chart ──
+  var roiCumulative = [];
+  var cum = 0;
+  analyzed.forEach(function(a) {
+    if (!a.topBet || a.topBet.won === null) return;
+    cum += a.topBet.won ? parseFloat(a.topBet.fairOdds) - 1 : -1;
+    roiCumulative.push(cum);
+  });
+
+  if (roiCumulative.length > 1) {
+    html += '<div class="roi-chart">';
+    html += '<div class="section-title" style="margin-bottom:10px">📈 ROI CUMULATIF (unités)</div>';
+    html += '<div class="roi-chart-inner">';
+    html += renderROIChart(roiCumulative);
+    html += '</div></div>';
+  }
+
+  // ── Par marché ──
+  var marketKeys = Object.keys(byMarket);
+  if (marketKeys.length > 1) {
+    html += '<div class="section-title" style="margin-bottom:10px">🎯 PAR MARCHÉ</div>';
+    html += '<div class="market-grid">';
+    marketKeys.forEach(function(m) {
+      var d = byMarket[m];
+      var acc = d.total > 0 ? d.correct / d.total * 100 : 0;
+      var col = acc >= 60 ? 'var(--green)' : acc >= 50 ? 'var(--gold)' : 'var(--red)';
+      html += '<div class="market-card">';
+      html += '<div class="market-name">' + esc(m) + '</div>';
+      html += '<div class="market-bar-wrap"><div class="market-bar-fill" style="width:' + acc.toFixed(0) + '%;background:' + col + '"></div></div>';
+      html += '<div class="market-stats"><span class="market-acc" style="color:' + col + '">' + acc.toFixed(0) + '%</span><span class="market-count">' + d.correct + '/' + d.total + '</span></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // ── Détail match par match ──
+  html += '<div class="timeline-header">';
+  html += '<div class="section-title">📋 DÉTAIL MATCH PAR MATCH</div>';
+  html += '</div>';
+
+  analyzed.forEach(function(a) {
+    var match = a.match;
+    var ft = match.score && match.score.fullTime;
+    var scoreStr = ft ? ft.home + ' - ' + ft.away : '?';
+    var topWon = a.topBet && a.topBet.won;
+    var rowClass = a.topBet && a.topBet.won !== null ? (topWon ? 'win' : 'loss') : '';
+
+    html += '<div class="match-row ' + rowClass + '">';
+    html += '<div class="match-row-header">';
+    html += '<span class="match-league">' + esc((match.competition&&match.competition.name)||'') + '</span>';
+    html += '<span class="match-date">' + formatDate(match.utcDate) + '</span>';
+    html += '</div>';
+    html += '<div class="match-teams">';
+    html += '<span>' + esc((match.homeTeam.shortName||match.homeTeam.name)) + '</span>';
+    html += '<span class="match-score">' + scoreStr + '</span>';
+    html += '<span>' + esc((match.awayTeam.shortName||match.awayTeam.name)) + '</span>';
+    html += '</div>';
+    html += '<div class="bets-list">';
+    a.bets.slice(0, 4).forEach(function(b) {
+      var wonClass = b.won === null ? 'na' : (b.won ? 'win' : 'loss');
+      var wonIcon = b.won === null ? '?' : (b.won ? '✓' : '✗');
+      var pnl = b.won === null ? '' : (b.won ? '+' + (parseFloat(b.fairOdds)-1).toFixed(2) : '-1.00');
+      var pnlColor = b.won ? 'var(--green)' : 'var(--red)';
+      html += '<div class="bet-item">';
+      html += '<div class="bet-result ' + wonClass + '">' + wonIcon + '</div>';
+      html += '<span class="bet-name">' + esc(b.name) + '</span>';
+      html += '<span class="bet-score-badge" style="color:' + scoreColor(b.score) + '">' + b.score + '</span>';
+      html += '<span class="bet-odds">@' + b.fairOdds + '</span>';
+      if (pnl) html += '<span class="bet-pnl" style="color:' + pnlColor + '">' + pnl + '</span>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  results.innerHTML = html;
+}
+
+/* ── SVG ROI Chart ── */
+function renderROIChart(data) {
+  if (data.length < 2) return '';
+  var W = 800, H = 80;
+  var min = Math.min.apply(null, data.concat([0]));
+  var max = Math.max.apply(null, data.concat([0]));
+  var range = Math.max(max - min, 0.01);
+  var stepX = W / (data.length - 1);
+  var toY = function(v) { return H - ((v - min) / range * H * 0.85) - H * 0.075; };
+  var zero = toY(0);
+  // Points
+  var pts = data.map(function(v, i) { return (i * stepX).toFixed(1) + ',' + toY(v).toFixed(1); }).join(' ');
+  // Fill
+  var fillPts = '0,' + zero + ' ' + pts + ' ' + ((data.length-1)*stepX).toFixed(1) + ',' + zero;
+  var lastV = data[data.length-1];
+  var lineCol = lastV >= 0 ? '#10b981' : '#ef4444';
+  var fillCol = lastV >= 0 ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.08)';
+
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">';
+  // Zero line
+  svg += '<line x1="0" y1="' + zero.toFixed(1) + '" x2="' + W + '" y2="' + zero.toFixed(1) + '" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4,4"/>';
+  // Fill
+  svg += '<polygon points="' + fillPts + '" fill="' + fillCol + '"/>';
+  // Line
+  svg += '<polyline points="' + pts + '" fill="none" stroke="' + lineCol + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  // Last dot
+  var lx = ((data.length-1)*stepX).toFixed(1);
+  var ly = toY(lastV).toFixed(1);
+  svg += '<circle cx="' + lx + '" cy="' + ly + '" r="4" fill="' + lineCol + '"/>';
+  svg += '<text x="' + (parseFloat(lx)+8) + '" y="' + (parseFloat(ly)+4) + '" font-size="11" fill="' + lineCol + '" font-weight="700">' + (lastV>=0?'+':'') + lastV.toFixed(2) + 'u</text>';
+  svg += '</svg>';
+  return svg;
+}
+
+/* ── Helpers ── */
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function formatDate(iso) {
+  try {
+    var d = new Date(iso);
+    return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
+  } catch(e) { return ''; }
+}
+function scoreColor(s) {
+  return s>=75?'var(--green)':s>=60?'var(--gold)':s>=45?'var(--orange)':'var(--red)';
+}
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1c1c2e;border:1px solid #2a2a3e;color:#f0f0ff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:1000;';
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 3000);
+}
+
+initDates();
+</script>
+</body>
+</html>
