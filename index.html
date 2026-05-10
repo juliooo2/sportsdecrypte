@@ -115,6 +115,9 @@
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
     z-index: 1;
@@ -548,6 +551,7 @@
   .bet-sport-icon.lost { background: rgba(255,71,87,0.12); }
   .bet-sport-icon.pending { background: rgba(245,200,66,0.1); }
   .bet-sport-icon.combo { background: rgba(176,110,243,0.12); }
+  .bet-sport-icon.casino { background: rgba(255,255,255,0.06); }
   .bet-info { flex: 1; min-width: 0; }
   .bet-match { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .bet-pick { font-size: 10px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1510,6 +1514,15 @@
     <div id="type-combo-btn" onclick="switchType('combo')" style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.2s;"><div style="font-size:16px;margin-bottom:3px;">🎰</div><div style="font-family:Bebas Neue,cursive;font-size:12px;letter-spacing:2px;color:var(--text2);">COMBINÉ</div></div>
   </div>
 
+  <!-- BOUTON CASINO DISCRET -->
+  <div style="padding:0 24px;margin-bottom:16px">
+    <div id="type-casino-btn" onclick="switchType('casino')" style="background:var(--bg2);border:1px dashed rgba(255,255,255,0.1);border-radius:12px;padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s">
+      <span style="font-size:14px">🎰</span>
+      <span style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:1px">SESSION CASINO</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--text3)">›</span>
+    </div>
+  </div>
+
   <!-- QUICK FORM -->
   <div id="form-quick" class="form-body">
     <div style="background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.2);border-radius:12px;padding:10px 14px;font-size:11px;color:var(--text2);">⚡ <strong style="color:var(--green)">Mode Express</strong> — 3 champs seulement, enregistrement en 10 secondes.</div>
@@ -1672,6 +1685,60 @@
     </div>
     <div class="goals-list" id="goals-list"></div>
   </div>
+
+  <!-- FORMULAIRE CASINO -->
+  <div id="form-casino" class="form-body" style="display:none;width:100%;min-height:100px">
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;font-size:11px;color:var(--text2);margin-bottom:4px">🎰 <strong style="color:var(--text)">Session Casino</strong> — enregistre ton gain ou ta perte. Ta bankroll s'ajuste automatiquement.</div>
+
+    <div class="form-group">
+      <div class="form-label">JEU</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="casino-game-selector">
+        <div class="sport-btn selected" data-game="slots" onclick="selectCasinoGame(this)"><span>🎰</span><span>SLOTS</span></div>
+        <div class="sport-btn" data-game="blackjack" onclick="selectCasinoGame(this)"><span>🃏</span><span>BLACKJACK</span></div>
+        <div class="sport-btn" data-game="roulette" onclick="selectCasinoGame(this)"><span>🎡</span><span>ROULETTE</span></div>
+        <div class="sport-btn" data-game="poker" onclick="selectCasinoGame(this)"><span>♠️</span><span>POKER</span></div>
+        <div class="sport-btn" data-game="autre" onclick="selectCasinoGame(this)"><span>🎲</span><span>AUTRE</span></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group">
+        <div class="form-label">MISE INITIALE (€)</div>
+        <input type="number" class="form-input" id="casino-stake" placeholder="100" inputmode="decimal" style="font-size:18px;padding:16px;font-weight:700;color:var(--gold)" oninput="updateCasinoResult()">
+      </div>
+      <div class="form-group">
+        <div class="form-label">RÉSULTAT FINAL (€)</div>
+        <input type="number" class="form-input" id="casino-return" placeholder="150" inputmode="decimal" style="font-size:18px;padding:16px;font-weight:700;color:var(--gold)" oninput="updateCasinoResult()">
+      </div>
+    </div>
+
+    <!-- Résumé P&L -->
+    <div id="casino-pnl-preview" style="display:none;padding:12px 14px;border-radius:12px;margin-bottom:8px;text-align:center">
+      <div style="font-size:10px;letter-spacing:2px;color:var(--text2);margin-bottom:4px">RÉSULTAT SESSION</div>
+      <div id="casino-pnl-value" style="font-family:Bebas Neue,cursive;font-size:32px"></div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">BOOKMAKER (optionnel)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="bookie-selector-casino">
+        <div class="bookie-btn selected" data-bookie="" onclick="selectBookie('casino',this)">Aucun</div>
+        <div class="bookie-btn" data-bookie="Betclic" onclick="selectBookie('casino',this)">Betclic</div>
+        <div class="bookie-btn" data-bookie="Winamax" onclick="selectBookie('casino',this)">Winamax</div>
+        <div class="bookie-btn" data-bookie="Unibet" onclick="selectBookie('casino',this)">Unibet</div>
+        <div class="bookie-btn" data-bookie="Autre" onclick="selectBookie('casino',this)">Autre</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">NOTE (optionnel)</div>
+      <input type="text" class="form-input" id="casino-note" placeholder="Ex: Bonus bienvenue, tournoi poker...">
+    </div>
+
+    <button onclick="saveCasinoSession()" style="width:100%;background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04));border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px;font-family:Bebas Neue,cursive;font-size:16px;letter-spacing:3px;color:var(--text);cursor:pointer;margin-top:8px">
+      🎰 ENREGISTRER LA SESSION
+    </button>
+  </div>
+
 </div>
 
 <!-- BADGES SCREEN -->
@@ -2066,6 +2133,12 @@
       <div onclick="navTo('screen-advanced-stats',null)" style="background:rgba(91,155,255,0.1);border:1px solid rgba(91,155,255,0.25);border-radius:12px;padding:8px 10px;font-family:'Bebas Neue',cursive;font-size:11px;letter-spacing:2px;color:#5b9bff;cursor:pointer;">📈 AVANCÉ</div>
       <div onclick="navTo('screen-strat-compare',null)" style="background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);border-radius:12px;padding:8px 10px;font-family:'Bebas Neue',cursive;font-size:11px;letter-spacing:2px;color:var(--gold);cursor:pointer;">⚖️ STRAT.</div>
     </div>
+  </div>
+  <!-- Toggle Sport / Casino / Tout -->
+  <div style="display:flex;gap:6px;padding:0 20px 12px;flex-shrink:0">
+    <div id="stats-filter-sport" onclick="setStatsFilter('sport')" style="flex:1;text-align:center;padding:8px 6px;background:rgba(0,212,170,0.12);border:1px solid rgba(0,212,170,0.35);border-radius:10px;font-family:Bebas Neue,cursive;font-size:11px;letter-spacing:2px;color:var(--green);cursor:pointer">⚽ Sport</div>
+    <div id="stats-filter-casino" onclick="setStatsFilter('casino')" style="flex:1;text-align:center;padding:8px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-family:Bebas Neue,cursive;font-size:11px;letter-spacing:2px;color:var(--text2);cursor:pointer">🎰 Casino</div>
+    <div id="stats-filter-all" onclick="setStatsFilter('all')" style="flex:1;text-align:center;padding:8px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-family:Bebas Neue,cursive;font-size:11px;letter-spacing:2px;color:var(--text2);cursor:pointer">🔢 Tout</div>
   </div>
   <div id="stats-page" style="padding:0 20px 120px;"></div>
 </div>
@@ -2657,8 +2730,8 @@
   let currentAccountId = null;
   let state = { initialBankroll: 0, bets: [], goals: [] };
 
-  const ICONS = { football:'⚽', tennis:'🎾', basket:'🏀', autre:'🏅' };
-  const NAMES = { football:'Football', tennis:'Tennis', basket:'Basket', autre:'Autre' };
+  const ICONS = { football:'⚽', tennis:'🎾', basket:'🏀', autre:'🏅', casino:'🎰' };
+  const NAMES = { football:'Football', tennis:'Tennis', basket:'Basket', autre:'Autre', casino:'Casino' };
 
   let filterResult = 'all';
   let filterSport = 'all';
@@ -2693,7 +2766,7 @@
               if (params.get('action') !== 'add_bet') return;
               var data = {match:params.get('match')||'',bet:params.get('bet')||'',odds:params.get('odds')||'',kelly:params.get('kelly')||'',prob:params.get('prob')||'',edge:params.get('edge')||'',verdict:params.get('verdict')||'',sport:params.get('sport')||''};
               if (!data.odds && !data.match) return;
-              var icons={football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉'};
+              var icons={football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉',casino:'🎰'};
               var icon=icons[data.sport]||'🔮';
               var vColor=data.verdict.includes('VALUE')?'#00e5b8':data.verdict.includes('ÉVITER')?'#ff4757':'#f5c842';
               var html='<div id="predict-banner" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,rgba(124,58,237,0.95),rgba(168,85,247,0.95));padding:14px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,0.4)"><div style="font-size:24px">'+icon+'</div><div style="flex:1"><div style="font-family:Bebas Neue,cursive;font-size:14px;letter-spacing:2px;color:#fff">IMPORTÉ DE PREDICT</div><div style="font-size:11px;color:rgba(255,255,255,0.8)">'+data.match+'</div></div><div style="text-align:right">'+(data.odds?'<div style="font-family:Bebas Neue,cursive;font-size:20px;color:#f5c842">@'+data.odds+'</div>':'')+(data.verdict?'<div style="font-size:10px;font-weight:700;color:'+vColor+'">'+data.verdict+'</div>':'')+'</div><div onclick="document.getElementById(\'predict-banner\').remove()" style="font-size:20px;color:rgba(255,255,255,0.6);cursor:pointer">✕</div></div>';
@@ -2822,6 +2895,8 @@
     });
     const target = document.getElementById(id);
     target.style.display = 'flex';
+    target.style.width = '100%';
+    target.style.height = '100%';
     target.classList.add('active');
     if (target.id === 'screen-dashboard') {
       target.style.opacity = '0';
@@ -2896,7 +2971,73 @@
     document.getElementById('form-quick').style.display=type==='quick'?'flex':'none';
     document.getElementById('form-single').style.display=type==='single'?'flex':'none';
     document.getElementById('form-combo').style.display=type==='combo'?'flex':'none';
+    document.getElementById('form-casino').style.display=type==='casino'?'flex':'none';
+    // Style bouton casino
+    var casinoBtn = document.getElementById('type-casino-btn');
+    if(casinoBtn) {
+      casinoBtn.style.background = type==='casino'?'rgba(255,255,255,0.06)':'var(--bg2)';
+      casinoBtn.style.borderColor = type==='casino'?'rgba(255,255,255,0.2)':'rgba(255,255,255,0.1)';
+      casinoBtn.querySelector('span:nth-child(2)').style.color = type==='casino'?'var(--text)':'var(--text3)';
+    }
     if(type==='combo') initComboLegs();
+  }
+
+  // ── CASINO ──
+  var selCasinoGame = 'slots';
+  var selCasinoBookie = '';
+
+  function selectCasinoGame(el) {
+    document.querySelectorAll('#casino-game-selector .sport-btn').forEach(function(b){ b.classList.remove('selected'); });
+    el.classList.add('selected');
+    selCasinoGame = el.dataset.game;
+  }
+
+  function updateCasinoResult() {
+    var stake = parseFloat(document.getElementById('casino-stake').value) || 0;
+    var ret = parseFloat(document.getElementById('casino-return').value);
+    var preview = document.getElementById('casino-pnl-preview');
+    var val = document.getElementById('casino-pnl-value');
+    if(!stake || isNaN(ret)) { preview.style.display='none'; return; }
+    var profit = ret - stake;
+    preview.style.display = 'block';
+    preview.style.background = profit >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)';
+    preview.style.border = '1px solid ' + (profit >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)');
+    val.style.color = profit >= 0 ? 'var(--green)' : 'var(--red)';
+    val.textContent = (profit >= 0 ? '+' : '') + profit.toFixed(2) + ' €';
+  }
+
+  function saveCasinoSession() {
+    var stake = parseFloat(document.getElementById('casino-stake').value);
+    var ret = parseFloat(document.getElementById('casino-return').value);
+    var note = document.getElementById('casino-note').value.trim();
+    if(!stake || stake <= 0) { showToast('Indique la mise initiale 💶'); return; }
+    if(isNaN(ret)) { showToast('Indique le résultat final 💶'); return; }
+    var profit = parseFloat((ret - stake).toFixed(2));
+    var gameLabels = {slots:'Slots',blackjack:'Blackjack',roulette:'Roulette',poker:'Poker',autre:'Casino'};
+    var gameLabel = gameLabels[selCasinoGame] || 'Casino';
+    state.bets.unshift({
+      id: Date.now(),
+      type: 'casino',
+      sport: 'casino',
+      match: gameLabel + (selCasinoBookie ? ' — ' + selCasinoBookie : ''),
+      pick: note || 'Session casino',
+      stake: stake,
+      odds: ret > 0 ? parseFloat((ret/stake).toFixed(2)) : 0,
+      result: profit >= 0 ? 'won' : 'lost',
+      profit: profit,
+      bookmaker: selCasinoBookie,
+      note: note,
+      casinoGame: selCasinoGame,
+      date: new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})
+    });
+    saveState();
+    document.getElementById('casino-stake').value = '';
+    document.getElementById('casino-return').value = '';
+    document.getElementById('casino-note').value = '';
+    document.getElementById('casino-pnl-preview').style.display = 'none';
+    showToast(profit >= 0 ? '🎰 Session gagnante ! +'+profit.toFixed(2)+'€' : '🎰 Session notée — '+Math.abs(profit).toFixed(2)+'€ perdus');
+    navTo('screen-dashboard', document.querySelectorAll('.nav-item')[0]);
+    renderDashboard();
   }
 
   function handleSubmit() {
@@ -3129,6 +3270,7 @@
     selector.querySelectorAll('.bookie-btn').forEach(b => b.classList.remove('selected'));
     el.classList.add('selected');
     if (mode === 'quick') selBookie = el.dataset.bookie;
+    else if (mode === 'casino') selCasinoBookie = el.dataset.bookie;
     else selBookieSingle = el.dataset.bookie;
   }
 
@@ -7298,14 +7440,42 @@ function renderAdvancedStats() {
     });}
 
   // ── STATS ──
+  var currentStatsFilter = 'sport';
+
+  function setStatsFilter(filter) {
+    currentStatsFilter = filter;
+    var filters = {sport:'stats-filter-sport', casino:'stats-filter-casino', all:'stats-filter-all'};
+    var colors = {sport:'rgba(0,212,170,0.12)', casino:'rgba(255,255,255,0.06)', all:'rgba(91,155,255,0.1)'};
+    var borders = {sport:'rgba(0,212,170,0.35)', casino:'rgba(255,255,255,0.15)', all:'rgba(91,155,255,0.3)'};
+    var textCols = {sport:'var(--green)', casino:'var(--text)', all:'#5b9bff'};
+    Object.keys(filters).forEach(function(f) {
+      var el = document.getElementById(filters[f]);
+      if(!el) return;
+      var isActive = f === filter;
+      el.style.background = isActive ? colors[f] : 'var(--bg3)';
+      el.style.borderColor = isActive ? borders[f] : 'var(--border)';
+      el.style.color = isActive ? textCols[f] : 'var(--text2)';
+    });
+    renderStats();
+  }
+
   function renderStats() {
     var page = document.getElementById("stats-page");
     if (!page) return;
+
+    // Filtrer les paris selon le toggle
+    var allBets = state.bets;
+    if (currentStatsFilter === 'sport') {
+      allBets = state.bets.filter(function(b){ return b.type !== 'casino'; });
+    } else if (currentStatsFilter === 'casino') {
+      allBets = state.bets.filter(function(b){ return b.type === 'casino'; });
+    }
+
     var won = []; var lost = []; var push2 = [];
-    for (var i = 0; i < state.bets.length; i++) {
-      if (state.bets[i].result === "won") won.push(state.bets[i]);
-      else if (state.bets[i].result === "lost") lost.push(state.bets[i]);
-      else if (state.bets[i].result === "push") push2.push(state.bets[i]);
+    for (var i = 0; i < allBets.length; i++) {
+      if (allBets[i].result === "won") won.push(allBets[i]);
+      else if (allBets[i].result === "lost") lost.push(allBets[i]);
+      else if (allBets[i].result === "push") push2.push(allBets[i]);
     }
     var settled = won.concat(lost).concat(push2);
     if (!settled.length) {
