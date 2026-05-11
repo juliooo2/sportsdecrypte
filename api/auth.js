@@ -24,19 +24,17 @@ export default async function handler(req, res) {
     if (!email || !password)
       return res.status(400).json({ error: 'Email et mot de passe requis' });
 
-    var r = await fetch(SUPABASE_URL + '/auth/v1/admin/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SERVICE_KEY,
-        'Authorization': 'Bearer ' + SERVICE_KEY
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-        email_confirm: true
-      })
-    });
+var r = await fetch(SUPABASE_URL + '/auth/v1/signup', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'apikey': SERVICE_KEY
+  },
+  body: JSON.stringify({
+    email: email,
+    password: password
+  })
+});
 
     var data = await r.json();
     if (!r.ok) {
