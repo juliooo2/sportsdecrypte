@@ -11,6 +11,8 @@ export default async function handler(req, res) {
   var SUPABASE_URL = process.env.SUPABASE_URL;
   var SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;
 
+  console.log('[auth] URL:', SUPABASE_URL ? 'OK' : 'MANQUANT', '| KEY:', SERVICE_KEY ? SERVICE_KEY.substring(0, 20) + '...' : 'MANQUANT');
+ 
   if (!SUPABASE_URL || !SERVICE_KEY) {
     return res.status(500).json({ error: 'Variables Supabase manquantes' });
   }
