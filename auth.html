@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr" style="color-scheme:dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#05050d">
+  <title>SportsDecrypté — Connexion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #f5c842;
+      --gold2: #ffd700;
+      --orange: #ff6b35;
+      --bg: #05050d;
+      --bg2: #0a0a16;
+      --bg3: #111120;
+      --bg4: #181828;
+      --text: #f0f0ff;
+      --text2: rgba(240,240,255,0.6);
+      --text3: rgba(240,240,255,0.35);
+      --green: #00d4aa;
+      --red: #ff4757;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* ── LOGO ── */
+    .logo {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .logo-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 32px;
+      letter-spacing: 5px;
+      background: linear-gradient(90deg, var(--orange), var(--gold2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .logo-sub {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--text3);
+      font-weight: 600;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--bg3);
+      border: 1px solid rgba(245,200,66,0.12);
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(245,200,66,0.08);
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      background: var(--bg2);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      color: var(--text3);
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, var(--orange), var(--gold2));
+      color: #000;
+    }
+
+    /* ── FORM ── */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--text3);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .form-input {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      border-color: rgba(245,200,66,0.4);
+    }
+    .form-input::placeholder { color: var(--text3); }
+
+    /* ── BOUTON PRINCIPAL ── */
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--orange), var(--gold2));
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── MESSAGES ── */
+    .msg {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .msg.error { background: rgba(255,71,87,0.12); border: 1px solid rgba(255,71,87,0.3); color: var(--red); }
+    .msg.success { background: rgba(0,212,170,0.12); border: 1px solid rgba(0,212,170,0.3); color: var(--green); }
+    .msg.show { display: block; }
+
+    /* ── LIEN MOT DE PASSE OUBLIÉ ── */
+    .link-forgot {
+      text-align: center;
+      margin-top: 16px;
+    }
+    .link-forgot a {
+      color: var(--text3);
+      font-size: 12px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .link-forgot a:hover { color: var(--gold); }
+
+    /* ── SECTION MOT DE PASSE OUBLIÉ ── */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── LOADER ── */
+    .loader {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(0,0,0,0.3);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── PRO BADGE (page de reset confirmée) ── */
+    .pro-features {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(245,200,66,0.06);
+      border: 1px solid rgba(245,200,66,0.15);
+      border-radius: 12px;
+    }
+    .pro-features-title {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .pro-feature-item {
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .divider {
+      text-align: center;
+      color: var(--text3);
+      font-size: 10px;
+      letter-spacing: 2px;
+      margin: 20px 0;
+      position: relative;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 38%;
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <div class="logo-title">Sports Décrypté</div>
+    <div class="logo-sub">Bankroll Tracker · Analyse · IA</div>
+  </div>
+
+  <div class="card">
+
+    <!-- TABS -->
+    <div class="tabs" id="tabs">
+      <button class="tab active" onclick="switchTab('login')">Connexion</button>
+      <button class="tab" onclick="switchTab('signup')">Inscription</button>
+    </div>
+
+    <!-- MESSAGE GLOBAL -->
+    <div class="msg" id="msg"></div>
+
+    <!-- ── SECTION CONNEXION ── -->
+    <div class="section active" id="section-login">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="login-email" placeholder="ton@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <input type="password" class="form-input" id="login-password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" id="btn-login" onclick="doLogin()">
+        Se connecter →
+      </button>
+      <div class="link-forgot">
+        <a onclick="switchTab('forgot')">Mot de passe oublié ?</a>
+      </div>
+    </div>
+
+    <!-- ── SECTION INSCRIPTION ── -->
+    <div class="section" id="section-signup">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="signup-email" placeholder="ton@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <input type="password" class="form-input" id="signup-password" placeholder="8 caractères minimum" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirmer le mot de passe</label>
+        <input type="password" class="form-input" id="signup-password2" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button class="btn-primary" id="btn-signup" onclick="doSignup()">
+        Créer mon compte →
+      </button>
+
+      <div class="pro-features">
+        <div class="pro-features-title">✦ Inclus gratuitement</div>
+        <div class="pro-feature-item">📊 Tracker bankroll illimité</div>
+        <div class="pro-feature-item">🧮 Calculateur Kelly & Value Bet</div>
+        <div class="pro-feature-item">🎮 Niveaux, badges & objectifs</div>
+        <div class="pro-feature-item">🔮 Predict Football (3/semaine)</div>
+      </div>
+    </div>
+
+    <!-- ── SECTION MOT DE PASSE OUBLIÉ ── -->
+    <div class="section" id="section-forgot">
+      <div class="form-group">
+        <label class="form-label">Ton email</label>
+        <input type="email" class="form-input" id="forgot-email" placeholder="ton@email.com">
+      </div>
+      <button class="btn-primary" id="btn-forgot" onclick="doForgot()">
+        Envoyer le lien →
+      </button>
+      <div class="link-forgot">
+        <a onclick="switchTab('login')">← Retour à la connexion</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Vérifier si déjà connecté ──────────────────────────────────
+    (function() {
+      var token = localStorage.getItem('sd_auth_token');
+      if (token) {
+        // Vérifier que le token est toujours valide
+        fetch('/api/auth?action=verify', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d.success) {
+            // Mettre à jour le statut PRO et rediriger
+            localStorage.setItem('sd_is_pro', d.isPro ? '1' : '0');
+            window.location.href = '/index.html';
+          }
+        })
+        .catch(function() {
+          // Token invalide, on reste sur la page
+          localStorage.removeItem('sd_auth_token');
+        });
+      }
+    })();
+
+    // ── Gestion des tabs ────────────────────────────────────────────
+    function switchTab(tab) {
+      // Cacher toutes les sections
+      document.querySelectorAll('.section').forEach(function(s) {
+        s.classList.remove('active');
+      });
+      // Désactiver tous les tabs
+      document.querySelectorAll('.tab').forEach(function(t) {
+        t.classList.remove('active');
+      });
+      // Cacher le message
+      hideMsg();
+
+      if (tab === 'login') {
+        document.getElementById('section-login').classList.add('active');
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('tabs').style.display = 'flex';
+      } else if (tab === 'signup') {
+        document.getElementById('section-signup').classList.add('active');
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('tabs').style.display = 'flex';
+      } else if (tab === 'forgot') {
+        document.getElementById('section-forgot').classList.add('active');
+        document.getElementById('tabs').style.display = 'none';
+      }
+    }
+
+    // ── Messages ────────────────────────────────────────────────────
+    function showMsg(text, type) {
+      var el = document.getElementById('msg');
+      el.textContent = text;
+      el.className = 'msg ' + type + ' show';
+    }
+    function hideMsg() {
+      var el = document.getElementById('msg');
+      el.className = 'msg';
+    }
+
+    // ── Loader sur bouton ───────────────────────────────────────────
+    function setLoading(btnId, loading) {
+      var btn = document.getElementById(btnId);
+      if (loading) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loader"></span> Chargement...';
+      } else {
+        btn.disabled = false;
+      }
+    }
+
+    // ── CONNEXION ───────────────────────────────────────────────────
+    async function doLogin() {
+      var email = document.getElementById('login-email').value.trim();
+      var password = document.getElementById('login-password').value;
+
+      if (!email || !password) {
+        showMsg('Remplis tous les champs.', 'error');
+        return;
+      }
+
+      setLoading('btn-login', true);
+      hideMsg();
+
+      try {
+        var res = await fetch('/api/auth?action=login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        var data = await res.json();
+
+        if (!res.ok) {
+          showMsg(data.error || 'Erreur de connexion.', 'error');
+          document.getElementById('btn-login').innerHTML = 'Se connecter →';
+          return;
+        }
+
+        // Sauvegarder les infos de session
+        localStorage.setItem('sd_auth_token', data.token);
+        localStorage.setItem('sd_auth_email', data.email);
+        localStorage.setItem('sd_auth_userid', data.userId);
+        localStorage.setItem('sd_is_pro', data.isPro ? '1' : '0');
+
+        showMsg('Connexion réussie ! Redirection...', 'success');
+        setTimeout(function() {
+          window.location.href = '/index.html';
+        }, 800);
+
+      } catch(e) {
+        showMsg('Erreur réseau, réessaie.', 'error');
+        document.getElementById('btn-login').innerHTML = 'Se connecter →';
+      }
+    }
+
+    // ── INSCRIPTION ─────────────────────────────────────────────────
+    async function doSignup() {
+      var email = document.getElementById('signup-email').value.trim();
+      var password = document.getElementById('signup-password').value;
+      var password2 = document.getElementById('signup-password2').value;
+
+      if (!email || !password || !password2) {
+        showMsg('Remplis tous les champs.', 'error');
+        return;
+      }
+      if (password.length < 8) {
+        showMsg('Le mot de passe doit faire au moins 8 caractères.', 'error');
+        return;
+      }
+      if (password !== password2) {
+        showMsg('Les mots de passe ne correspondent pas.', 'error');
+        return;
+      }
+
+      setLoading('btn-signup', true);
+      hideMsg();
+
+      try {
+        var res = await fetch('/api/auth?action=signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        var data = await res.json();
+
+        if (!res.ok) {
+          showMsg(data.error || 'Erreur lors de l\'inscription.', 'error');
+          document.getElementById('btn-signup').innerHTML = 'Créer mon compte →';
+          return;
+        }
+
+        // Connexion automatique après inscription
+        var loginRes = await fetch('/api/auth?action=login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        var loginData = await loginRes.json();
+
+        if (loginData.success) {
+          localStorage.setItem('sd_auth_token', loginData.token);
+          localStorage.setItem('sd_auth_email', loginData.email);
+          localStorage.setItem('sd_auth_userid', loginData.userId);
+          localStorage.setItem('sd_is_pro', '0');
+        }
+
+        showMsg('Compte créé ! Redirection...', 'success');
+        setTimeout(function() {
+          window.location.href = '/index.html';
+        }, 800);
+
+      } catch(e) {
+        showMsg('Erreur réseau, réessaie.', 'error');
+        document.getElementById('btn-signup').innerHTML = 'Créer mon compte →';
+      }
+    }
+
+    // ── MOT DE PASSE OUBLIÉ ─────────────────────────────────────────
+    async function doForgot() {
+      var email = document.getElementById('forgot-email').value.trim();
+      if (!email) {
+        showMsg('Entre ton email.', 'error');
+        return;
+      }
+
+      setLoading('btn-forgot', true);
+      hideMsg();
+
+      try {
+        var res = await fetch('/api/auth?action=reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        showMsg('Si cet email existe, un lien de réinitialisation a été envoyé.', 'success');
+        document.getElementById('btn-forgot').innerHTML = 'Envoyer le lien →';
+
+      } catch(e) {
+        showMsg('Erreur réseau, réessaie.', 'error');
+        document.getElementById('btn-forgot').innerHTML = 'Envoyer le lien →';
+      }
+    }
+
+    // ── Entrée clavier ──────────────────────────────────────────────
+    document.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter') return;
+      var active = document.querySelector('.section.active');
+      if (!active) return;
+      if (active.id === 'section-login') doLogin();
+      else if (active.id === 'section-signup') doSignup();
+      else if (active.id === 'section-forgot') doForgot();
+    });
+  </script>
+</body>
+</html>
