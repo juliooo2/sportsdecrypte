@@ -36,14 +36,15 @@ var r = await fetch(SUPABASE_URL + '/auth/v1/signup', {
   })
 });
 
-    var data = await r.json();
-    if (!r.ok) {
-      var msg = data.message || data.error || 'Erreur inscription';
-      if (msg.includes('already registered') || msg.includes('already exists')) {
-        msg = 'Cet email est déjà utilisé.';
-      }
-      return res.status(400).json({ error: msg });
-    }
+var data = await r.json();
+if (!r.ok) {
+  console.error('[auth signup] Supabase error:', JSON.stringify(data));
+  var msg = data.message || data.error_description || data.error || 'Erreur inscription';
+  if (msg.includes('already registered') || msg.includes('already exists')) {
+    msg = 'Cet email est déjà utilisé.';
+  }
+  return res.status(400).json({ error: msg, debug: data });
+}
 
     return res.status(200).json({ success: true, userId: data.id });
   }
