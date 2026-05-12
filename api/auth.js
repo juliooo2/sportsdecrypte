@@ -40,7 +40,14 @@ var r = await fetch(SUPABASE_URL + '/auth/v1/signup', {
 
 var data = await r.json();
 if (!r.ok) {
-  return res.status(400).json({ error: JSON.stringify(data) });
+  var msg = data.msg || data.message || data.error_description || data.error || 'Erreur inscription';
+  if (msg.includes('already registered') || msg.includes('already exists')) {
+    msg = 'Cet email est déjà utilisé.';
+  }
+  if (msg.includes('rate limit')) {
+    msg = 'Trop de tentatives, réessaie dans quelques minutes.';
+  }
+  return res.status(400).json({ error: msg });
 }
     
     return res.status(200).json({ success: true, userId: data.id });
