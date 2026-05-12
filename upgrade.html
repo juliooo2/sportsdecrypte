@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fr" style="color-scheme:dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#05050d">
+  <title>SportsDecrypté — Passer PRO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    :root {
+      --gold: #f5c842;
+      --gold2: #ffd700;
+      --orange: #ff6b35;
+      --bg: #05050d;
+      --bg2: #0a0a16;
+      --bg3: #111120;
+      --bg4: #181828;
+      --text: #f0f0ff;
+      --text2: rgba(240,240,255,0.6);
+      --text3: rgba(240,240,255,0.35);
+      --green: #00d4aa;
+      --red: #ff4757;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px 16px 40px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-top: 8px;
+    }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text3);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--gold); }
+    .logo-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 20px;
+      letter-spacing: 4px;
+      background: linear-gradient(90deg, var(--orange), var(--gold2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245,200,66,0.1);
+      border: 1px solid rgba(245,200,66,0.25);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 42px;
+      letter-spacing: 4px;
+      line-height: 1;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #fff 0%, var(--gold2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    /* ── PLANS ── */
+    .plans {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .plan {
+      background: var(--bg3);
+      border: 2px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .plan.selected {
+      border-color: var(--gold);
+      background: rgba(245,200,66,0.05);
+    }
+    .plan.early {
+      border-color: rgba(255,107,53,0.4);
+    }
+    .plan.early.selected {
+      border-color: var(--orange);
+      background: rgba(255,107,53,0.06);
+    }
+
+    .plan-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: linear-gradient(135deg, var(--orange), var(--gold2));
+      color: #000;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .plan-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .plan-radio {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .plan.selected .plan-radio {
+      border-color: var(--gold);
+    }
+    .plan.early.selected .plan-radio {
+      border-color: var(--orange);
+    }
+    .plan-radio-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .plan.early .plan-radio-dot { background: var(--orange); }
+    .plan.selected .plan-radio-dot { opacity: 1; }
+
+    .plan-name {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text2);
+    }
+    .plan-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .plan-price {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 38px;
+      letter-spacing: 2px;
+      color: var(--gold2);
+    }
+    .plan.early .plan-price { color: var(--orange); }
+    .plan-period {
+      font-size: 12px;
+      color: var(--text3);
+    }
+    .plan-desc {
+      font-size: 12px;
+      color: var(--text3);
+      line-height: 1.5;
+    }
+    .plan-economy {
+      display: inline-block;
+      margin-top: 6px;
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.2);
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      background: var(--bg3);
+      border: 1px solid rgba(245,200,66,0.1);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 24px;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .features-title {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .feature-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .feature-text strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .feature-text span {
+      font-size: 11px;
+      color: var(--text3);
+      line-height: 1.4;
+    }
+
+    /* ── CTA ── */
+    .cta-wrap {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .btn-cta {
+      width: 100%;
+      padding: 18px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, var(--orange), var(--gold2));
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: opacity 0.2s, transform 0.1s;
+      position: relative;
+    }
+    .btn-cta:active { transform: scale(0.98); opacity: 0.9; }
+    .btn-cta:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-annual {
+      width: 100%;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(245,200,66,0.2);
+      background: transparent;
+      color: var(--gold);
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+    }
+    .btn-annual:hover {
+      background: rgba(245,200,66,0.06);
+    }
+
+    .guarantee {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text3);
+      line-height: 1.6;
+    }
+    .guarantee strong { color: var(--text2); }
+
+    /* ── LOADER ── */
+    .loader {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(0,0,0,0.3);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MSG ── */
+    .msg {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .msg.error { background: rgba(255,71,87,0.12); border: 1px solid rgba(255,71,87,0.3); color: var(--red); display: block; }
+
+    /* ── ALREADY PRO ── */
+    .already-pro {
+      text-align: center;
+      padding: 40px 20px;
+      max-width: 420px;
+      margin: 0 auto;
+      display: none;
+    }
+    .already-pro-icon { font-size: 48px; margin-bottom: 16px; }
+    .already-pro-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 28px;
+      letter-spacing: 3px;
+      color: var(--gold2);
+      margin-bottom: 8px;
+    }
+    .already-pro-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <a class="back-btn" onclick="history.back()">← Retour</a>
+    <div class="logo-title">Sports Décrypté</div>
+    <div style="width:60px"></div>
+  </div>
+
+  <!-- DÉJÀ PRO -->
+  <div class="already-pro" id="already-pro">
+    <div class="already-pro-icon">💎</div>
+    <div class="already-pro-title">Tu es déjà PRO !</div>
+    <div class="already-pro-sub">Tu as accès à toutes les fonctionnalités premium.</div>
+    <button class="btn-cta" onclick="window.location.href='/index.html'" style="max-width:280px;margin:0 auto;display:block;">
+      Retour à l'app →
+    </button>
+  </div>
+
+  <!-- CONTENU PRINCIPAL -->
+  <div id="main-content">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-badge">✦ Offre limitée</div>
+      <div class="hero-title">Passe PRO</div>
+      <div class="hero-sub">Débloque tout le potentiel de SportsDecrypté et parie comme un professionnel.</div>
+    </div>
+
+    <!-- PLANS -->
+    <div class="plans">
+
+      <!-- EARLY ADOPTER -->
+      <div class="plan early selected" id="plan-early" onclick="selectPlan('early')">
+        <div class="plan-badge">⚡ Early Adopter</div>
+        <div class="plan-header">
+          <div class="plan-radio"><div class="plan-radio-dot"></div></div>
+          <div class="plan-name">Lancement — 50 premiers</div>
+        </div>
+        <div class="plan-price-row">
+          <div class="plan-price">4,99€</div>
+          <div class="plan-period">/ mois</div>
+        </div>
+        <div class="plan-desc">Prix bloqué à vie. Les 50 premiers abonnés gardent ce tarif pour toujours.</div>
+        <div class="plan-economy">🔒 Prix garanti à vie</div>
+      </div>
+
+      <!-- STANDARD -->
+      <div class="plan" id="plan-standard" onclick="selectPlan('standard')">
+        <div class="plan-header">
+          <div class="plan-radio"><div class="plan-radio-dot"></div></div>
+          <div class="plan-name">Standard</div>
+        </div>
+        <div class="plan-price-row">
+          <div class="plan-price">9,99€</div>
+          <div class="plan-period">/ mois</div>
+        </div>
+        <div class="plan-desc">Accès complet, résiliable à tout moment.</div>
+      </div>
+
+    </div>
+
+    <!-- FEATURES -->
+    <div class="features">
+      <div class="features-title">✦ Tout ce que tu débloqués</div>
+
+      <div class="feature-item">
+        <div class="feature-icon">🔮</div>
+        <div class="feature-text">
+          <strong>Predict — Tous sports illimité</strong>
+          <span>Tennis, Basket, Hockey, MMA, Rugby + analyses illimitées</span>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">📡</div>
+        <div class="feature-text">
+          <strong>Radar en temps réel</strong>
+          <span>Détection automatique des value bets du moment</span>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">🤖</div>
+        <div class="feature-text">
+          <strong>IA Coach — 5 modes complets</strong>
+          <span>Coach personnel, analyse de match, post-match, suggestions du jour</span>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">🏦</div>
+        <div class="feature-text">
+          <strong>Multi-bankroll illimité</strong>
+          <span>Gérez plusieurs comptes de mise séparément</span>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">📊</div>
+        <div class="feature-text">
+          <strong>Export & historique illimité</strong>
+          <span>Export CSV/JSON + accès à tout ton historique</span>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">🏆</div>
+        <div class="feature-text">
+          <strong>Profil tipster public</strong>
+          <span>Partage tes performances et bâtis ta réputation</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MSG ERREUR -->
+    <div class="msg error" id="msg-error" style="display:none"></div>
+
+    <!-- CTA -->
+    <div class="cta-wrap">
+      <button class="btn-cta" id="btn-subscribe" onclick="doSubscribe()">
+        Démarrer mon essai PRO →
+      </button>
+
+      <div class="guarantee">
+        <strong>Résiliable à tout moment</strong> · Aucun engagement<br>
+        Paiement sécurisé par <strong>Stripe</strong> · Données chiffrées
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Config ──────────────────────────────────────────────────────
+    var STRIPE_PUBLIC_KEY = 'pk_test_51TWEUIFA47y0FqrmTbJ7A9HaJsC8rxJI2kqzrlNCi2kK9ZupNtxtxESSkNReBMZXIZKHkOEk7NyFU1Zdy1Q7K7dR003TLZlNie';
+    var PRICES = {
+      early:    'price_1TWEcPFA47y0FqrmrxZkoZ1c', // 4,99€
+      standard: 'price_1TWEcPFA47y0FqrmbbEoeaxB'  // 9,99€
+    };
+
+    var selectedPlan = 'early';
+    var stripe = Stripe(STRIPE_PUBLIC_KEY);
+
+    // ── Vérifier si déjà connecté et déjà PRO ───────────────────────
+    (function() {
+      var token = localStorage.getItem('sd_auth_token');
+      var isPro = localStorage.getItem('sd_is_pro') === '1';
+
+      if (!token) {
+        window.location.href = '/auth.html';
+        return;
+      }
+      if (isPro) {
+        document.getElementById('already-pro').style.display = 'block';
+        document.getElementById('main-content').style.display = 'none';
+      }
+    })();
+
+    // ── Sélection du plan ────────────────────────────────────────────
+    function selectPlan(plan) {
+      selectedPlan = plan;
+      document.getElementById('plan-early').classList.toggle('selected', plan === 'early');
+      document.getElementById('plan-standard').classList.toggle('selected', plan === 'standard');
+    }
+
+    // ── Paiement Stripe ──────────────────────────────────────────────
+    async function doSubscribe() {
+      var token = localStorage.getItem('sd_auth_token');
+      var email = localStorage.getItem('sd_auth_email');
+
+      if (!token) {
+        window.location.href = '/auth.html';
+        return;
+      }
+
+      var btn = document.getElementById('btn-subscribe');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loader"></span> Redirection...';
+      document.getElementById('msg-error').style.display = 'none';
+
+      try {
+        // Créer la session Stripe Checkout côté serveur
+        var res = await fetch('/api/create-checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            priceId: PRICES[selectedPlan],
+            email: email,
+            plan: selectedPlan
+          })
+        });
+
+        var data = await res.json();
+
+        if (!res.ok || !data.sessionId) {
+          throw new Error(data.error || 'Erreur lors de la création du paiement');
+        }
+
+        // Rediriger vers Stripe Checkout
+        var result = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+
+      } catch(e) {
+        var errEl = document.getElementById('msg-error');
+        errEl.textContent = e.message || 'Erreur, réessaie.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = 'Démarrer mon essai PRO →';
+      }
+    }
+  </script>
+
+</body>
+</html>
