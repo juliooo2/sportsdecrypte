@@ -1525,6 +1525,58 @@
     </div>
   </div>
 
+  <!-- FORMULAIRE CASINO -->
+  <div id="form-casino" class="form-body" style="display:none">
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;font-size:11px;color:var(--text2);margin-bottom:4px">🎰 <strong style="color:var(--text)">Session Casino</strong> — enregistre ton gain ou ta perte. Ta bankroll s'ajuste automatiquement.</div>
+
+    <div class="form-group">
+      <div class="form-label">JEU</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="casino-game-selector">
+        <div class="sport-btn selected" data-game="slots" onclick="selectCasinoGame(this)"><span>🎰</span><span>SLOTS</span></div>
+        <div class="sport-btn" data-game="blackjack" onclick="selectCasinoGame(this)"><span>🃏</span><span>BLACKJACK</span></div>
+        <div class="sport-btn" data-game="roulette" onclick="selectCasinoGame(this)"><span>🎡</span><span>ROULETTE</span></div>
+        <div class="sport-btn" data-game="poker" onclick="selectCasinoGame(this)"><span>♠️</span><span>POKER</span></div>
+        <div class="sport-btn" data-game="autre" onclick="selectCasinoGame(this)"><span>🎲</span><span>AUTRE</span></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group">
+        <div class="form-label">MISE INITIALE (€)</div>
+        <input type="number" class="form-input" id="casino-stake" placeholder="100" inputmode="decimal" style="font-size:18px;padding:16px;font-weight:700;color:var(--gold)" oninput="updateCasinoResult()">
+      </div>
+      <div class="form-group">
+        <div class="form-label">RÉSULTAT FINAL (€)</div>
+        <input type="number" class="form-input" id="casino-return" placeholder="150" inputmode="decimal" style="font-size:18px;padding:16px;font-weight:700;color:var(--gold)" oninput="updateCasinoResult()">
+      </div>
+    </div>
+
+    <!-- Résumé P&L -->
+    <div id="casino-pnl-preview" style="display:none;padding:12px 14px;border-radius:12px;margin-bottom:8px;text-align:center">
+      <div style="font-size:10px;letter-spacing:2px;color:var(--text2);margin-bottom:4px">RÉSULTAT SESSION</div>
+      <div id="casino-pnl-value" style="font-family:Bebas Neue,cursive;font-size:32px"></div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">BOOKMAKER (optionnel)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="bookie-selector-casino">
+        <div class="bookie-btn selected" data-bookie="" onclick="selectBookie('casino',this)">Aucun</div>
+        <div class="bookie-btn" data-bookie="Betclic" onclick="selectBookie('casino',this)">Betclic</div>
+        <div class="bookie-btn" data-bookie="Winamax" onclick="selectBookie('casino',this)">Winamax</div>
+        <div class="bookie-btn" data-bookie="Unibet" onclick="selectBookie('casino',this)">Unibet</div>
+        <div class="bookie-btn" data-bookie="Autre" onclick="selectBookie('casino',this)">Autre</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">NOTE (optionnel)</div>
+      <input type="text" class="form-input" id="casino-note" placeholder="Ex: Bonus bienvenue, tournoi poker...">
+    </div>
+
+    <button onclick="saveCasinoSession()" style="width:100%;background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04));border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px;font-family:Bebas Neue,cursive;font-size:16px;letter-spacing:3px;color:var(--text);cursor:pointer;margin-top:8px">
+      🎰 ENREGISTRER LA SESSION
+    </button>
+  </div>
   <!-- QUICK FORM -->
   <div id="form-quick" class="form-body">
     <div style="background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.2);border-radius:12px;padding:10px 14px;font-size:11px;color:var(--text2);">⚡ <strong style="color:var(--green)">Mode Express</strong> — 3 champs seulement, enregistrement en 10 secondes.</div>
@@ -1688,58 +1740,6 @@
     <div class="goals-list" id="goals-list"></div>
   </div>
 
-  <!-- FORMULAIRE CASINO -->
-  <div id="form-casino" class="form-body" style="display:none;width:100%;min-height:100px">
-    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;font-size:11px;color:var(--text2);margin-bottom:4px">🎰 <strong style="color:var(--text)">Session Casino</strong> — enregistre ton gain ou ta perte. Ta bankroll s'ajuste automatiquement.</div>
-
-    <div class="form-group">
-      <div class="form-label">JEU</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="casino-game-selector">
-        <div class="sport-btn selected" data-game="slots" onclick="selectCasinoGame(this)"><span>🎰</span><span>SLOTS</span></div>
-        <div class="sport-btn" data-game="blackjack" onclick="selectCasinoGame(this)"><span>🃏</span><span>BLACKJACK</span></div>
-        <div class="sport-btn" data-game="roulette" onclick="selectCasinoGame(this)"><span>🎡</span><span>ROULETTE</span></div>
-        <div class="sport-btn" data-game="poker" onclick="selectCasinoGame(this)"><span>♠️</span><span>POKER</span></div>
-        <div class="sport-btn" data-game="autre" onclick="selectCasinoGame(this)"><span>🎲</span><span>AUTRE</span></div>
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="form-group">
-        <div class="form-label">MISE INITIALE (€)</div>
-        <input type="number" class="form-input" id="casino-stake" placeholder="100" inputmode="decimal" style="font-size:18px;padding:16px;font-weight:700;color:var(--gold)" oninput="updateCasinoResult()">
-      </div>
-      <div class="form-group">
-        <div class="form-label">RÉSULTAT FINAL (€)</div>
-        <input type="number" class="form-input" id="casino-return" placeholder="150" inputmode="decimal" style="font-size:18px;padding:16px;font-weight:700;color:var(--gold)" oninput="updateCasinoResult()">
-      </div>
-    </div>
-
-    <!-- Résumé P&L -->
-    <div id="casino-pnl-preview" style="display:none;padding:12px 14px;border-radius:12px;margin-bottom:8px;text-align:center">
-      <div style="font-size:10px;letter-spacing:2px;color:var(--text2);margin-bottom:4px">RÉSULTAT SESSION</div>
-      <div id="casino-pnl-value" style="font-family:Bebas Neue,cursive;font-size:32px"></div>
-    </div>
-
-    <div class="form-group">
-      <div class="form-label">BOOKMAKER (optionnel)</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="bookie-selector-casino">
-        <div class="bookie-btn selected" data-bookie="" onclick="selectBookie('casino',this)">Aucun</div>
-        <div class="bookie-btn" data-bookie="Betclic" onclick="selectBookie('casino',this)">Betclic</div>
-        <div class="bookie-btn" data-bookie="Winamax" onclick="selectBookie('casino',this)">Winamax</div>
-        <div class="bookie-btn" data-bookie="Unibet" onclick="selectBookie('casino',this)">Unibet</div>
-        <div class="bookie-btn" data-bookie="Autre" onclick="selectBookie('casino',this)">Autre</div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <div class="form-label">NOTE (optionnel)</div>
-      <input type="text" class="form-input" id="casino-note" placeholder="Ex: Bonus bienvenue, tournoi poker...">
-    </div>
-
-    <button onclick="saveCasinoSession()" style="width:100%;background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04));border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px;font-family:Bebas Neue,cursive;font-size:16px;letter-spacing:3px;color:var(--text);cursor:pointer;margin-top:8px">
-      🎰 ENREGISTRER LA SESSION
-    </button>
-  </div>
 
 </div>
 
