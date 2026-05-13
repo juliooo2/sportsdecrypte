@@ -258,20 +258,25 @@
         };
       }
 
-      // ── Limite Football : 3 analyses/semaine ──────────────────
-      // Intercepte compute() — la fonction principale d'analyse
-      var origCompute = window.compute;
-      if (origCompute) {
-        window.compute = function () {
-          var count = getCount('predict_football');
-          if (count >= 3) {
-            SD_showPaywall('Predict Football illimité — plus de 3 analyses par semaine avec le plan PRO');
-            return;
+// ── Limite Football : 3 analyses/semaine ──────────────────
+      // Intercepte le clic sur le bouton "Lancer l'analyse"
+      document.addEventListener('click', function (e) {
+        var btn = e.target.closest('button');
+        if (!btn) return;
+        var txt = (btn.textContent || btn.innerText || '').trim();
+        if (txt.includes('Lancer') && txt.includes('analyse')) {
+          if (!window.SD_IS_PRO) {
+            var count = getCount('predict_football');
+            if (count >= 3) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+              SD_showPaywall('Predict Football illimité — plus de 3 analyses par semaine avec le plan PRO');
+              return;
+            }
+            incCount('predict_football');
           }
-          incCount('predict_football');
-          origCompute.apply(this, arguments);
-        };
-      }
+        }
+      }, true);
     });
   }
 
