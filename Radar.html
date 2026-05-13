@@ -436,84 +436,49 @@
       <div class="logo-icon">📡</div>
       <div>
         <div>Bet <span class="accent">Radar</span></div>
-        <div class="subtitle">Détection automatique de paris à valeur — SportsDecrypté</div>
+        <div class="subtitle">Value bets du jour — mis à jour automatiquement</div>
       </div>
       <a href="backtest.html" style="margin-left:auto;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.3);border-radius:10px;padding:8px 12px;font-size:11px;font-weight:700;color:#a78bfa;text-decoration:none;white-space:nowrap;letter-spacing:0.5px">📊 Backtest</a>
     </div>
   </header>
 
+  <!-- Barre de statut -->
   <div class="quota">
     <span>📊</span>
     <div class="quota-bar"><div class="quota-fill" id="quotaFill" style="width:0%"></div></div>
-    <span class="quota-text" id="quotaText">Prêt — Football-Data.org (10 req/min)</span>
-    <button class="btn btn-ghost btn-sm" id="resetCacheBtn">Vider cache</button>
+    <span class="quota-text" id="quotaText">Chargement...</span>
+    <button class="btn btn-ghost btn-sm" id="resetCacheBtn" onclick="clearAllCache();init()">🔄</button>
   </div>
 
-  <div class="controls">
-    <div class="controls-row">
-      <div class="input-group">
-        <label class="input-label" for="dateInput">Date</label>
-        <input type="date" id="dateInput">
-      </div>
-      <div class="input-group">
-        <label class="input-label" for="leagueSelect">Compétition</label>
-        <select id="leagueSelect">
-          <option value="ALL_TOP">Top 5 ligues + CL</option>
-          <option value="PL">Premier League (ENG)</option>
-          <option value="PD">La Liga (ESP)</option>
-          <option value="BL1">Bundesliga (GER)</option>
-          <option value="SA">Serie A (ITA)</option>
-          <option value="FL1">Ligue 1 (FRA)</option>
-          <option value="CL">Champions League</option>
-          <option value="EL">Europa League</option>
-          <option value="DED">Eredivisie (NED)</option>
-          <option value="PPL">Primeira Liga (POR)</option>
-          <option value="ELC">Championship (ENG)</option>
-          <option value="BSA">Brasileirão (BRA)</option>
-        </select>
-      </div>
-      <div class="input-group" style="flex:0 0 auto; align-self:flex-end;">
-        <button class="btn" id="analyzeBtn">⚡ Analyser</button>
-      </div>
-    </div>
-  </div>
-
+  <!-- Filtres rapides -->
   <div class="filters" id="marketFilters">
     <div class="filter-chip active" data-market="all">Tous marchés</div>
     <div class="filter-chip" data-market="1N2">1N2</div>
-    <div class="filter-chip" data-market="OU">Over / Under</div>
+    <div class="filter-chip" data-market="OU">Over/Under</div>
     <div class="filter-chip" data-market="BTTS">BTTS</div>
     <div class="filter-chip" data-market="DC">Double Chance</div>
-    <button class="btn-top3" id="top3Btn" onclick="toggleTop3()">🏆 Top 3 du jour</button>
+    <button class="btn-top3" id="top3Btn" onclick="toggleTop3()">🏆 Top 3</button>
   </div>
 
-  <!-- Slider score minimum -->
-  <div class="slider-row">
-    <span class="slider-label">Score min.</span>
-    <input type="range" id="scoreSlider" min="0" max="90" step="5" value="0" oninput="onSliderChange(this.value)">
-    <span class="slider-value" id="sliderVal">0</span>
-    <span class="slider-label" style="color:var(--text-faint)">/ 100</span>
-  </div>
-
-  <!-- Slider cote minimum -->
+  <!-- Filtre cote minimum — 1.20 par défaut -->
   <div class="slider-row">
     <span class="slider-label">Cote min.</span>
-    <input type="range" id="oddsSlider" min="1" max="5" step="0.1" value="1" oninput="onOddsSliderChange(this.value)">
-    <span class="slider-value" id="oddsSliderVal" style="color:var(--gold)">Tout</span>
+    <input type="range" id="oddsSlider" min="1" max="5" step="0.05" value="1.2" oninput="onOddsSliderChange(this.value)">
+    <span class="slider-value" id="oddsSliderVal" style="color:var(--gold)">@1.20</span>
   </div>
 
-  <!-- Disclaimer cotes -->
-  <div id="oddsDisclaimer" style="display:none;background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.2);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text-dim);margin-bottom:12px;line-height:1.5">
-    ⚠️ <strong style="color:var(--gold)">Cotes estimées par notre modèle</strong> — pas des cotes bookmaker réelles. Elles représentent la valeur théorique selon nos calculs. Compare-les avec les cotes de ton bookmaker pour détecter les value bets.
+  <!-- Disclaimer -->
+  <div id="oddsDisclaimer" style="background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.15);border-radius:10px;padding:8px 14px;font-size:11px;color:var(--text-dim);margin:0 0 10px;line-height:1.5">
+    ⚠️ <strong style="color:var(--gold)">Cotes estimées par notre modèle</strong> — pas des cotes bookmaker réelles. Compare-les avec ton bookmaker pour détecter les value bets.
   </div>
 
-  <!-- Summary bar (cachée au départ) -->
+  <!-- Summary bar -->
   <div class="summary-bar" id="summaryBar" style="display:none"></div>
 
   <div class="tabs">
     <button class="tab active" data-tab="matches">Matchs <span class="tab-badge" id="badgeMatches">0</span></button>
     <button class="tab" data-tab="favorites">⭐ Favoris <span class="tab-badge" id="badgeFavorites">0</span></button>
-    <button class="tab" data-tab="saved">💾 Paris sauvés <span class="tab-badge" id="badgeSaved">0</span></button>
+    <button class="tab" data-tab="saved">💾 Sauvés <span class="tab-badge" id="badgeSaved">0</span></button>
   </div>
 
   <div id="content" class="matches">
@@ -841,20 +806,12 @@ function scoreLevel(score) {
   return { label: 'À éviter', cls: 'score-eviter' };
 }
 
-function onSliderChange(val) {
-  state.scoreMin = parseInt(val, 10);
-  document.getElementById('sliderVal').textContent = val;
-  renderMatches();
-}
 
 function onOddsSliderChange(val) {
   var v = parseFloat(val);
-  state.oddsMin = v <= 1.1 ? 0 : v;
-  var label = v <= 1.1 ? 'Tout' : '@' + v.toFixed(1) + '+';
+  state.oddsMin = v <= 1.05 ? 0 : v;
+  var label = v <= 1.05 ? 'Tout' : '@' + v.toFixed(2);
   document.getElementById('oddsSliderVal').textContent = label;
-  // Afficher/cacher le disclaimer quand on utilise le filtre cote
-  var disclaimer = document.getElementById('oddsDisclaimer');
-  if (disclaimer) disclaimer.style.display = state.oddsMin > 0 ? 'block' : 'none';
   renderMatches();
 }
 
@@ -1034,128 +991,6 @@ function analyzeMatch(match) {
 /* ============================================================
    MAIN ANALYSIS FLOW
    ============================================================ */
-function runAnalysis() {
-  var date = document.getElementById('dateInput').value;
-  var leagueCode = document.getElementById('leagueSelect').value;
-  if (!date) { showToast('Sélectionne une date', 'error'); return; }
-
-  var btn = document.getElementById('analyzeBtn');
-  btn.disabled = true;
-  btn.textContent = 'Analyse en cours...';
-
-  var content = document.getElementById('content');
-  content.innerHTML = '<div class="loader"><span class="loader-spin"></span>Récupération des matchs...</div>';
-
-  var compCodes = leagueCode === 'ALL_TOP' ? TOP5_PLUS_CL : [leagueCode];
-
-  // Widen the API request to J-1 and J+1 to catch matches near midnight UTC
-  // (a match at 21h Paris on day D is at 19h UTC, OK; but a match at 02h Paris
-  // on day D+1 is at 00h UTC on day D+1, and might be missed if API bounds are strict)
-  var dateObj = new Date(date + 'T12:00:00');
-  var dayBefore = new Date(dateObj.getTime() - 86400000);
-  var dayAfter = new Date(dateObj.getTime() + 86400000);
-  function fmt(d) {
-    return d.getFullYear() + '-' +
-      String(d.getMonth() + 1).padStart(2, '0') + '-' +
-      String(d.getDate()).padStart(2, '0');
-  }
-  var dateFrom = fmt(dayBefore);
-  var dateTo = fmt(dayAfter);
-
-  // Chain competition requests sequentially to respect rate limit
-  // (Promise.all would fire all 6 at once, getting throttled by the API)
-  content.innerHTML = '<div class="loader"><span class="loader-spin"></span>' +
-    'Récupération des matchs (' + compCodes.length + ' compétition' +
-    (compCodes.length > 1 ? 's' : '') + ')...</div>';
-
-  var allCompResults = [];
-  var fetchChain = Promise.resolve();
-  compCodes.forEach(function (code, idx) {
-    fetchChain = fetchChain.then(function () {
-      content.innerHTML = '<div class="loader"><span class="loader-spin"></span>' +
-        'Récupération ' + (idx + 1) + '/' + compCodes.length + ' : ' + code + '...</div>';
-      return fetchCompetitionMatches(code, dateFrom, dateTo)
-        .then(function (data) {
-          var n = (data.matches || []).length;
-          console.log('[Radar] ✓ ' + code + ': ' + n + ' matchs API');
-          allCompResults.push(data.matches || []);
-        })
-        .catch(function (err) {
-          console.warn('[Radar] ✗ ' + code + ' indisponible:', err.message);
-          allCompResults.push([]);
-        });
-    });
-  });
-
-  fetchChain.then(function () {
-    var allMatches = [];
-    allCompResults.forEach(function (arr) { allMatches = allMatches.concat(arr); });
-    console.log('[Radar] Total matchs récupérés (J±1):', allMatches.length);
-
-    // Keep only matches on the requested local date
-    var onDate = allMatches.filter(function (m) {
-      return isOnLocalDate(m.utcDate, date);
-    });
-    console.log('[Radar] Matchs sur la date sélectionnée:', onDate.length);
-
-    // Accept any non-finished status (TIMED, SCHEDULED, IN_PLAY, PAUSED, POSTPONED…)
-    // We just exclude FINISHED, CANCELLED, AWARDED, SUSPENDED
-    var fixtures = onDate.filter(function (m) {
-      var s = m.status;
-      return s !== 'FINISHED' && s !== 'CANCELLED' && s !== 'AWARDED' && s !== 'SUSPENDED';
-    });
-    console.log('[Radar] Matchs à venir:', fixtures.length, fixtures);
-
-    if (fixtures.length === 0) {
-      var msg = 'Aucun match à venir trouvé pour cette date.';
-      if (allMatches.length > 0 && onDate.length === 0) {
-        msg += '<br><small>(' + allMatches.length + ' matchs trouvés à J±1 mais aucun le ' + date + ')</small>';
-      } else if (onDate.length > 0) {
-        msg += '<br><small>(' + onDate.length + ' matchs ce jour mais tous déjà terminés)</small>';
-      } else {
-        msg += '<br><small>(Saison probablement terminée pour ces compétitions, ou pas de match programmé.)</small>';
-      }
-      content.innerHTML = '<div class="empty">' + msg + '</div>';
-      btn.disabled = false; btn.textContent = '⚡ Analyser';
-      return;
-    }
-
-    var maxAnalyze = Math.min(fixtures.length, 5);
-    var slice = fixtures.slice(0, maxAnalyze);
-    if (fixtures.length > maxAnalyze) {
-      showToast(fixtures.length + ' matchs trouvés, ' + maxAnalyze + ' analysés');
-    }
-
-    content.innerHTML = '<div class="loader"><span class="loader-spin"></span>' +
-      'Analyse de ' + slice.length + ' match' + (slice.length > 1 ? 's' : '') +
-      '...<br><small>(rate limit 10 req/min, ~' + (slice.length * 20) + 's estimé)</small></div>';
-
-    var results2 = [];
-    var chain = Promise.resolve();
-    slice.forEach(function (m, idx) {
-      chain = chain.then(function () {
-        content.innerHTML = '<div class="loader"><span class="loader-spin"></span>' +
-          'Match ' + (idx + 1) + ' / ' + slice.length + ' : ' +
-          escapeHtml(m.homeTeam.shortName || m.homeTeam.name) + ' vs ' +
-          escapeHtml(m.awayTeam.shortName || m.awayTeam.name) + '</div>';
-        return analyzeMatch(m).then(function (r) { results2.push(r); });
-      });
-    });
-
-    chain.then(function () {
-      state.matches = results2;
-      renderMatches();
-      btn.disabled = false; btn.textContent = '⚡ Analyser';
-    }).catch(function (err) {
-      content.innerHTML = '<div class="error">Erreur: ' + escapeHtml(err.message) + '</div>';
-      btn.disabled = false; btn.textContent = '⚡ Analyser';
-    });
-
-  }).catch(function (err) {
-    content.innerHTML = '<div class="error">Erreur: ' + escapeHtml(err.message) + '</div>';
-    btn.disabled = false; btn.textContent = '⚡ Analyser';
-  });
-}
 
 /* ============================================================
    RENDERING
@@ -1536,13 +1371,18 @@ function showToast(msg, kind) {
 
 function init() {
   var today = new Date().toISOString().slice(0, 10);
-  document.getElementById('dateInput').value = today;
   updateRateUi();
-  document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);
+
+  // Filtre cote 1.20 par défaut
+  state.oddsMin = 1.20;
+  document.getElementById('oddsSliderVal').textContent = '@1.20';
+
   document.getElementById('resetCacheBtn').addEventListener('click', function () {
     var n = clearAllCache();
     showToast(n + ' entrée(s) cache effacée(s)');
+    setTimeout(function() { autoAnalyze(today); }, 300);
   });
+
   document.querySelectorAll('.tab').forEach(function (t) {
     t.addEventListener('click', function () {
       document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('active'); });
@@ -1551,6 +1391,7 @@ function init() {
       renderMatches();
     });
   });
+
   document.querySelectorAll('.filter-chip').forEach(function (c) {
     c.addEventListener('click', function () {
       document.querySelectorAll('.filter-chip').forEach(function (x) { x.classList.remove('active'); });
@@ -1559,10 +1400,172 @@ function init() {
       renderMatches();
     });
   });
+
   setInterval(updateRateUi, 5000);
 
-  // Sync slider display on load
-  document.getElementById('sliderVal').textContent = '0';
+  // ── Lancement automatique ──
+  autoAnalyze(today);
+}
+
+function autoAnalyze(date) {
+  var content = document.getElementById('content');
+
+  // 1. Essayer le cache d'abord → affichage instantané
+  var cacheKey = 'radar_full_' + date;
+  var cached = cacheGet(cacheKey);
+  if (cached && cached.matches && cached.matches.length > 0) {
+    state.matches = cached.matches;
+    document.getElementById('quotaText').textContent = 'Cache — ' + cached.matches.length + ' matchs analysés';
+    renderMatches();
+    // Refresh silencieux en arrière-plan si cache > 2h
+    if (Date.now() - (cached.ts || 0) > 2 * 3600 * 1000) {
+      setTimeout(function() { fetchAndAnalyze(date, true); }, 1000);
+    }
+    return;
+  }
+
+  // 2. Pas de cache → analyse complète
+  fetchAndAnalyze(date, false);
+}
+
+function fetchAndAnalyze(date, silent) {
+  var content = document.getElementById('content');
+  var compCodes = ['PL', 'PD', 'BL1', 'SA', 'FL1', 'CL', 'EL', 'DED', 'PPL'];
+
+  if (!silent) {
+    content.innerHTML = '<div class="loader"><span class="loader-spin"></span>Analyse des matchs du jour...</div>';
+    document.getElementById('quotaText').textContent = 'Analyse en cours...';
+  }
+
+  var dateObj = new Date(date + 'T12:00:00');
+  var dayBefore = new Date(dateObj.getTime() - 86400000);
+  var dayAfter = new Date(dateObj.getTime() + 86400000);
+  function fmt(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  var dateFrom = fmt(dayBefore);
+  var dateTo = fmt(dayAfter);
+
+  var allCompResults = [];
+  var fetchChain = Promise.resolve();
+  compCodes.forEach(function(code, idx) {
+    fetchChain = fetchChain.then(function() {
+      if (!silent) {
+        document.getElementById('quotaText').textContent = 'Ligue ' + (idx+1) + '/' + compCodes.length + ' : ' + code + '...';
+      }
+      return fetchCompetitionMatches(code, dateFrom, dateTo)
+        .then(function(data) { allCompResults.push(data.matches || []); })
+        .catch(function() { allCompResults.push([]); });
+    });
+  });
+
+  fetchChain.then(function() {
+    var allMatches = [];
+    allCompResults.forEach(function(arr) { allMatches = allMatches.concat(arr); });
+
+    var onDate = allMatches.filter(function(m) { return isOnLocalDate(m.utcDate, date); });
+    var fixtures = onDate.filter(function(m) {
+      var s = m.status;
+      return s !== 'FINISHED' && s !== 'CANCELLED' && s !== 'AWARDED' && s !== 'SUSPENDED';
+    });
+
+    if (fixtures.length === 0) {
+      if (!silent) {
+        content.innerHTML = '<div class="empty">Aucun match à venir trouvé aujourd\'hui.<br><small>Les ligues européennes jouent principalement le week-end.</small></div>';
+        document.getElementById('quotaText').textContent = 'Aucun match aujourd\'hui';
+      }
+      return;
+    }
+
+    if (!silent) {
+      content.innerHTML = '<div class="loader"><span class="loader-spin"></span>Analyse de ' + fixtures.length + ' matchs...</div>';
+    }
+
+    // Limiter à 20 matchs max pour le rate limit
+    var toAnalyze = fixtures.slice(0, 20);
+    var analyzed = [];
+    var chain2 = Promise.resolve();
+    var done = 0;
+
+    toAnalyze.forEach(function(match) {
+      chain2 = chain2.then(function() {
+        done++;
+        if (!silent) {
+          document.getElementById('quotaText').textContent = 'Match ' + done + '/' + toAnalyze.length + '...';
+        }
+        var homeId = match.homeTeam.id;
+        var awayId = match.awayTeam.id;
+        return Promise.all([
+          fetchTeamMatches(homeId, 10).catch(function() { return null; }),
+          fetchTeamMatches(awayId, 10).catch(function() { return null; }),
+          fetchH2H(match.id).catch(function() { return null; })
+        ]).then(function(results) {
+          var hd = results[0], ad = results[1], h2hData = results[2];
+          var hm = (hd && hd.matches) || [];
+          var am = (ad && ad.matches) || [];
+          var homeAll = summarizeMatches(hm, homeId);
+          var awayAll = summarizeMatches(am, awayId);
+          var homeL5 = summarizeMatches(lastNMatches(hm, 5), homeId);
+          var awayL5 = summarizeMatches(lastNMatches(am, 5), awayId);
+
+          // Forme V/N/D
+          if (homeL5) {
+            homeL5._form = lastNMatches(hm.filter(function(m){return m.status==='FINISHED';}), 5)
+              .map(function(m) {
+                var ft = m.score && m.score.fullTime;
+                if (!ft || ft.home==null) return '?';
+                var isHome = m.homeTeam && m.homeTeam.id === homeId;
+                var tg = isHome ? ft.home : ft.away;
+                var og = isHome ? ft.away : ft.home;
+                return tg > og ? 'V' : tg === og ? 'N' : 'D';
+              });
+          }
+          if (awayL5) {
+            awayL5._form = lastNMatches(am.filter(function(m){return m.status==='FINISHED';}), 5)
+              .map(function(m) {
+                var ft = m.score && m.score.fullTime;
+                if (!ft || ft.home==null) return '?';
+                var isHome = m.homeTeam && m.homeTeam.id === awayId;
+                var tg = isHome ? ft.home : ft.away;
+                var og = isHome ? ft.away : ft.home;
+                return tg > og ? 'V' : tg === og ? 'N' : 'D';
+              });
+          }
+
+          var homeBlend = blendStats(homeAll, homeL5);
+          var awayBlend = blendStats(awayAll, awayL5);
+          var h2h = h2hData ? summarizeH2H(h2hData, homeId) : null;
+          var bets = computeBets(homeBlend, awayBlend, h2h);
+
+          // Filtrer les cotes < 1.20 dès le calcul
+          bets = bets.filter(function(b) { return !b.fairOdds || parseFloat(b.fairOdds) >= 1.20; });
+
+          analyzed.push({
+            match: match,
+            bets: bets,
+            stats: { homeAll: homeAll, awayAll: awayAll, homeL5: homeL5, awayL5: awayL5, h2h: h2h }
+          });
+        });
+      });
+    });
+
+    chain2.then(function() {
+      // Filtrer les matchs sans paris valides
+      var valid = analyzed.filter(function(a) { return a.bets && a.bets.length > 0; });
+
+      // Mettre en cache 3h
+      cacheSet('radar_full_' + date, { matches: valid, ts: Date.now() }, 3 * 3600);
+
+      state.matches = valid;
+      document.getElementById('quotaText').textContent = '✅ ' + valid.length + ' matchs analysés · Cache 3h';
+      renderMatches();
+    }).catch(function(err) {
+      if (!silent) {
+        content.innerHTML = '<div class="empty">Erreur : ' + escapeHtml(err.message) + '</div>';
+        document.getElementById('quotaText').textContent = 'Erreur';
+      }
+    });
+  });
 }
 
 init();
