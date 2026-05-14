@@ -3247,6 +3247,30 @@ function applyAutoFillData(data, homeId, awayId) {
     setVal('h2h-d', h2h.draws);
     setVal('h2h-a', h2h.awayWins);
   }
+
+  // ── 6. Possession estimée ──
+  // Basée sur le ratio d'attaque : l'équipe qui crée plus tend à posséder plus
+  var hGF = hAll.played > 0 ? hAll.gf : (hHome.played > 0 ? hHome.gf : 1.5);
+  var aGF = aAll.played > 0 ? aAll.gf : (aAway.played > 0 ? aAway.gf : 1.5);
+  var hGA = hAll.played > 0 ? hAll.ga : (hHome.played > 0 ? hHome.ga : 1.5);
+  var aGA = aAll.played > 0 ? aAll.ga : (aAway.played > 0 ? aAway.ga : 1.5);
+  // Indice de domination = buts marqués + (buts encaissés adversaire)
+  var hDom = hGF + aGA;
+  var aDom = aGF + hGA;
+  var totalDom = hDom + aDom;
+  if (totalDom > 0) {
+    var hPoss = Math.round((hDom / totalDom) * 100);
+    // Ajustement avantage domicile (+3%)
+    hPoss = Math.min(75, Math.max(35, hPoss + 3));
+    var aPoss = 100 - hPoss;
+    setVal('h-poss', hPoss);
+    setVal('a-poss', aPoss);
+  }
+
+  // ── 7. ELO via ClubElo.com ──
+  var homeName = afSelected.home ? afSelected.home.name : '';
+  var awayName = afSelected.away ? afSelected.away.name : '';
+  fetchClubElo(homeName, awayName);
 }
 
 function setVal(id, val) {
@@ -3357,6 +3381,162 @@ function computeH2H(matches, homeId) {
     homeWinRate: hw / n, drawRate: d / n, awayWinRate: aw / n,
     avgTotal: gtot / n, bttsRate: btts / n, over25Rate: over25 / n
   };
+}
+
+// ── ELO via ClubElo.com (API publique gratuite) ──────────────────────────
+// Normalise le nom d'équipe pour ClubElo (ex: "Manchester City" → "ManCity")
+function normalizeClubEloName(name) {
+  var map = {
+    'manchester city': 'ManCity',
+    'manchester united': 'ManUtd',
+    'tottenham hotspur': 'Tottenham',
+    'tottenham': 'Tottenham',
+    'newcastle united': 'Newcastle',
+    'west ham united': 'WestHam',
+    'wolverhampton wanderers': 'Wolves',
+    'wolverhampton': 'Wolves',
+    'nottingham forest': 'NottsForest',
+    'sheffield united': 'SheffieldUtd',
+    'brighton & hove albion': 'Brighton',
+    'brighton': 'Brighton',
+    'aston villa': 'AstonVilla',
+    'brentford': 'Brentford',
+    'crystal palace': 'CrystalPalace',
+    'fulham': 'Fulham',
+    'luton town': 'Luton',
+    'burnley': 'Burnley',
+    'everton': 'Everton',
+    'chelsea': 'Chelsea',
+    'arsenal': 'Arsenal',
+    'liverpool': 'Liverpool',
+    'bournemouth': 'Bournemouth',
+    'real madrid': 'RealMadrid',
+    'barcelona': 'Barcelona',
+    'atletico madrid': 'AtleticoMadrid',
+    'atletico de madrid': 'AtleticoMadrid',
+    'sevilla': 'Sevilla',
+    'real sociedad': 'RealSociedad',
+    'villarreal': 'Villarreal',
+    'athletic club': 'AthleticBilbao',
+    'real betis': 'Betis',
+    'osasuna': 'Osasuna',
+    'valencia': 'Valencia',
+    'bayern munich': 'Bayern',
+    'fc bayern münchen': 'Bayern',
+    'borussia dortmund': 'Dortmund',
+    'bayer leverkusen': 'Leverkusen',
+    'rb leipzig': 'RBLeipzig',
+    'eintracht frankfurt': 'Frankfurt',
+    'union berlin': 'UnionBerlin',
+    'vfb stuttgart': 'Stuttgart',
+    'borussia mönchengladbach': 'MGladbach',
+    'juventus': 'Juventus',
+    'inter milan': 'Inter',
+    'internazionale': 'Inter',
+    'ac milan': 'Milan',
+    'napoli': 'Napoli',
+    'roma': 'Roma',
+    'as roma': 'Roma',
+    'lazio': 'Lazio',
+    'ss lazio': 'Lazio',
+    'fiorentina': 'Fiorentina',
+    'atalanta': 'Atalanta',
+    'paris saint-germain': 'PSG',
+    'psg': 'PSG',
+    'olympique de marseille': 'Marseille',
+    'marseille': 'Marseille',
+    'olympique lyonnais': 'Lyon',
+    'lyon': 'Lyon',
+    'monaco': 'Monaco',
+    'as monaco': 'Monaco',
+    'lille': 'Lille',
+    'losc lille': 'Lille',
+    'rennes': 'Rennes',
+    'stade rennais': 'Rennes',
+    'nice': 'Nice',
+    'ogc nice': 'Nice',
+    'lens': 'Lens',
+    'rc lens': 'Lens',
+    'porto': 'Porto',
+    'fc porto': 'Porto',
+    'benfica': 'Benfica',
+    'sl benfica': 'Benfica',
+    'sporting cp': 'Sporting',
+    'ajax': 'Ajax',
+    'psv eindhoven': 'PSV',
+    'psv': 'PSV',
+    'celtic': 'Celtic',
+    'rangers': 'Rangers',
+    'porto': 'Porto',
+    'benfica': 'Benfica'
+  };
+  var lower = (name || '').toLowerCase().trim();
+  return map[lower] || name.replace(/\s+/g, '');
+}
+
+function fetchClubElo(homeName, awayName) {
+  if (!homeName || !awayName) return;
+
+  var homeEloName = normalizeClubEloName(homeName);
+  var awayEloName = normalizeClubEloName(awayName);
+
+  var today = new Date().toISOString().slice(0, 10);
+
+  // Appel via notre proxy /api/clubelo (évite le CORS)
+  fetch('/api/clubelo?club=' + encodeURIComponent(homeEloName))
+    .then(function(r) { return r.text(); })
+    .then(function(csv) {
+      var elo = parseClubEloCsv(csv, today);
+      if (elo) {
+        setVal('h-elo', Math.round(elo));
+        setAutofillStatus('⚡ ELO chargé — ' + homeName + ' : ' + Math.round(elo), 'ok');
+        setTimeout(function() { hideAutofillStatus(); }, 2000);
+      }
+    })
+    .catch(function() {
+      console.log('[ELO] ' + homeName + ' non trouvé sur ClubElo');
+    });
+
+  fetch('/api/clubelo?club=' + encodeURIComponent(awayEloName))
+    .then(function(r) { return r.text(); })
+    .then(function(csv) {
+      var elo = parseClubEloCsv(csv, today);
+      if (elo) {
+        setVal('a-elo', Math.round(elo));
+      }
+    })
+    .catch(function() {
+      console.log('[ELO] ' + awayName + ' non trouvé sur ClubElo');
+    });
+}
+
+function parseClubEloCsv(csv, targetDate) {
+  // Format CSV ClubElo : Rank,Club,Country,Level,Elo,From,To
+  var lines = csv.trim().split('\n');
+  if (lines.length < 2) return null;
+
+  var latest = null;
+  var latestDate = null;
+
+  for (var i = 1; i < lines.length; i++) {
+    var parts = lines[i].split(',');
+    if (parts.length < 7) continue;
+    var elo = parseFloat(parts[4]);
+    var from = parts[5] && parts[5].trim();
+    var to = parts[6] && parts[6].trim();
+    if (!elo || isNaN(elo)) continue;
+
+    // Prendre la ligne la plus récente dont la période inclut aujourd'hui
+    if (from && to && from <= targetDate && to >= targetDate) {
+      return elo;
+    }
+    // Fallback : garder la dernière ligne
+    if (!latestDate || from > latestDate) {
+      latestDate = from;
+      latest = elo;
+    }
+  }
+  return latest;
 }
 
 // Initialisation au chargement
