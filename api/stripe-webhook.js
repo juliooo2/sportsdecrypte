@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   var STRIPE_SECRET         = process.env.STRIPE_SECRET_KEY;
-  var STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+  var STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET_LIVE || process.env.STRIPE_WEBHOOK_SECRET;
   var SUPABASE_URL          = process.env.SUPABASE_URL;
   var SERVICE_KEY           = process.env.SUPABASE_SERVICE_KEY;
 
