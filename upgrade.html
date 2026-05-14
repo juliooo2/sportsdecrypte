@@ -427,6 +427,19 @@
         <div class="plan-desc">Accès complet, résiliable à tout moment.</div>
       </div>
 
+      <div class="plan" id="plan-annual" onclick="selectPlan('annual')" style="border-color:rgba(0,229,184,0.3);position:relative">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;white-space:nowrap;letter-spacing:1px">🎉 -34% ÉCONOMIES</div>
+        <div class="plan-header">
+          <div class="plan-radio"><div class="plan-radio-dot"></div></div>
+          <div class="plan-name" style="color:var(--green)">Annuel</div>
+        </div>
+        <div class="plan-price-row">
+          <div class="plan-price" style="color:var(--green)">79€</div>
+          <div class="plan-period">/ an</div>
+        </div>
+        <div class="plan-desc">Soit 6,58€/mois — 2 mois offerts !</div>
+      </div>
+
     </div>
 
     <!-- FEATURES -->
@@ -504,8 +517,9 @@
     // ── Config ──────────────────────────────────────────────────────
    var STRIPE_PUBLIC_KEY = 'pk_live_51TWETjF75S81FRZ1R6gapd8EkwwpcuoSFM8wikK2GHYlhAWdjRyDsdUSvTLH1mZfj0q6gt7T28yHPfgdKKG4qKxO00bRvvvOim';
    var PRICES = {
-      early:    'price_1TWEcPFA47y0FqrmrxZkoZ1c', // 4,99€
-      standard: 'price_1TWEcPFA47y0FqrmbbEoeaxB'  // 9,99€
+      early:    'price_1TWHpJF75S81FRZ1IevHaoup', // 4,99€
+      standard: 'price_1TWHpHF75S81FRZ1FymRPoGg', // 9,99€
+      annual:   'price_1TWxGEF75S81FRZ1VzV1sK6l'  // 79€/an
     };
 
     var selectedPlan = 'early';
@@ -531,6 +545,8 @@
       selectedPlan = plan;
       document.getElementById('plan-early').classList.toggle('selected', plan === 'early');
       document.getElementById('plan-standard').classList.toggle('selected', plan === 'standard');
+      var annualEl = document.getElementById('plan-annual');
+      if (annualEl) annualEl.classList.toggle('selected', plan === 'annual');
     }
 
     // ── Paiement Stripe ──────────────────────────────────────────────
