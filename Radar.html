@@ -447,6 +447,7 @@
     <span>📊</span>
     <div class="quota-bar"><div class="quota-fill" id="quotaFill" style="width:0%"></div></div>
     <span class="quota-text" id="quotaText">Chargement...</span>
+    <button id="notif-btn" onclick="toggleNotifications()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:5px 8px;font-size:14px;cursor:pointer;transition:all 0.2s;flex-shrink:0" title="Activer les notifications">🔔</button>
     <button class="btn btn-ghost btn-sm" id="resetCacheBtn" onclick="clearAllCache();init()">🔄</button>
   </div>
 
@@ -1559,6 +1560,8 @@ function fetchAndAnalyze(date, silent) {
       state.matches = valid;
       document.getElementById('quotaText').textContent = '✅ ' + valid.length + ' matchs analysés · Cache 3h';
       renderMatches();
+      // Notifier les value bets si notifications activées
+      notifyValueBets(valid);
     }).catch(function(err) {
       if (!silent) {
         content.innerHTML = '<div class="empty">Erreur : ' + escapeHtml(err.message) + '</div>';
@@ -1566,6 +1569,191 @@ function fetchAndAnalyze(date, silent) {
       }
     });
   });
+}
+
+
+// ═══════════════════════════════════════════════════════
+// MODULE NOTIFICATIONS PUSH
+// ═══════════════════════════════════════════════════════
+
+var VAPID_PUBLIC_KEY = 'BHKItR4XL_r20OUboQv-dZ-NGR7_rqxx1iNsREetzql_y5O_-t56TGVwk-5ZuOeWqu3SmfHuRchq36gtzzmTJXA';
+var pushSubscription = null;
+var notifEnabled = localStorage.getItem('sd_notif_enabled') === '1';
+
+// Mettre à jour l'icône du bouton notif au chargement
+function updateNotifBtn() {
+  var btn = document.getElementById('notif-btn');
+  if (!btn) return;
+  if (notifEnabled && pushSubscription) {
+    btn.textContent = '🔔';
+    btn.style.background = 'rgba(0,229,184,0.15)';
+    btn.style.borderColor = 'rgba(0,229,184,0.4)';
+    btn.title = 'Notifications activées — cliquer pour désactiver';
+  } else {
+    btn.textContent = '🔕';
+    btn.style.background = 'rgba(255,255,255,0.05)';
+    btn.style.borderColor = 'rgba(255,255,255,0.1)';
+    btn.title = 'Activer les notifications value bets';
+  }
+}
+
+async function toggleNotifications() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    showToast('Notifications non supportées sur ce navigateur');
+    return;
+  }
+
+  if (notifEnabled && pushSubscription) {
+    // Désactiver
+    try {
+      await pushSubscription.unsubscribe();
+    } catch(e) {}
+    pushSubscription = null;
+    notifEnabled = false;
+    localStorage.setItem('sd_notif_enabled', '0');
+    updateNotifBtn();
+    showToast('🔕 Notifications désactivées');
+    return;
+  }
+
+  // Demander la permission
+  var permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    showToast('Permission refusée. Active les notifs dans les paramètres du navigateur.');
+    return;
+  }
+
+  showToast('⏳ Activation des notifications...');
+
+  try {
+    // Enregistrer le service worker
+    var reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+
+    // S'abonner au push
+    pushSubscription = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+
+    // Sauvegarder la subscription côté serveur
+    var userId = localStorage.getItem('sd_auth_userid');
+    if (userId) {
+      await fetch('/api/push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'subscribe',
+          subscription: pushSubscription.toJSON(),
+          userId: userId
+        })
+      });
+    }
+
+    // Sauvegarder localement
+    localStorage.setItem('sd_notif_enabled', '1');
+    localStorage.setItem('sd_push_subscription', JSON.stringify(pushSubscription.toJSON()));
+    notifEnabled = true;
+    updateNotifBtn();
+    showToast('🔔 Notifications activées ! Tu seras alerté des value bets.');
+
+    // Envoyer une notif de test
+    setTimeout(function() {
+      sendLocalNotif('SportsDecrypté 📡', 'Notifications activées ! Tu recevras les meilleurs value bets ici.');
+    }, 1000);
+
+  } catch(e) {
+    console.error('[push]', e);
+    showToast('Erreur : ' + e.message);
+  }
+}
+
+// Envoyer une notification locale (sans serveur)
+function sendLocalNotif(title, body, url) {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.ready.then(function(reg) {
+    reg.showNotification(title, {
+      body: body,
+      icon: '/icon-192.png',
+      tag: 'radar-' + Date.now(),
+      vibrate: [200, 100, 200],
+      data: { url: url || '/Radar.html' }
+    });
+  });
+}
+
+// Notifier les value bets détectés (appelé après l'analyse)
+function notifyValueBets(matches) {
+  if (!notifEnabled) return;
+
+  // Trouver les meilleurs value bets (score >= 70)
+  var topBets = [];
+  matches.forEach(function(m) {
+    if (!m.bets) return;
+    m.bets.forEach(function(b) {
+      if (b.score >= 70 && b.fairOdds && parseFloat(b.fairOdds) >= state.oddsMin) {
+        topBets.push({
+          match: m.match.homeTeam.name + ' vs ' + m.match.awayTeam.name,
+          bet: b.label || b.betType,
+          odds: b.fairOdds,
+          score: b.score
+        });
+      }
+    });
+  });
+
+  if (topBets.length === 0) return;
+
+  // Notifier seulement si on n'a pas déjà notifié ces matchs
+  var notifKey = 'sd_last_notif_' + new Date().toISOString().slice(0, 10);
+  var alreadyNotified = localStorage.getItem(notifKey) === '1';
+  if (alreadyNotified) return;
+
+  var best = topBets[0];
+  var title = '📡 Value bet détecté ! (score ' + best.score + '/100)';
+  var body = best.match + '\n' + best.bet + ' @' + best.odds;
+
+  sendLocalNotif(title, body, '/Radar.html');
+  localStorage.setItem(notifKey, '1');
+
+  if (topBets.length > 1) {
+    setTimeout(function() {
+      sendLocalNotif(
+        '📡 ' + topBets.length + ' value bets aujourd\'hui',
+        topBets.map(function(b) { return b.match; }).join(' · '),
+        '/Radar.html'
+      );
+    }, 3000);
+  }
+}
+
+// Restaurer la subscription existante au chargement
+(function restorePushSubscription() {
+  if (!notifEnabled) { updateNotifBtn(); return; }
+  var saved = localStorage.getItem('sd_push_subscription');
+  if (saved) {
+    try {
+      pushSubscription = JSON.parse(saved);
+      updateNotifBtn();
+    } catch(e) {}
+  }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(function(reg) {
+      reg.pushManager.getSubscription().then(function(sub) {
+        if (sub) { pushSubscription = sub; updateNotifBtn(); }
+        else { notifEnabled = false; updateNotifBtn(); }
+      });
+    });
+  }
+})();
+
+function urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData = window.atob(base64);
+  var outputArray = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
 }
 
 init();
