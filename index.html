@@ -1247,17 +1247,10 @@
   <div class="bankroll-card">
     <div class="bankroll-label">MA BANKROLL</div>
     <div class="bankroll-amount" id="dash-bankroll">0 €</div>
-    <div style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:4px">
-      <div class="bankroll-initial">Capital initial : <span id="dash-initial">0 €</span></div>
-      <div id="dash-evolution-badge" style="display:none;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px"></div>
-    </div>
-    <div id="dash-config-btn" onclick="navTo('screen-accounts',null)" style="display:none;background:rgba(245,200,66,0.12);border:1px solid rgba(245,200,66,0.3);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--gold);cursor:pointer;text-align:center;margin-bottom:8px">
-      ⚙️ Configurer ma bankroll initiale →
-    </div>
     <div class="bankroll-stats">
-      <div class="bk-stat"><div class="bk-stat-label">PROFIT / PERTE</div><div class="bk-stat-value neutral" id="dash-profit">+0 €</div></div>
+      <div class="bk-stat"><div class="bk-stat-label">CAPITAL INITIAL</div><div class="bk-stat-value neutral" id="dash-initial">0 €</div></div>
       <div class="bk-stat"><div class="bk-stat-label">ROI</div><div class="bk-stat-value neutral" id="dash-roi">0%</div></div>
-      <div class="bk-stat"><div class="bk-stat-label">SÉRIE</div><div class="bk-stat-value neutral" id="dash-streak">—</div></div>
+      <div class="bk-stat"><div class="bk-stat-label">PROFIT</div><div class="bk-stat-value neutral" id="dash-profit">+0 €</div></div>
       <div class="bk-stat"><div class="bk-stat-label">WIN RATE</div><div class="bk-stat-value neutral" id="dash-winrate">—</div></div>
     </div>
   </div>
@@ -2844,9 +2837,32 @@
         document.getElementById('screen-onboarding').classList.remove('active');
         document.getElementById('screen-onboarding').style.display = 'none';
       }
-      const saved = localStorage.getItem('sd_accounts');
-      if (saved) {
-        const data = JSON.parse(saved);
+      var saved = localStorage.getItem('sd_accounts');
+
+      // Créer automatiquement un compte par défaut si aucune donnée
+      if (!saved) {
+        var defaultId = Date.now();
+        var defaultAccount = {
+          accounts: [{
+            id: defaultId,
+            name: 'Mon compte',
+            emoji: '💰',
+            state: {
+              initialBankroll: 0,
+              bets: [],
+              goals: [],
+              unlockedBadges: {},
+              deposits: [],
+              vbHistory: []
+            }
+          }],
+          currentId: defaultId
+        };
+        localStorage.setItem('sd_accounts', JSON.stringify(defaultAccount));
+        saved = localStorage.getItem('sd_accounts');
+      }
+
+      const data = JSON.parse(saved);
         allAccounts = data.accounts || [];
         currentAccountId = data.currentId || null;
         if (allAccounts.length > 0) {
@@ -2880,12 +2896,13 @@
           }, 800);
           goTo('screen-dashboard');
           setTimeout(function() { renderDashboard(); }, 50);
+          // Si bankroll pas encore configurée → aller vers setup
+          if (state.initialBankroll === 0 && localStorage.getItem('sd_onboarding_done')) {
+            setTimeout(function() { goTo('screen-setup'); }, 100);
+          }
         } else {
           if (localStorage.getItem('sd_onboarding_done')) goTo('screen-setup');
         }
-      } else {
-        if (localStorage.getItem('sd_onboarding_done')) goTo('screen-setup');
-      }
     } catch(e) { console.error('loadState crash:', e); }
   }
 
@@ -7561,6 +7578,10 @@ function renderAdvancedStats() {
     var qw=document.getElementById('qs-won'); if(qw) qw.textContent=won.length;
     var qc=document.getElementById('qs-combo'); if(qc) qc.textContent=combos.length;
     var qg=document.getElementById('qs-goals'); if(qg) qg.textContent=state.goals.filter(function(g){return g.completed;}).length+'/'+state.goals.length;
+    // Nouveaux éléments bankroll card
+    var bc=document.getElementById('dash-bets-count'); if(bc) bc.textContent=state.bets.length;
+    var wc=document.getElementById('dash-won-count'); if(wc) wc.textContent=won.length;
+    var lc=document.getElementById('dash-lost-count'); if(lc) lc.textContent=lost.length;
   // Update mini shortcuts
   const goalsDone = state.goals.filter(g=>g.completed).length;
   const goalsTotal = state.goals.length;
