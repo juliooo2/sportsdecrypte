@@ -868,13 +868,21 @@ function applyDateFilter() {
   var date = document.getElementById('dateInput').value;
   var league = document.getElementById('leagueSelect').value;
   if (!date) date = new Date().toISOString().slice(0, 10);
+
+  // Bloquer si la date est dans plus de 7 jours
+  var selectedDate = new Date(date + 'T12:00:00');
+  var maxDate = new Date(Date.now() + 7 * 86400000);
+  if (selectedDate > maxDate) {
+    showToast('⚠️ Maximum 7 jours à l\'avance');
+    return;
+  }
+
   var leagueNames = {
     'ALL_TOP':'Toutes ligues','PL':'Premier League','PD':'La Liga',
     'BL1':'Bundesliga','SA':'Serie A','FL1':'Ligue 1',
     'CL':'Champions League','EL':'Europa League','DED':'Eredivisie','PPL':'Primeira Liga'
   };
-  var d = new Date(date + 'T12:00:00');
-  var dateLabel = d.toLocaleDateString('fr-FR', {day:'numeric',month:'short'});
+  var dateLabel = selectedDate.toLocaleDateString('fr-FR', {day:'numeric',month:'short'});
   document.getElementById('dateFilterLabel').textContent = dateLabel + ' · ' + (leagueNames[league] || league);
   document.getElementById('dateFilterPanel').style.display = 'none';
   document.getElementById('dateFilterArrow').style.transform = '';
@@ -1463,7 +1471,12 @@ function init() {
 
   // Initialiser la date d'aujourd'hui dans le sélecteur
   var dateInput = document.getElementById('dateInput');
-  if (dateInput) dateInput.value = today;
+  if (dateInput) {
+    dateInput.value = today;
+    // Bloquer au max 7 jours à l'avance
+    var maxDate = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+    dateInput.max = maxDate;
+  }
 
   document.getElementById('resetCacheBtn').addEventListener('click', function () {
     var n = clearAllCache();
@@ -1674,13 +1687,13 @@ function fetchAndAnalyze(date, silent, selectedLeague) {
       var cacheKey = 'radar_' + date + '_' + league;
 
       // Sauvegarder en local
-      cacheSet(cacheKey, { matches: valid, ts: Date.now() }, 3 * 3600 * 1000);
+      cacheSet(cacheKey, { matches: valid, ts: Date.now() }, 24 * 3600 * 1000);
 
       // Sauvegarder dans Supabase (cache partagé) en arrière-plan
       fetch('/api/radar-cache', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: cacheKey, data: { matches: valid }, ttlHours: 3 })
+        body: JSON.stringify({ key: cacheKey, data: { matches: valid }, ttlHours: 24 })
       }).catch(function(){});
 
       state.matches = valid;
