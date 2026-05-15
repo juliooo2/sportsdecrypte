@@ -1497,23 +1497,46 @@ function init() {
 
 function autoAnalyze(date) {
   var content = document.getElementById('content');
+  var league = (document.getElementById('leagueSelect') && document.getElementById('leagueSelect').value) || 'ALL_TOP';
+  var cacheKey = 'radar_' + date + '_' + league;
 
-  // 1. Essayer le cache d'abord → affichage instantané
-  var cacheKey = 'radar_full_' + date;
-  var cached = cacheGet(cacheKey);
-  if (cached && cached.matches && cached.matches.length > 0) {
-    state.matches = cached.matches;
-    document.getElementById('quotaText').textContent = 'Cache — ' + cached.matches.length + ' matchs analysés';
+  // 1. Cache local (instantané)
+  var localCached = cacheGet(cacheKey);
+  if (localCached && localCached.matches && localCached.matches.length > 0) {
+    state.matches = localCached.matches;
+    document.getElementById('quotaText').textContent = '⚡ Cache local — ' + localCached.matches.length + ' matchs';
     renderMatches();
-    // Refresh silencieux en arrière-plan si cache > 2h
-    if (Date.now() - (cached.ts || 0) > 2 * 3600 * 1000) {
-      setTimeout(function() { fetchAndAnalyze(date, true); }, 1000);
+    if (Date.now() - (localCached.ts || 0) > 2 * 3600 * 1000) {
+      setTimeout(function() { fetchAndAnalyze(date, true, league); }, 1000);
     }
     return;
   }
 
-  // 2. Pas de cache → analyse complète
-  fetchAndAnalyze(date, false);
+  // 2. Cache Supabase partagé
+  content.innerHTML = '<div class="loader"><span class="loader-spin"></span>Chargement...</div>';
+  document.getElementById('quotaText').textContent = 'Vérification du cache...';
+
+  fetch('/api/radar-cache?key=' + encodeURIComponent(cacheKey))
+    .then(function(r) { return r.json(); })
+    .then(function(result) {
+      if (result.found && result.data && result.data.matches && result.data.matches.length > 0) {
+        // Cache Supabase trouvé → affichage instantané
+        state.matches = result.data.matches;
+        var createdAt = new Date(result.created_at);
+        var timeAgo = Math.round((Date.now() - createdAt.getTime()) / 60000);
+        document.getElementById('quotaText').textContent = '⚡ Cache partagé — ' + result.data.matches.length + ' matchs · il y a ' + timeAgo + 'min';
+        // Sauvegarder aussi en local
+        cacheSet(cacheKey, { matches: result.data.matches, ts: createdAt.getTime() }, 3 * 3600 * 1000);
+        renderMatches();
+      } else {
+        // Pas de cache → analyse complète
+        fetchAndAnalyze(date, false, league);
+      }
+    })
+    .catch(function() {
+      // Erreur réseau → analyse complète
+      fetchAndAnalyze(date, false, league);
+    });
 }
 
 function fetchAndAnalyze(date, silent, selectedLeague) {
@@ -1647,7 +1670,18 @@ function fetchAndAnalyze(date, silent, selectedLeague) {
       var valid = analyzed.filter(function(a) { return a.bets && a.bets.length > 0; });
 
       // Mettre en cache 3h
-      cacheSet('radar_full_' + date, { matches: valid, ts: Date.now() }, 3 * 3600);
+      var league = (document.getElementById('leagueSelect') && document.getElementById('leagueSelect').value) || 'ALL_TOP';
+      var cacheKey = 'radar_' + date + '_' + league;
+
+      // Sauvegarder en local
+      cacheSet(cacheKey, { matches: valid, ts: Date.now() }, 3 * 3600 * 1000);
+
+      // Sauvegarder dans Supabase (cache partagé) en arrière-plan
+      fetch('/api/radar-cache', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: cacheKey, data: { matches: valid }, ttlHours: 3 })
+      }).catch(function(){});
 
       state.matches = valid;
       document.getElementById('quotaText').textContent = '✅ ' + valid.length + ' matchs analysés · Cache 3h';
