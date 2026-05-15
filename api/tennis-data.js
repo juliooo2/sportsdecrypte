@@ -24,8 +24,19 @@ export default async function handler(req, res) {
     'getH2HFixtures',
     'getDateFixtures',
     'getDateRangeFixtures',
-    'getPlayerRanking'
+    'getPlayerRanking',
+    'ranking/live'
   ];
+
+  // Endpoint ranking/live est un cas spécial avec chemin différent
+  var url;
+  if (endpoint === 'ranking/live') {
+    url = 'https://tennis-api-atp-wta-itf.p.rapidapi.com/tennis/v2/ranking/live';
+    if (params.toString()) url += '?' + params.toString();
+  } else {
+    url = 'https://tennis-api-atp-wta-itf.p.rapidapi.com/tennis/v2/' + endpoint;
+    if (params.toString()) url += '?' + params.toString();
+  }
   if (allowed.indexOf(endpoint) === -1) {
     return res.status(400).json({ error: 'Endpoint non autorisé' });
   }
@@ -35,9 +46,6 @@ export default async function handler(req, res) {
   Object.keys(req.query).forEach(function(k) {
     if (k !== 'endpoint') params.append(k, req.query[k]);
   });
-
-  var url = 'https://tennis-api-atp-wta-itf.p.rapidapi.com/tennis/v2/' + endpoint;
-  if (params.toString()) url += '?' + params.toString();
 
   try {
     var response = await fetch(url, {
