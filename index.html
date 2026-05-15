@@ -184,6 +184,7 @@
     width: 260px; height: 260px; border-radius: 50%;
     background: radial-gradient(circle, rgba(245,200,66,0.12) 0%, transparent 65%);
     pointer-events: none;
+    z-index: 0;
   }
   .bankroll-card::after {
     content: '';
@@ -191,6 +192,7 @@
     width: 180px; height: 180px; border-radius: 50%;
     background: radial-gradient(circle, rgba(255,107,53,0.07) 0%, transparent 65%);
     pointer-events: none;
+    z-index: 0;
   }
   .bankroll-card > * { position: relative; z-index: 1; }
   .bankroll-label { font-size: 9px; letter-spacing: 4px; color: rgba(245,200,66,0.55); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
@@ -1104,73 +1106,83 @@
     <!-- Slides -->
     <div class="ob-slides" id="ob-slides">
 
+      <!-- SLIDE 1 — BIENVENUE -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:300px;height:300px;background:radial-gradient(circle,rgba(245,200,66,0.12),transparent);top:10%;right:-50px;"></div>
-        <div class="ob-visual animate" id="ob-vis-0">📊</div>
+        <div class="ob-bg-glow" style="width:320px;height:320px;background:radial-gradient(circle,rgba(255,107,53,0.14),transparent);top:5%;left:50%;transform:translateX(-50%);"></div>
+        <div class="ob-visual animate" id="ob-vis-0">🏆</div>
         <div class="ob-content">
           <div class="ob-tag">BIENVENUE</div>
           <div class="ob-title">SPORTS<br><span>DÉCRYPTÉ</span></div>
-          <div class="ob-desc">L'app de suivi de bankroll pour parieurs sérieux. Analyse tes performances et progresse.</div>
+          <div class="ob-desc">L'app tout-en-un pour parieurs sérieux. Suis ta bankroll, analyse tes performances et parie avec méthode.</div>
           <div class="ob-features">
-            <div class="ob-feature"><div class="ob-feature-icon">💰</div><div class="ob-feature-text"><strong>Suis ta bankroll</strong> en temps réel</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">📈</div><div class="ob-feature-text"><strong>Analyse tes stats</strong> : ROI, win rate, séries</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🏆</div><div class="ob-feature-text"><strong>Progresse</strong> du niveau Débutant à Légende</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">💰</div><div class="ob-feature-text"><strong>Bankroll tracker</strong> — suivi en temps réel</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">📊</div><div class="ob-feature-text"><strong>Stats avancées</strong> — ROI, win rate, séries, heatmap</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🎰</div><div class="ob-feature-text"><strong>Casino inclus</strong> — sessions casino dans ta bankroll</div></div>
           </div>
         </div>
       </div>
 
+      <!-- SLIDE 2 — BANKROLL & STATS -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:280px;height:280px;background:radial-gradient(circle,rgba(0,229,184,0.1),transparent);bottom:20%;left:-60px;"></div>
-        <div class="ob-visual" id="ob-vis-1">⚡</div>
+        <div class="ob-bg-glow" style="width:280px;height:280px;background:radial-gradient(circle,rgba(0,229,184,0.12),transparent);bottom:20%;left:-60px;"></div>
+        <div class="ob-visual" id="ob-vis-1">📈</div>
         <div class="ob-content">
-          <div class="ob-tag">SAISIE RAPIDE</div>
-          <div class="ob-title">ENREGISTRE<br><span>EN 10 SEC</span></div>
-          <div class="ob-desc">Le mode Express te permet d'enregistrer un pari avec seulement 3 champs.</div>
+          <div class="ob-tag">BANKROLL & STATS</div>
+          <div class="ob-title">SUIS TES<br><span>PERFORMANCES</span></div>
+          <div class="ob-desc">Enregistre tes paris en 10 secondes et accède à des statistiques dignes d'un professionnel.</div>
           <div class="ob-features">
-            <div class="ob-feature"><div class="ob-feature-icon">⚡</div><div class="ob-feature-text"><strong>Mode Express</strong> — match, mise, cote</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🎯</div><div class="ob-feature-text"><strong>Mode Simple</strong> — tous les détails</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🎰</div><div class="ob-feature-text"><strong>Mode Combiné</strong> — jusqu'à 8 matchs</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">⚡</div><div class="ob-feature-text"><strong>Mode Express</strong> — 3 champs, 10 secondes</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🧮</div><div class="ob-feature-text"><strong>Kelly & Value Bet</strong> — mise optimale calculée</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">📅</div><div class="ob-feature-text"><strong>Stats.html</strong> — courbe bankroll, ROI mensuel, heatmap</div></div>
           </div>
         </div>
       </div>
 
+      <!-- SLIDE 3 — PREDICT -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:260px;height:260px;background:radial-gradient(circle,rgba(91,155,255,0.1),transparent);top:15%;left:-40px;"></div>
-        <div class="ob-visual" id="ob-vis-2">🧮</div>
+        <div class="ob-bg-glow" style="width:260px;height:260px;background:radial-gradient(circle,rgba(124,58,237,0.12),transparent);top:15%;right:-40px;"></div>
+        <div class="ob-visual" id="ob-vis-2">🔮</div>
         <div class="ob-content">
-          <div class="ob-tag">OUTILS PRO</div>
-          <div class="ob-title">MISE<br><span>OPTIMALE</span></div>
-          <div class="ob-desc">Kelly et Value Bet t'aident à miser intelligemment et détecter les opportunités.</div>
+          <div class="ob-tag">PREDICT — 6 SPORTS</div>
+          <div class="ob-title">ANALYSE<br><span>SCIENTIFIQUE</span></div>
+          <div class="ob-desc">Modèle Dixon-Coles, ELO rating, H2H automatique. Les meilleures prédictions en quelques secondes.</div>
           <div class="ob-features">
-            <div class="ob-feature"><div class="ob-feature-icon">🧮</div><div class="ob-feature-text"><strong>Kelly</strong> — calcule ta mise idéale</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">💎</div><div class="ob-feature-text"><strong>Value Bet</strong> — détecte l'edge on chaque cote</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">💡</div><div class="ob-feature-text"><strong>Conseils IA</strong> — analyse automatique</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">⚽</div><div class="ob-feature-text"><strong>Football</strong> — auto-fill ELO + H2H + possession</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🎾</div><div class="ob-feature-text"><strong>Tennis, Basket, Hockey</strong> — modèles dédiés</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">💰</div><div class="ob-feature-text"><strong>Value Bet</strong> — cote juste vs cote bookmaker</div></div>
           </div>
         </div>
       </div>
 
+      <!-- SLIDE 4 — RADAR & IA -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:280px;height:280px;background:radial-gradient(circle,rgba(176,110,243,0.1),transparent);bottom:25%;right:-50px;"></div>
-        <div class="ob-visual" id="ob-vis-3">🔥</div>
+        <div class="ob-bg-glow" style="width:300px;height:300px;background:radial-gradient(circle,rgba(91,155,255,0.1),transparent);bottom:25%;right:-50px;"></div>
+        <div class="ob-visual" id="ob-vis-3">📡</div>
         <div class="ob-content">
-          <div class="ob-tag">GAMIFICATION</div>
-          <div class="ob-title">DÉBLOQUE<br><span>DES NIVEAUX</span></div>
-          <div class="ob-desc">8 niveaux selon ton ROI, 28 badges à collecter.</div>
+          <div class="ob-tag">RADAR & COACH IA</div>
+          <div class="ob-title">LES MEILLEURS<br><span>VALUE BETS</span></div>
+          <div class="ob-desc">Le Radar analyse automatiquement tous les matchs du jour et t'alerte sur les meilleures opportunités.</div>
           <div class="ob-features">
-            <div class="ob-feature"><div class="ob-feature-icon">🎮</div><div class="ob-feature-text"><strong>8 niveaux</strong> de Débutant à Légende</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🎖️</div><div class="ob-feature-text"><strong>28 badges</strong> à collecter</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🧠</div><div class="ob-feature-text"><strong>Moteur GO/NO GO</strong> — décide intelligemment</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">📡</div><div class="ob-feature-text"><strong>Radar auto</strong> — value bets dès l'ouverture</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🔔</div><div class="ob-feature-text"><strong>Notifications push</strong> — alertes en temps réel</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🤖</div><div class="ob-feature-text"><strong>Coach IA</strong> — analyse, conseils, post-match</div></div>
           </div>
         </div>
       </div>
 
+      <!-- SLIDE 5 — PASSE PRO -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:350px;height:350px;background:radial-gradient(circle,rgba(255,107,53,0.1),transparent);top:20%;left:50%;transform:translateX(-50%);"></div>
-        <div class="ob-visual" id="ob-vis-4">🚀</div>
+        <div class="ob-bg-glow" style="width:350px;height:350px;background:radial-gradient(circle,rgba(245,200,66,0.12),transparent);top:10%;left:50%;transform:translateX(-50%);"></div>
+        <div class="ob-visual" id="ob-vis-4">💎</div>
         <div class="ob-content">
-          <div class="ob-tag">C'EST PARTI</div>
-          <div class="ob-title">PRÊT À<br><span>PERFORMER ?</span></div>
-          <div class="ob-desc">Configure ta bankroll et commence à tracker tes performances maintenant. C'est gratuit et sans inscription.</div>
+          <div class="ob-tag">GRATUIT + PRO</div>
+          <div class="ob-title">TOUT EST<br><span>ACCESSIBLE</span></div>
+          <div class="ob-desc">L'app est gratuite. Pour débloquer Predict tous sports, Radar illimité et Coach IA complet, passe PRO.</div>
+          <div class="ob-features">
+            <div class="ob-feature"><div class="ob-feature-icon">✅</div><div class="ob-feature-text"><strong>Gratuit</strong> — Bankroll, Stats, Predict Football</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">💎</div><div class="ob-feature-text"><strong>PRO dès 4,99€/mois</strong> — tout débloquer</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🔒</div><div class="ob-feature-text"><strong>Prix garanti à vie</strong> pour les 50 premiers</div></div>
+          </div>
         </div>
       </div>
 
@@ -1235,7 +1247,13 @@
   <div class="bankroll-card">
     <div class="bankroll-label">MA BANKROLL</div>
     <div class="bankroll-amount" id="dash-bankroll">0 €</div>
-    <div class="bankroll-initial">Capital initial : <span id="dash-initial">0 €</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:4px">
+      <div class="bankroll-initial">Capital initial : <span id="dash-initial">0 €</span></div>
+      <div id="dash-evolution-badge" style="display:none;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px"></div>
+    </div>
+    <div id="dash-config-btn" onclick="navTo('screen-accounts',null)" style="display:none;background:rgba(245,200,66,0.12);border:1px solid rgba(245,200,66,0.3);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--gold);cursor:pointer;text-align:center;margin-bottom:8px">
+      ⚙️ Configurer ma bankroll initiale →
+    </div>
     <div class="bankroll-stats">
       <div class="bk-stat"><div class="bk-stat-label">PROFIT / PERTE</div><div class="bk-stat-value neutral" id="dash-profit">+0 €</div></div>
       <div class="bk-stat"><div class="bk-stat-label">ROI</div><div class="bk-stat-value neutral" id="dash-roi">0%</div></div>
@@ -2539,6 +2557,17 @@
   <div class="header"><div><div class="logo-sports">PARAMÈTRES</div><div class="logo-sub">RÉGLAGES & OUTILS</div></div></div>
   <div style="padding:0 20px 120px;display:flex;flex-direction:column;gap:12px;">
 
+    <!-- 0. Revoir l'onboarding -->
+    <div onclick="restartOnboarding()" style="background:linear-gradient(135deg,rgba(245,200,66,0.08),rgba(255,107,53,0.05));border:1px solid rgba(245,200,66,0.2);border-radius:20px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+      <div style="font-size:24px">👋</div>
+      <div>
+        <div style="font-size:9px;letter-spacing:3px;color:var(--gold);font-weight:700;margin-bottom:3px;">TUTORIEL</div>
+        <div style="font-size:13px;font-weight:700;">Revoir l'introduction</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px;">Redécouvrir toutes les fonctionnalités</div>
+      </div>
+      <div style="margin-left:auto;color:var(--text3);font-size:18px;">›</div>
+    </div>
+
     <!-- 1. Install PWA -->
     <div style="background:linear-gradient(135deg,rgba(176,110,243,0.1),rgba(91,155,255,0.05));border:1px solid rgba(176,110,243,0.25);border-radius:20px;padding:18px;">
       <div style="font-size:9px;letter-spacing:3px;color:var(--purple);font-weight:700;margin-bottom:6px;">📲 INSTALLER L'APP</div>
@@ -2771,6 +2800,22 @@
 
   function skipOnboarding() {
     localStorage.setItem('sd_onboarding_done', '1');
+
+  function restartOnboarding() {
+    // Réinitialiser l'onboarding
+    localStorage.removeItem('sd_onboarding_done');
+    // Revenir au slide 0
+    var slides = document.getElementById('ob-slides');
+    if (slides) { slides.style.transform = 'translateX(0)'; }
+    var dots = document.querySelectorAll('.ob-dot');
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === 0); });
+    var btn = document.getElementById('ob-btn');
+    if (btn) btn.textContent = 'SUIVANT →';
+    var progress = document.getElementById('ob-progress');
+    if (progress) progress.style.width = '20%';
+    // Naviguer vers l'onboarding
+    goTo('screen-onboarding');
+  }
     document.getElementById('screen-onboarding').style.display = 'none';
     document.getElementById('screen-onboarding').classList.remove('active');
     const hasAccounts = localStorage.getItem('sd_accounts');
@@ -2834,7 +2879,7 @@
             } catch(err){ console.log('predict params error:',err); }
           }, 800);
           goTo('screen-dashboard');
-          renderDashboard();
+          setTimeout(function() { renderDashboard(); }, 50);
         } else {
           if (localStorage.getItem('sd_onboarding_done')) goTo('screen-setup');
         }
@@ -2956,7 +3001,7 @@
     target.classList.add('active');
     if (target.id === 'screen-dashboard') {
       target.style.opacity = '0';
-      requestAnimationFrame(() => { setTimeout(() => { target.style.opacity = '1'; }, 30); });
+      requestAnimationFrame(() => { setTimeout(() => { target.style.opacity = '1'; renderDashboard(); }, 30); });
     } else {
       target.style.opacity = '';
     }
@@ -7473,7 +7518,49 @@ function renderAdvancedStats() {
     card.innerHTML = ("\n      <div style=\"background:var(--bg3);border:1px solid var(--border);border-radius:18px;padding:16px 18px;cursor:pointer;\" onclick=\"navTo('screen-advice',document.querySelectorAll('.nav-item')[3])\">\n        <div style=\"display:flex;align-items:center;gap:14px;\">\n          <div style=\"position:relative;width:64px;height:64px;flex-shrink:0;\">\n            <svg width=\"64\" height=\"64\" viewBox=\"0 0 64 64\" style=\"transform:rotate(-90deg)\">\n              <circle cx=\"32\" cy=\"32\" r=\"26\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"7\"/>\n              <circle cx=\"32\" cy=\"32\" r=\"26\" fill=\"none\" stroke=\""+(col)+"\" stroke-width=\"7\"\n                stroke-dasharray=\""+(2*Math.PI*26)+"\" stroke-dashoffset=\""+(2*Math.PI*26*(1-score/100))+"\"\n                stroke-linecap=\"round\" style=\"filter:drop-shadow(0 0 6px "+(col)+"66)\"/>\n            </svg>\n            <div style=\"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,cursive;font-size:18px;color:"+(col)+";\">"+(score)+"</div>\n          </div>\n          <div style=\"flex:1;\">\n            <div style=\"font-size:9px;letter-spacing:3px;color:var(--text3);font-weight:700;margin-bottom:3px;\">SANTÉ DE PARIEUR</div>\n            <div style=\"font-family:Bebas Neue,cursive;font-size:22px;color:"+(col)+";letter-spacing:2px;\">"+(emoji)+" "+(label)+"</div>\n            <div style=\"font-size:10px;color:var(--text3);margin-top:3px;\">ROI "+(roi>=0?'+':'')+(roi.toFixed(1))+"% · WR "+(wr.toFixed(0))+"% · Mise moy. "+(avgStakePct.toFixed(1))+"% BK</div>\n          </div>\n          <div style=\"font-size:14px;color:var(--text3);\">💡</div>\n        </div>\n      </div>");
   }
 
-  function renderDashboard(){const current=getCurrentBankroll();const won=state.bets.filter(b=>b.result==='won');const lost=state.bets.filter(b=>b.result==='lost');const settled=won.concat(lost);const combos=state.bets.filter(b=>b.type==='combo');const totalProfit=state.bets.reduce((s,b)=>s+b.profit,0);const staked=settled.reduce((s,b)=>s+b.stake,0);const roi=staked>0?((totalProfit/staked)*100).toFixed(1):0;const wr=settled.length>0?((won.length/settled.length)*100).toFixed(0):null;document.getElementById('dash-bankroll').textContent=fmt(current)+' €';document.getElementById('dash-initial').textContent=fmt(state.initialBankroll)+' €';const pe=document.getElementById('dash-profit');pe.textContent=(totalProfit>=0?'+':'')+fmt(totalProfit)+' €';pe.className='bk-stat-value '+(totalProfit>0?'pos':totalProfit<0?'neg':'neutral');const re=document.getElementById('dash-roi');re.textContent=(roi>=0?'+':'')+roi+'%';re.className='bk-stat-value '+(roi>0?'pos':roi<0?'neg':'neutral');document.getElementById('dash-winrate').textContent=wr!==null?wr+'%':'—';document.getElementById('qs-total').textContent=state.bets.length;document.getElementById('qs-won').textContent=won.length;document.getElementById('qs-combo').textContent=combos.length;document.getElementById('qs-goals').textContent=state.goals.filter(g=>g.completed).length+'/'+state.goals.length;
+  function renderDashboard(){
+    var current=getCurrentBankroll();
+    var won=state.bets.filter(function(b){return b.result==='won';});
+    var lost=state.bets.filter(function(b){return b.result==='lost';});
+    var settled=won.concat(lost);
+    var combos=state.bets.filter(function(b){return b.type==='combo';});
+    var totalProfit=state.bets.reduce(function(s,b){return s+b.profit;},0);
+    var staked=settled.reduce(function(s,b){return s+b.stake;},0);
+    var roi=staked>0?((totalProfit/staked)*100).toFixed(1):0;
+    var wr=settled.length>0?((won.length/settled.length)*100).toFixed(0):null;
+
+    var dbEl=document.getElementById('dash-bankroll');
+    var diEl=document.getElementById('dash-initial');
+    if(dbEl) dbEl.textContent=fmt(current);
+    if(diEl) diEl.textContent=fmt(state.initialBankroll);
+
+    // Bouton config si bankroll = 0
+    var cfgBtn=document.getElementById('dash-config-btn');
+    if(cfgBtn) cfgBtn.style.display=state.initialBankroll===0?'block':'none';
+
+    // Badge évolution
+    var badge=document.getElementById('dash-evolution-badge');
+    if(badge && state.initialBankroll>0){
+      var evoPct=((current-state.initialBankroll)/state.initialBankroll*100).toFixed(1);
+      if(Math.abs(evoPct)>0.1){
+        badge.style.display='inline-block';
+        badge.textContent=(evoPct>0?'▲ +':'▼ ')+evoPct+'%';
+        badge.style.background=evoPct>0?'rgba(0,229,184,0.15)':'rgba(255,71,87,0.15)';
+        badge.style.color=evoPct>0?'var(--green)':'var(--red)';
+      } else { badge.style.display='none'; }
+    }
+
+    var pe=document.getElementById('dash-profit');
+    if(pe){pe.textContent=(totalProfit>=0?'+':'')+fmt(totalProfit);pe.className='bk-stat-value '+(totalProfit>0?'pos':totalProfit<0?'neg':'neutral');}
+    var re=document.getElementById('dash-roi');
+    if(re){re.textContent=(roi>=0?'+':'')+roi+'%';re.className='bk-stat-value '+(roi>0?'pos':roi<0?'neg':'neutral');}
+    var we=document.getElementById('dash-winrate');
+    if(we) we.textContent=wr!==null?wr+'%':'—';
+
+    var qt=document.getElementById('qs-total'); if(qt) qt.textContent=state.bets.length;
+    var qw=document.getElementById('qs-won'); if(qw) qw.textContent=won.length;
+    var qc=document.getElementById('qs-combo'); if(qc) qc.textContent=combos.length;
+    var qg=document.getElementById('qs-goals'); if(qg) qg.textContent=state.goals.filter(function(g){return g.completed;}).length+'/'+state.goals.length;
   // Update mini shortcuts
   const goalsDone = state.goals.filter(g=>g.completed).length;
   const goalsTotal = state.goals.length;
