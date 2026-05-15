@@ -3610,76 +3610,88 @@ async function runTennisAutoFill() {
 
   var btn = document.getElementById('btn-tennis-autofill');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Chargement...'; }
-  setTennisStatus('Recherche des joueurs...', 'loading');
+  setTennisStatus('Recherche des joueurs dans le classement ATP/WTA...', 'loading');
 
   try {
-    // 1. Chercher les fixtures récentes de chaque joueur pour trouver leurs IDs
-    var today = new Date().toISOString().slice(0, 10);
-    var dateFrom = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);
-
-    var [r1, r2] = await Promise.all([
-      fetch('/api/tennis-data?endpoint=getDateRangeFixtures&dateFrom=' + dateFrom + '&dateTo=' + today + '&tour=ATP').then(function(r){return r.json();}),
-      fetch('/api/tennis-data?endpoint=getDateRangeFixtures&dateFrom=' + dateFrom + '&dateTo=' + today + '&tour=WTA').then(function(r){return r.json();})
+    // 1. Charger classements ATP + WTA pour trouver les IDs des joueurs
+    var [atpRank, wtaRank] = await Promise.all([
+      fetch('/api/tennis-data?endpoint=getPlayerRanking&tour=ATP').then(function(r){return r.json();}),
+      fetch('/api/tennis-data?endpoint=getPlayerRanking&tour=WTA').then(function(r){return r.json();})
     ]);
 
-    var allFixtures = [];
-    if (r1 && r1.result) allFixtures = allFixtures.concat(r1.result);
-    if (r2 && r2.result) allFixtures = allFixtures.concat(r2.result);
+    var allPlayers = [];
+    if (atpRank && atpRank.result) allPlayers = allPlayers.concat(atpRank.result.map(function(p){return Object.assign({tour:'ATP'},p);}));
+    if (wtaRank && wtaRank.result) allPlayers = allPlayers.concat(wtaRank.result.map(function(p){return Object.assign({tour:'WTA'},p);}));
 
-    // Trouver les IDs des joueurs par correspondance de nom
-    var p1Id = null, p2Id = null;
-    var p1NameLow = p1Name.toLowerCase();
-    var p2NameLow = p2Name.toLowerCase();
-    var p1Tour = 'ATP', p2Tour = 'ATP';
+    // Trouver les joueurs par nom (fuzzy match sur nom de famille)
+    function findPlayer(name) {
+      var nameLow = name.toLowerCase();
+      var nameParts = nameLow.split(' ');
+      var lastName = nameParts[nameParts.length - 1];
+      // Cherche d'abord correspondance exacte
+      var found = allPlayers.find(function(p) {
+        return (p.player || '').toLowerCase() === nameLow;
+      });
+      if (!found) {
+        // Puis correspondance sur le nom de famille
+        found = allPlayers.find(function(p) {
+          var pLow = (p.player || '').toLowerCase();
+          return pLow.indexOf(lastName) !== -1 || pLow.indexOf(nameLow) !== -1;
+        });
+      }
+      if (!found) {
+        // Puis correspondance partielle
+        found = allPlayers.find(function(p) {
+          var pLow = (p.player || '').toLowerCase();
+          return nameParts.some(function(part) { return part.length > 3 && pLow.indexOf(part) !== -1; });
+        });
+      }
+      return found;
+    }
 
-    allFixtures.forEach(function(f) {
-      var fp1 = (f.event_first_player || '').toLowerCase();
-      var fp2 = (f.event_second_player || '').toLowerCase();
-      if (!p1Id && (fp1.indexOf(p1NameLow) !== -1 || p1NameLow.indexOf(fp1.split(' ')[fp1.split(' ').length-1]) !== -1)) {
-        p1Id = f.first_player_key;
-        if (f.event_type_type && f.event_type_type.toLowerCase().indexOf('wta') !== -1) p1Tour = 'WTA';
-      }
-      if (!p2Id && (fp2.indexOf(p2NameLow) !== -1 || p2NameLow.indexOf(fp2.split(' ')[fp2.split(' ').length-1]) !== -1)) {
-        p2Id = f.second_player_key;
-        if (f.event_type_type && f.event_type_type.toLowerCase().indexOf('wta') !== -1) p2Tour = 'WTA';
-      }
-      if (!p1Id && (fp2.indexOf(p1NameLow) !== -1 || p1NameLow.indexOf(fp2.split(' ')[fp2.split(' ').length-1]) !== -1)) {
-        p1Id = f.second_player_key;
-        if (f.event_type_type && f.event_type_type.toLowerCase().indexOf('wta') !== -1) p1Tour = 'WTA';
-      }
-      if (!p2Id && (fp1.indexOf(p2NameLow) !== -1 || p2NameLow.indexOf(fp1.split(' ')[fp1.split(' ').length-1]) !== -1)) {
-        p2Id = f.first_player_key;
-        if (f.event_type_type && f.event_type_type.toLowerCase().indexOf('wta') !== -1) p2Tour = 'WTA';
-      }
-    });
+    var p1Player = findPlayer(p1Name);
+    var p2Player = findPlayer(p2Name);
 
-    if (!p1Id && !p2Id) {
-      setTennisStatus('Joueurs non trouvés dans les matchs récents. Remplis manuellement.', 'error');
+    if (!p1Player && !p2Player) {
+      setTennisStatus('Joueurs non trouvés dans le classement ATP/WTA. Vérifie l\'orthographe.', 'error');
       if (btn) { btn.disabled = false; btn.textContent = '🎾 AUTO-REMPLIR'; }
       return;
     }
 
     setTennisStatus('Joueurs trouvés — chargement des stats...', 'loading');
 
-    // 2. Récupérer les stats des joueurs + H2H
+    // 2. Remplir les classements immédiatement
+    if (p1Player) {
+      setTVal('t-p1-rank', p1Player.place || p1Player.ranking);
+      document.getElementById('t-lbl-p1').textContent = p1Player.player || p1Name;
+    }
+    if (p2Player) {
+      setTVal('t-p2-rank', p2Player.place || p2Player.ranking);
+      document.getElementById('t-lbl-p2').textContent = p2Player.player || p2Name;
+    }
+
+    // 3. Charger les matchs récents pour les stats
     var promises = [];
-    if (p1Id) promises.push(fetch('/api/tennis-data?endpoint=getPlayerFixtures&player_key=' + p1Id).then(function(r){return r.json();}));
-    else promises.push(Promise.resolve(null));
-    if (p2Id) promises.push(fetch('/api/tennis-data?endpoint=getPlayerFixtures&player_key=' + p2Id).then(function(r){return r.json();}));
-    else promises.push(Promise.resolve(null));
-    if (p1Id && p2Id) promises.push(fetch('/api/tennis-data?endpoint=getH2HFixtures&first_player_key=' + p1Id + '&second_player_key=' + p2Id).then(function(r){return r.json();}));
-    else promises.push(Promise.resolve(null));
+    if (p1Player && p1Player.player_key) {
+      promises.push(fetch('/api/tennis-data?endpoint=getPlayerFixtures&player_key=' + p1Player.player_key).then(function(r){return r.json();}));
+    } else promises.push(Promise.resolve(null));
+
+    if (p2Player && p2Player.player_key) {
+      promises.push(fetch('/api/tennis-data?endpoint=getPlayerFixtures&player_key=' + p2Player.player_key).then(function(r){return r.json();}));
+    } else promises.push(Promise.resolve(null));
+
+    if (p1Player && p1Player.player_key && p2Player && p2Player.player_key) {
+      promises.push(fetch('/api/tennis-data?endpoint=getH2HFixtures&first_player_key=' + p1Player.player_key + '&second_player_key=' + p2Player.player_key).then(function(r){return r.json();}));
+    } else promises.push(Promise.resolve(null));
 
     var results = await Promise.all(promises);
     var p1Data = results[0], p2Data = results[1], h2hData = results[2];
 
-    // 3. Calculer et remplir les stats
-    var p1Stats = computeTennisStats(p1Data, p1Id, surface);
-    var p2Stats = computeTennisStats(p2Data, p2Id, surface);
+    // 4. Calculer et remplir les stats
+    var p1Stats = computeTennisStats(p1Data, p1Player ? p1Player.player_key : null, surface);
+    var p2Stats = computeTennisStats(p2Data, p2Player ? p2Player.player_key : null, surface);
 
-    // Remplir J1
     if (p1Stats) {
-      if (p1Stats.rank) setTVal('t-p1-rank', p1Stats.rank);
       if (p1Stats.s1in) setTVal('t-p1-s1in', p1Stats.s1in);
       if (p1Stats.s1w) setTVal('t-p1-s1w', p1Stats.s1w);
       if (p1Stats.s2w) setTVal('t-p1-s2w', p1Stats.s2w);
@@ -3688,10 +3700,7 @@ async function runTennisAutoFill() {
       if (p1Stats.aces) setTVal('t-p1-aces', p1Stats.aces);
       if (p1Stats.df) setTVal('t-p1-df', p1Stats.df);
     }
-
-    // Remplir J2
     if (p2Stats) {
-      if (p2Stats.rank) setTVal('t-p2-rank', p2Stats.rank);
       if (p2Stats.s1in) setTVal('t-p2-s1in', p2Stats.s1in);
       if (p2Stats.s1w) setTVal('t-p2-s1w', p2Stats.s1w);
       if (p2Stats.s2w) setTVal('t-p2-s2w', p2Stats.s2w);
@@ -3701,7 +3710,7 @@ async function runTennisAutoFill() {
       if (p2Stats.df) setTVal('t-p2-df', p2Stats.df);
     }
 
-    // H2H
+    // 5. H2H
     if (h2hData && h2hData.result && h2hData.result.H2H) {
       var h2h = h2hData.result.H2H;
       var p1wins = 0, p2wins = 0;
@@ -3714,8 +3723,9 @@ async function runTennisAutoFill() {
       setTVal('t-h2h-2', p2wins);
     }
 
-    var filled = (p1Stats ? 'J.A' : '') + (p2Stats ? (p1Stats ? ' + J.B' : 'J.B') : '');
-    setTennisStatus('✅ Stats chargées — ' + filled + ' · Surface: ' + surface, 'ok');
+    var p1label = p1Player ? p1Player.player : p1Name;
+    var p2label = p2Player ? p2Player.player : p2Name;
+    setTennisStatus('✅ ' + p1label + ' vs ' + p2label + ' — stats chargées sur ' + surface, 'ok');
 
   } catch(err) {
     console.error('[tennis autofill]', err);
