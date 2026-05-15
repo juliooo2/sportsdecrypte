@@ -33,8 +33,9 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   html, body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg) !important;
+    color: var(--text) !important;
+    color-scheme: dark !important;
     font-family: 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 14px;
     line-height: 1.5;
@@ -42,6 +43,19 @@
     max-width: 430px;
     margin: 0 auto;
     overflow-x: hidden;
+  }
+
+  /* Forcer mode sombre sur iOS Safari */
+  * { -webkit-tap-highlight-color: transparent; }
+  input, select, textarea, button {
+    color-scheme: dark;
+    background-color: var(--bg-3);
+    color: var(--text);
+  }
+
+  /* Empêcher le fond blanc sur les sections */
+  .filters, .slider-row, .quota, .tabs, .summary-bar {
+    background: var(--bg-2) !important;
   }
 
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap');
@@ -461,6 +475,39 @@
     <button class="btn-top3" id="top3Btn" onclick="toggleTop3()">🏆 Top 3</button>
   </div>
 
+  <!-- Sélecteur date + ligue (discret, collapsible) -->
+  <div style="padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg-2)">
+    <div onclick="toggleDateFilter()" style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text-faint);font-size:11px;font-weight:700;letter-spacing:1px">
+      <span>📅</span>
+      <span id="dateFilterLabel">Aujourd'hui · Toutes ligues</span>
+      <span id="dateFilterArrow" style="margin-left:auto;transition:transform 0.2s">›</span>
+    </div>
+    <div id="dateFilterPanel" style="display:none;margin-top:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:var(--text-faint);font-weight:700;margin-bottom:5px">DATE</div>
+          <input type="date" id="dateInput" style="width:100%;background:var(--bg-3);border:1px solid var(--border-2);color:var(--text);padding:8px 10px;border-radius:10px;font-size:12px;font-family:inherit;outline:none">
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:2px;color:var(--text-faint);font-weight:700;margin-bottom:5px">LIGUE</div>
+          <select id="leagueSelect" style="width:100%;background:var(--bg-3);border:1px solid var(--border-2);color:var(--text);padding:8px 10px;border-radius:10px;font-size:12px;font-family:inherit;outline:none;-webkit-appearance:none">
+            <option value="ALL_TOP">Top 5 + CL</option>
+            <option value="PL">Premier League</option>
+            <option value="PD">La Liga</option>
+            <option value="BL1">Bundesliga</option>
+            <option value="SA">Serie A</option>
+            <option value="FL1">Ligue 1</option>
+            <option value="CL">Champions League</option>
+            <option value="EL">Europa League</option>
+            <option value="DED">Eredivisie</option>
+            <option value="PPL">Primeira Liga</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="applyDateFilter()" style="width:100%;margin-top:8px;background:linear-gradient(135deg,var(--orange),var(--gold));color:#000;border:none;padding:10px;border-radius:10px;font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:2px;cursor:pointer">⚡ ANALYSER</button>
+    </div>
+  </div>
+
   <!-- Filtre cote minimum — 1.20 par défaut -->
   <div class="slider-row">
     <span class="slider-label">Cote min.</span>
@@ -807,6 +854,32 @@ function scoreLevel(score) {
   return { label: 'À éviter', cls: 'score-eviter' };
 }
 
+
+function toggleDateFilter() {
+  var panel = document.getElementById('dateFilterPanel');
+  var arrow = document.getElementById('dateFilterArrow');
+  var open = panel.style.display === 'block';
+  panel.style.display = open ? 'none' : 'block';
+  arrow.style.transform = open ? '' : 'rotate(90deg)';
+}
+
+function applyDateFilter() {
+  var date = document.getElementById('dateInput').value;
+  var league = document.getElementById('leagueSelect').value;
+  if (!date) date = new Date().toISOString().slice(0, 10);
+  var leagueNames = {
+    'ALL_TOP':'Toutes ligues','PL':'Premier League','PD':'La Liga',
+    'BL1':'Bundesliga','SA':'Serie A','FL1':'Ligue 1',
+    'CL':'Champions League','EL':'Europa League','DED':'Eredivisie','PPL':'Primeira Liga'
+  };
+  var d = new Date(date + 'T12:00:00');
+  var dateLabel = d.toLocaleDateString('fr-FR', {day:'numeric',month:'short'});
+  document.getElementById('dateFilterLabel').textContent = dateLabel + ' · ' + (leagueNames[league] || league);
+  document.getElementById('dateFilterPanel').style.display = 'none';
+  document.getElementById('dateFilterArrow').style.transform = '';
+  state.matches = [];
+  fetchAndAnalyze(date, false, league);
+}
 
 function onOddsSliderChange(val) {
   var v = parseFloat(val);
@@ -1378,6 +1451,10 @@ function init() {
   state.oddsMin = 1.20;
   document.getElementById('oddsSliderVal').textContent = '@1.20';
 
+  // Initialiser la date d'aujourd'hui dans le sélecteur
+  var dateInput = document.getElementById('dateInput');
+  if (dateInput) dateInput.value = today;
+
   document.getElementById('resetCacheBtn').addEventListener('click', function () {
     var n = clearAllCache();
     showToast(n + ' entrée(s) cache effacée(s)');
@@ -1429,9 +1506,9 @@ function autoAnalyze(date) {
   fetchAndAnalyze(date, false);
 }
 
-function fetchAndAnalyze(date, silent) {
+function fetchAndAnalyze(date, silent, selectedLeague) {
   var content = document.getElementById('content');
-  var compCodes = ['PL', 'PD', 'BL1', 'SA', 'FL1', 'CL', 'EL', 'DED', 'PPL'];
+  var compCodes = (!selectedLeague || selectedLeague === 'ALL_TOP') ? ['PL','PD','BL1','SA','FL1','CL','EL','DED','PPL'] : [selectedLeague];
 
   if (!silent) {
     content.innerHTML = '<div class="loader"><span class="loader-spin"></span>Analyse des matchs du jour...</div>';
@@ -1539,7 +1616,12 @@ function fetchAndAnalyze(date, silent) {
           var bets = computeBets(homeBlend, awayBlend, h2h);
 
           // Filtrer les cotes < 1.20 dès le calcul
-          bets = bets.filter(function(b) { return !b.fairOdds || parseFloat(b.fairOdds) >= 1.20; });
+          // Filtrer : garder uniquement les paris avec une cote valide >= oddsMin
+          bets = bets.filter(function(b) {
+            if (!b.fairOdds) return false;
+            var odds = parseFloat(b.fairOdds);
+            return odds >= state.oddsMin && odds <= 15;
+          });
 
           analyzed.push({
             match: match,
