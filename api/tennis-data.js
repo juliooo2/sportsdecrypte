@@ -23,6 +23,7 @@ export default async function handler(req, res) {
     'getPlayerMatchFilters',
     'getH2HFixtures',
     'getDateFixtures',
+    'getDateRangeFixtures',
     'getPlayerRanking'
   ];
   if (allowed.indexOf(endpoint) === -1) {
