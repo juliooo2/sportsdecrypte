@@ -3615,13 +3615,13 @@ async function runTennisAutoFill() {
   try {
     // 1. Charger classements ATP + WTA pour trouver les IDs des joueurs
     var [atpRank, wtaRank] = await Promise.all([
-      fetch('/api/tennis-data?endpoint=getPlayerRanking&tour=ATP').then(function(r){return r.json();}),
-      fetch('/api/tennis-data?endpoint=getPlayerRanking&tour=WTA').then(function(r){return r.json();})
+      fetch('/api/tennis-data?endpoint=ranking/live&tour=ATP').then(function(r){return r.json();}),
+      fetch('/api/tennis-data?endpoint=ranking/live&tour=WTA').then(function(r){return r.json();})
     ]);
 
     var allPlayers = [];
-    if (atpRank && atpRank.result) allPlayers = allPlayers.concat(atpRank.result.map(function(p){return Object.assign({tour:'ATP'},p);}));
-    if (wtaRank && wtaRank.result) allPlayers = allPlayers.concat(wtaRank.result.map(function(p){return Object.assign({tour:'WTA'},p);}));
+    if (atpRank && atpRank.rankings) allPlayers = allPlayers.concat(atpRank.rankings.map(function(p){return Object.assign({tour:'ATP',player_key:p.player_key||p.id},p);}));
+    if (wtaRank && wtaRank.rankings) allPlayers = allPlayers.concat(wtaRank.rankings.map(function(p){return Object.assign({tour:'WTA',player_key:p.player_key||p.id},p);}));
 
     // Trouver les joueurs par nom (fuzzy match sur nom de famille)
     function findPlayer(name) {
