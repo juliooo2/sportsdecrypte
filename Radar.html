@@ -360,16 +360,17 @@
   }
   .match.expanded .details { display: block; }
   .bets-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 6px; margin-bottom: 12px;
+    display: flex; flex-direction: column;
+    gap: 5px; margin-bottom: 12px;
   }
   .bet-row {
     background: var(--bg-3); border: 1px solid var(--border);
     border-radius: 10px; padding: 8px 10px;
-    display: flex; justify-content: space-between; align-items: center; gap: 6px;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
   }
-  .bet-name { font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .bet-score { font-family: 'Bebas Neue', cursive; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bet-name { font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+  .bet-score { font-family: 'Bebas Neue', cursive; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+  .bet-odds-wrap { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
   .bet-odds { font-size: 11px; color: var(--gold); font-weight: 700; }
 
   .stats-section {
@@ -1166,11 +1167,20 @@ function renderMatches() {
 
     var betsHtml = bets.slice(0, 8).map(function (b) {
       var bl = scoreLevel(b.score);
+      // Raccourcir les noms longs
+      var shortName = b.name
+        .replace('Les deux équipes marquent — Oui', 'BTTS — Oui')
+        .replace('Les deux équipes marquent — Non', 'BTTS — Non')
+        .replace('Les deux équipes marquent', 'BTTS')
+        .replace('Victoire domicile', 'Dom.')
+        .replace('Victoire extérieur', 'Ext.')
+        .replace('Double Chance', 'DC')
+        .replace('Match nul', 'Nul');
       return '<div class="bet-row">' +
-        '<span class="bet-name">' + escapeHtml(b.name) + '</span>' +
-        '<div style="display:flex;align-items:center;gap:6px">' +
-          (b.fairOdds ? '<span style="font-size:11px;color:var(--gold);font-weight:700">@' + b.fairOdds + '</span>' : '') +
-          '<span class="bet-score ' + bl.cls + '">' + b.score + '</span>' +
+        '<span class="bet-name">' + escapeHtml(shortName) + '</span>' +
+        '<div class="bet-odds-wrap">' +
+          (b.fairOdds ? '<span style="font-size:11px;color:var(--gold);font-weight:700;white-space:nowrap">@' + b.fairOdds + '</span>' : '') +
+          '<span class="bet-score ' + bl.cls + '" style="min-width:26px;text-align:right">' + b.score + '</span>' +
         '</div>' +
       '</div>';
     }).join('');
