@@ -159,7 +159,7 @@
   .nav-add:active { transform: scale(0.88); box-shadow: 0 2px 12px rgba(255,107,53,0.3); }
 
   /* ── HEADER ── */
-  .header { padding: 52px 24px 16px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .header { padding: 48px 24px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
   .logo-sports {
     font-family: 'Bebas Neue', cursive; font-size: 24px; letter-spacing: 5px;
     background: linear-gradient(90deg, var(--orange), var(--gold2));
@@ -169,49 +169,25 @@
 
   /* ── BANKROLL CARD — PREMIUM ── */
   .bankroll-card {
-    margin: 0 20px 20px;
+    margin: 0 20px 14px;
     background: linear-gradient(145deg, rgba(245,200,66,0.11) 0%, rgba(255,107,53,0.07) 40%, rgba(91,155,255,0.05) 100%);
     border: 1px solid rgba(245,200,66,0.25);
-    border-radius: 32px;
-    padding: 28px 24px 22px;
+    border-radius: 24px;
+    padding: 14px 16px 12px;
     position: relative;
-    overflow: hidden;
     box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2);
   }
-  .bankroll-card::before {
-    content: '';
-    position: absolute; top: -80px; right: -80px;
-    width: 260px; height: 260px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(245,200,66,0.12) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .bankroll-card::after {
-    content: '';
-    position: absolute; bottom: -40px; left: -40px;
-    width: 180px; height: 180px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,107,53,0.07) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .bankroll-card > * { position: relative; z-index: 1; }
-  .bankroll-label { font-size: 9px; letter-spacing: 4px; color: rgba(245,200,66,0.55); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
+  .bankroll-label { font-size: 9px; letter-spacing: 4px; color: rgba(245,200,66,0.55); font-weight: 700; text-transform: uppercase; }
   .bankroll-amount {
-    font-family: 'Bebas Neue', cursive; font-size: 60px; letter-spacing: 2px;
-    color: var(--gold2); line-height: 1; margin-bottom: 6px;
+    font-family: 'Bebas Neue', cursive; font-size: 46px; letter-spacing: 2px;
+    color: var(--gold2); line-height: 1;
     text-shadow: 0 0 60px rgba(255,215,0,0.4), 0 2px 4px rgba(0,0,0,0.5);
     transition: all 0.3s ease;
   }
   .bankroll-initial { font-size: 11px; color: var(--text2); margin-bottom: 2px; }
   .bankroll-initial span { color: var(--text); font-weight: 700; }
-  .bankroll-stats {
-    display: flex; gap: 0; margin-top: 18px; padding-top: 16px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-  }
-  .bk-stat { flex: 1; padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.07); margin-right: 12px; }
-  .bk-stat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
-  .bk-stat-label { font-size: 8px; letter-spacing: 2px; color: var(--text3); font-weight: 700; margin-bottom: 4px; }
-  .bk-stat-value { font-family: 'Bebas Neue', cursive; font-size: 20px; transition: color 0.3s; }
+  .bk-stat-label { font-size: 7px; letter-spacing: 2px; color: var(--text3); font-weight: 700; margin-bottom: 2px; }
+  .bk-stat-value { font-family: 'Bebas Neue', cursive; font-size: 17px; transition: color 0.3s; }
   .bk-stat-value.pos { color: var(--green); text-shadow: 0 0 16px rgba(0,229,184,0.4); }
   .bk-stat-value.neg { color: var(--red); text-shadow: 0 0 16px rgba(255,71,87,0.3); }
   .bk-stat-value.neutral { color: var(--text); }
@@ -737,17 +713,17 @@
 
   /* NOTES */
   /* QUICK ACTIONS BAR */
-  .quick-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:0 20px 16px; }
+  .quick-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:0 20px 12px; }
   .qa-btn {
     background:var(--bg3); border:1px solid var(--border);
-    border-radius:18px; padding:14px 6px; text-align:center;
+    border-radius:14px; padding:10px 6px; text-align:center;
     cursor:pointer; transition:all 0.15s;
     box-shadow: var(--shadow-card);
     position: relative; overflow: hidden;
   }
   .qa-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(145deg, rgba(255,255,255,0.025), transparent); pointer-events:none; }
   .qa-btn:active { transform:scale(0.93); opacity:0.85; }
-  .qa-btn .qa-icon { font-size:22px; margin-bottom:6px; display:block; }
+  .qa-btn .qa-icon { font-size:20px; margin-bottom:4px; display:block; }
   .qa-btn .qa-label { font-family:Bebas Neue,cursive; font-size:9px; letter-spacing:1.5px; color:var(--text3); }
 
   /* SWIPE BET ACTIONS */
@@ -1245,13 +1221,53 @@
   </div>
 
   <div class="bankroll-card">
-    <div class="bankroll-label">MA BANKROLL</div>
-    <div class="bankroll-amount" id="dash-bankroll">0 €</div>
-    <div class="bankroll-stats">
-      <div class="bk-stat"><div class="bk-stat-label">CAPITAL INITIAL</div><div class="bk-stat-value neutral" id="dash-initial">0 €</div></div>
-      <div class="bk-stat"><div class="bk-stat-label">ROI</div><div class="bk-stat-value neutral" id="dash-roi">0%</div></div>
-      <div class="bk-stat"><div class="bk-stat-label">PROFIT</div><div class="bk-stat-value neutral" id="dash-profit">+0 €</div></div>
-      <div class="bk-stat"><div class="bk-stat-label">WIN RATE</div><div class="bk-stat-value neutral" id="dash-winrate">—</div></div>
+    <!-- Header : label + badge évolution -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <div class="bankroll-label" style="margin-bottom:0;">MA BANKROLL</div>
+      <span id="dash-evolution-badge" style="display:none;font-size:10px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:20px;"></span>
+    </div>
+    <!-- Montant + capital initial sur la même ligne -->
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
+      <div class="bankroll-amount" id="dash-bankroll">0 €</div>
+      <div style="font-size:10px;color:var(--text2);">initial : <span id="dash-initial" style="color:var(--text);font-weight:700;">0 €</span></div>
+    </div>
+    <!-- Ligne 1 : ROI · Profit · Win Rate · Série -->
+    <div style="display:flex;gap:0;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:10px;">
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">ROI</div>
+        <div class="bk-stat-value neutral" id="dash-roi" style="font-size:17px;">0%</div>
+      </div>
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">PROFIT</div>
+        <div class="bk-stat-value neutral" id="dash-profit" style="font-size:17px;">+0 €</div>
+      </div>
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">WIN RATE</div>
+        <div class="bk-stat-value neutral" id="dash-winrate" style="font-size:17px;">—</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">SÉRIE</div>
+        <div class="bk-stat-value neutral" id="dash-streak" style="font-size:17px;">—</div>
+      </div>
+    </div>
+    <!-- Ligne 2 : Paris · Gagnés · Perdus · En cours -->
+    <div style="display:flex;gap:0;">
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">PARIS</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:17px;color:var(--text);" id="dash-bets-count">0</div>
+      </div>
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">GAGNÉS</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:17px;color:var(--green);" id="dash-won-count">0</div>
+      </div>
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">PERDUS</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:17px;color:var(--red);" id="dash-lost-count">0</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">EN COURS</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:17px;color:var(--gold);" id="dash-pending-count">0</div>
+      </div>
     </div>
   </div>
   <!-- Shortcuts row -->
@@ -7582,6 +7598,16 @@ function renderAdvancedStats() {
     var bc=document.getElementById('dash-bets-count'); if(bc) bc.textContent=state.bets.length;
     var wc=document.getElementById('dash-won-count'); if(wc) wc.textContent=won.length;
     var lc=document.getElementById('dash-lost-count'); if(lc) lc.textContent=lost.length;
+    var pendingCount=state.bets.filter(function(b){return b.result==='pending';}).length;
+    var pc=document.getElementById('dash-pending-count'); if(pc) pc.textContent=pendingCount;
+    var streakEl=document.getElementById('dash-streak');
+    if(streakEl){
+      var wonStreak=getStreak(state,'won');
+      var lostStreak=getStreak(state,'lost');
+      if(wonStreak>=2){streakEl.textContent='🔥 '+wonStreak+'V';streakEl.style.color='var(--green)';}
+      else if(lostStreak>=2){streakEl.textContent='❄️ '+lostStreak+'D';streakEl.style.color='var(--red)';}
+      else{streakEl.textContent='—';streakEl.style.color='var(--text)';}
+    }
   // Update mini shortcuts
   const goalsDone = state.goals.filter(g=>g.completed).length;
   const goalsTotal = state.goals.length;
