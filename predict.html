@@ -4571,6 +4571,7 @@ function compute() {
     prob:betProb, edge:edge,
     kelly: kellyPct ? kellyPct.toFixed(1) : ''
   });
+  addShareButton('results-container', {sport:'football',home:home,away:away,betLabel:betLabel,odds:odds,verdict:verdict,prob:betProb,edge:edge});
   goStep(4);
   window.scrollTo(0, 0);
 
@@ -5725,6 +5726,7 @@ function computeBasket() {
     prob:betProb,edge:edge,
     kelly: kellyPct ? kellyPct.toFixed(1) : ''
   });
+  addShareButton('basket-results',{sport:'basket',home:home,away:away,betLabel:betLabel,odds:odds,verdict:verdict,prob:betProb,edge:edge});
   bGoStep(4);
   window.scrollTo(0,0);
 }
