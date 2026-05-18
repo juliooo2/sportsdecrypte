@@ -52,7 +52,7 @@ body::before{content:'';position:fixed;top:-150px;right:-150px;width:400px;heigh
 .step-line{flex:0 0 16px;height:1px;background:var(--bdr);margin-bottom:14px}
 
 /* CONTENT */
-.content{padding:16px 20px 20px;display:none}
+.content{padding:16px 20px 20px;display:none;background:var(--bg);color:var(--txt)}
 .content.active{display:block}
 
 /* CARDS */
@@ -169,10 +169,11 @@ input::placeholder{color:var(--txt3)}
 
   <!-- RANGÉE 2 : OUTILS -->
   <div style="font-size:8px;font-weight:700;letter-spacing:2px;color:var(--txt2);margin-bottom:6px">🛠️ OUTILS</div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:10px">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px">
     <div class="sport-tab" id="tab-tendances" onclick="setSport('tendances')" style="padding:8px 4px;font-size:11px;color:#ff6b35;border-color:rgba(255,107,53,0.2)">🔥<br><span style="font-size:9px">TENDANCES</span></div>
     <div class="sport-tab" id="tab-live" onclick="setSport('live')" style="padding:8px 4px;font-size:11px;color:#ff4444;border-color:rgba(255,68,68,0.2)">🔴<br><span style="font-size:9px">LIVE</span></div>
     <div class="sport-tab" id="tab-precision" onclick="setSport('precision')" style="padding:8px 4px;font-size:11px;color:var(--purple);border-color:rgba(124,58,237,0.2)">🎯<br><span style="font-size:9px">PRÉCISION</span></div>
+    <div class="sport-tab" id="tab-historique" onclick="setSport('historique')" style="padding:8px 4px;font-size:11px;color:var(--blue);border-color:rgba(91,155,255,0.2)">📋<br><span style="font-size:9px">HISTORIQUE</span></div>
   </div>
 
 </div>
@@ -2738,10 +2739,58 @@ input::placeholder{color:var(--txt3)}
   <div id="precision-container"></div>
 </div>
 
+<!-- ══════════════════════════════════════ -->
+<!-- HISTORIQUE DES ANALYSES               -->
+<!-- ══════════════════════════════════════ -->
+<div class="content" id="historique-screen" style="display:none;padding:16px 20px 80px;background:var(--bg);color:var(--txt);min-height:100vh">
 
-<!-- ══════════════════════════════════════ -->
-<!-- CALCULATEUR RAPIDE                     -->
-<!-- ══════════════════════════════════════ -->
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:3px;color:var(--blue)">📋 HISTORIQUE</div>
+      <div style="font-size:10px;color:var(--txt2);letter-spacing:1px">Toutes vos analyses Predict</div>
+    </div>
+    <button onclick="clearHistorique()" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--red);cursor:pointer">🗑️ Vider</button>
+  </div>
+
+  <!-- Filtres sport -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="hist-sport-filters">
+    <button class="hist-filter active" data-sport="all" onclick="filterHistorique('sport','all',this)">Tous</button>
+    <button class="hist-filter" data-sport="football" onclick="filterHistorique('sport','football',this)">⚽</button>
+    <button class="hist-filter" data-sport="tennis" onclick="filterHistorique('sport','tennis',this)">🎾</button>
+    <button class="hist-filter" data-sport="basket" onclick="filterHistorique('sport','basket',this)">🏀</button>
+    <button class="hist-filter" data-sport="hockey" onclick="filterHistorique('sport','hockey',this)">🏒</button>
+    <button class="hist-filter" data-sport="mma" onclick="filterHistorique('sport','mma',this)">🥊</button>
+    <button class="hist-filter" data-sport="rugby" onclick="filterHistorique('sport','rugby',this)">🏉</button>
+  </div>
+
+  <!-- Filtres verdict -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px" id="hist-verdict-filters">
+    <button class="hist-filter active" data-verdict="all" onclick="filterHistorique('verdict','all',this)">Tous verdicts</button>
+    <button class="hist-filter" data-verdict="value" onclick="filterHistorique('verdict','value',this)" style="color:var(--green);border-color:rgba(0,229,184,0.3)">✅ Value</button>
+    <button class="hist-filter" data-verdict="edge" onclick="filterHistorique('verdict','edge',this)" style="color:var(--gold);border-color:rgba(245,200,66,0.3)">⚡ Edge</button>
+    <button class="hist-filter" data-verdict="eviter" onclick="filterHistorique('verdict','eviter',this)" style="color:var(--red);border-color:rgba(255,71,87,0.3)">❌ Éviter</button>
+  </div>
+
+  <!-- Stats rapides -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px" id="hist-quick-stats">
+    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:10px;text-align:center">
+      <div style="font-size:9px;letter-spacing:2px;color:var(--txt2);font-weight:700;margin-bottom:4px">ANALYSES</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--blue)" id="hist-stat-total">0</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:10px;text-align:center">
+      <div style="font-size:9px;letter-spacing:2px;color:var(--txt2);font-weight:700;margin-bottom:4px">VALUE BETS</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--green)" id="hist-stat-value">0</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:10px;text-align:center">
+      <div style="font-size:9px;letter-spacing:2px;color:var(--txt2);font-weight:700;margin-bottom:4px">AUJOURD'HUI</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--gold)" id="hist-stat-today">0</div>
+    </div>
+  </div>
+
+  <!-- Liste -->
+  <div id="hist-list-predict"></div>
+</div>
 <div class="calc-modal" id="calc-modal" onclick="closeCalcModal(event)">
   <div class="calc-panel">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -7708,7 +7757,160 @@ function addExportButton(containerId, data) {
 }
 
 // ── BOUTON PARTAGE ────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// MODULE HISTORIQUE DES ANALYSES PREDICT
+// ═══════════════════════════════════════════════════════
+
+var HIST_KEY = 'sd_predict_historique';
+var histSportFilter = 'all';
+var histVerdictFilter = 'all';
+
+function saveAnalyseHistorique(data) {
+  var hist = getHistorique();
+  var entry = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    sport: data.sport || 'football',
+    home: data.home || '',
+    away: data.away || '',
+    betLabel: data.betLabel || data.bet || '',
+    odds: data.odds || '',
+    prob: data.prob || 0,
+    edge: data.edge || null,
+    verdict: data.verdict || '',
+    kelly: data.kelly || ''
+  };
+  hist.unshift(entry); // Plus récent en premier
+  if (hist.length > 100) hist = hist.slice(0, 100); // Max 100 entrées
+  localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+}
+
+function getHistorique() {
+  try {
+    return JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+  } catch(e) { return []; }
+}
+
+function clearHistorique() {
+  if (!confirm('Vider tout l\'historique ?')) return;
+  localStorage.removeItem(HIST_KEY);
+  renderHistoriquePredict();
+  showToast('Historique vidé');
+}
+
+function filterHistorique(type, val, btn) {
+  if (type === 'sport') {
+    histSportFilter = val;
+    document.querySelectorAll('#hist-sport-filters .hist-filter').forEach(function(b) { b.classList.remove('active'); });
+  } else {
+    histVerdictFilter = val;
+    document.querySelectorAll('#hist-verdict-filters .hist-filter').forEach(function(b) { b.classList.remove('active'); });
+  }
+  if (btn) btn.classList.add('active');
+  renderHistoriquePredict();
+}
+
+function renderHistoriquePredict() {
+  var hist = getHistorique();
+  var today = new Date().toISOString().slice(0, 10);
+
+  // Stats
+  var totalValue = hist.filter(function(h) { return h.verdict && h.verdict.includes('VALUE'); }).length;
+  var todayCount = hist.filter(function(h) { return h.date && h.date.slice(0, 10) === today; }).length;
+  var statTotal = document.getElementById('hist-stat-total');
+  var statValue = document.getElementById('hist-stat-value');
+  var statToday = document.getElementById('hist-stat-today');
+  if (statTotal) statTotal.textContent = hist.length;
+  if (statValue) statValue.textContent = totalValue;
+  if (statToday) statToday.textContent = todayCount;
+
+  // Filtrer
+  var filtered = hist.filter(function(h) {
+    var sportOk = histSportFilter === 'all' || h.sport === histSportFilter;
+    var verdictOk = histVerdictFilter === 'all' ||
+      (histVerdictFilter === 'value' && h.verdict && h.verdict.includes('VALUE')) ||
+      (histVerdictFilter === 'edge' && h.verdict && h.verdict.includes('EDGE')) ||
+      (histVerdictFilter === 'eviter' && h.verdict && h.verdict.includes('ÉVITER'));
+    return sportOk && verdictOk;
+  });
+
+  var container = document.getElementById('hist-list-predict');
+  if (!container) return;
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--txt2);font-size:13px">' +
+      '<div style="font-size:40px;margin-bottom:12px">📋</div>' +
+      '<div style="font-weight:700;margin-bottom:6px">Aucune analyse</div>' +
+      '<div style="font-size:11px;opacity:0.6">Tes analyses apparaîtront ici automatiquement</div>' +
+      '</div>';
+    return;
+  }
+
+  var sportEmojis = {football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉'};
+  var html = '';
+
+  filtered.forEach(function(h) {
+    var verdictColor = h.verdict && h.verdict.includes('VALUE') ? 'var(--green)' :
+                       h.verdict && h.verdict.includes('ÉVITER') ? 'var(--red)' :
+                       h.verdict && h.verdict.includes('EDGE') ? 'var(--gold)' : 'var(--txt2)';
+    var verdictBg = h.verdict && h.verdict.includes('VALUE') ? 'rgba(0,229,184,0.08)' :
+                    h.verdict && h.verdict.includes('ÉVITER') ? 'rgba(255,71,87,0.08)' :
+                    h.verdict && h.verdict.includes('EDGE') ? 'rgba(245,200,66,0.08)' : 'rgba(255,255,255,0.03)';
+
+    var dateObj = new Date(h.date);
+    var dateStr = dateObj.toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var emoji = sportEmojis[h.sport] || '🏆';
+    var probPct = h.prob ? Math.round(h.prob * 100) + '%' : '—';
+    var edgeStr = h.edge !== null && h.edge !== undefined ? (h.edge > 0 ? '+' : '') + (h.edge * 100).toFixed(1) + '%' : '—';
+
+    html += '<div class="hist-card" style="background:' + verdictBg + ';border-color:' + verdictColor + '33;margin-bottom:10px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<span style="font-size:18px">' + emoji + '</span>' +
+          '<div>' +
+            '<div style="font-size:12px;font-weight:700;color:var(--txt)">' + escapeHtml(h.home) + ' vs ' + escapeHtml(h.away) + '</div>' +
+            '<div style="font-size:10px;color:var(--txt2)">' + dateStr + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:9px;font-weight:700;color:' + verdictColor + ';background:' + verdictBg + ';padding:3px 8px;border-radius:20px;border:1px solid ' + verdictColor + '44">' + (h.verdict || '—') + '</div>' +
+      '</div>' +
+      '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:8px 10px;margin-bottom:8px">' +
+        '<div style="font-size:11px;color:var(--txt2);margin-bottom:2px">PRONOSTIC</div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--txt)">' + escapeHtml(h.betLabel || '—') + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:6px">' +
+        '<div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:6px">' +
+          '<div style="font-size:8px;color:var(--txt2);font-weight:700;letter-spacing:1px;margin-bottom:2px">COTE</div>' +
+          '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:var(--gold)">@' + (h.odds || '—') + '</div>' +
+        '</div>' +
+        '<div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:6px">' +
+          '<div style="font-size:8px;color:var(--txt2);font-weight:700;letter-spacing:1px;margin-bottom:2px">CONFIANCE</div>' +
+          '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:' + verdictColor + '">' + probPct + '</div>' +
+        '</div>' +
+        '<div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:6px">' +
+          '<div style="font-size:8px;color:var(--txt2);font-weight:700;letter-spacing:1px;margin-bottom:2px">EDGE</div>' +
+          '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:var(--txt)">' + edgeStr + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<button onclick=\'shareFromHistorique(' + JSON.stringify(h).replace(/'/g, "\\'") + ')\' style="width:100%;margin-top:8px;background:rgba(91,155,255,0.1);border:1px solid rgba(91,155,255,0.25);border-radius:10px;padding:8px;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer">📤 Repartager</button>' +
+    '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function shareFromHistorique(data) {
+  generateShareImage(data);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function addShareButton(containerId, data) {
+  // Sauvegarder automatiquement dans l'historique
+  saveAnalyseHistorique(data);
   var container = document.getElementById(containerId);
   if (!container) return;
   var btn = document.createElement('button');
@@ -9685,7 +9887,7 @@ function setSport(sport) {
   currentSport = sport;
 
   // ── Tabs ──
-  ['football','tennis','basket','hockey','mma','rugby','tendances','live','precision'].forEach(function(s) {
+  ['football','tennis','basket','hockey','mma','rugby','tendances','live','precision','historique'].forEach(function(s) {
     var tab = document.getElementById('tab-'+s);
     if (tab) tab.classList.toggle('active', s === sport);
   });
@@ -9751,6 +9953,11 @@ function setSport(sport) {
   if (precScreen) precScreen.style.display = sport==='precision' ? 'block' : 'none';
   if (sport==='precision') renderPrecisionScreen();
 
+  // ── HISTORIQUE ──
+  var histScreen = document.getElementById('historique-screen');
+  if (histScreen) histScreen.style.display = sport==='historique' ? 'block' : 'none';
+  if (sport==='historique') renderHistoriquePredict();
+
   // ── Header subtitle ──
   var sub = document.getElementById('hdr-sub');
   var labels = {
@@ -9762,7 +9969,8 @@ function setSport(sport) {
     rugby:    'MODÈLES PRÉDICTIFS RUGBY',
     tendances: '🔥 DÉTECTEUR DE TENDANCES',
     live:      '🔴 RECALCUL EN DIRECT',
-    precision: '🎯 PRÉCISION DES MODÈLES'
+    precision: '🎯 PRÉCISION DES MODÈLES',
+    historique: '📋 HISTORIQUE DES ANALYSES'
   };
   if (sub) sub.textContent = labels[sport] || 'MODÈLES PRÉDICTIFS';
 
