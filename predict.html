@@ -7500,8 +7500,20 @@ var histFilter = 'all';
 var pendingResultId = null;
 
 function getHistory() {
-  try { return JSON.parse(localStorage.getItem('predict_history')||'[]'); }
-  catch(e) { return []; }
+  try {
+    // Source 1 : ancien historique predict_history
+    var old = JSON.parse(localStorage.getItem('predict_history') || '[]');
+    // Source 2 : nouveau historique sd_predict_historique
+    var newHist = JSON.parse(localStorage.getItem('sd_predict_historique') || '[]');
+    // Fusionner et dédupliquer par id
+    var merged = old.concat(newHist);
+    var seen = {};
+    return merged.filter(function(e) {
+      if (seen[e.id]) return false;
+      seen[e.id] = true;
+      return true;
+    });
+  } catch(e) { return []; }
 }
 
 function saveHistory(h) {
