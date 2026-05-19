@@ -5,100 +5,208 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Backtest — SportsDecrypté</title>
 <style>
-:root {
-  --bg: #0a0a0f;
-  --bg2: #0f0f18;
-  --bg3: #161622;
-  --border: #1e1e2e;
-  --border2: #2a2a3e;
-  --txt: #f0f0ff;
-  --txt2: #8888aa;
-  --txt3: #444466;
-  --gold: #f5c842;
-  --green: #10b981;
-  --red: #ef4444;
-  --orange: #f59e0b;
-  --blue: #3b82f6;
-  --purple: #8b5cf6;
-  --win: rgba(16,185,129,0.12);
-  --win-border: rgba(16,185,129,0.25);
-  --loss: rgba(239,68,68,0.08);
-  --loss-border: rgba(239,68,68,0.2);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
-  background: var(--bg);
-  color: var(--txt);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 14px;
-  min-height: 100vh;
-  line-height: 1.5;
-}
-.container { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap');
+  :root {
+    --bg: #05050d;
+    --bg2: #0a0a16;
+    --bg3: #111120;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --txt: #f0f0ff;
+    --txt2: rgba(240,240,255,0.55);
+    --txt3: rgba(240,240,255,0.25);
+    --gold: #f5c842;
+    --green: #00e5b8;
+    --red: #ff4757;
+    --orange: #ff6b35;
+    --blue: #5b9bff;
+    --purple: #b06ef3;
+    --win: rgba(0,229,184,0.08);
+    --win-border: rgba(0,229,184,0.2);
+    --loss: rgba(255,71,87,0.06);
+    --loss-border: rgba(255,71,87,0.18);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    background: var(--bg);
+    color: var(--txt);
+    font-family: 'Syne', -apple-system, sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  body::before {
+    content: '';
+    position: fixed; top: -150px; right: -150px;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(176,110,243,0.06) 0%, transparent 65%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 430px; margin: 0 auto; padding: 0 0 80px; position: relative; z-index: 1; }
 
-/* HEADER */
-.header {
-  display: flex; align-items: center; gap: 14px;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-}
-.header-back {
-  width: 36px; height: 36px;
-  background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: 10px; display: flex; align-items: center;
-  justify-content: center; cursor: pointer; font-size: 16px;
-  text-decoration: none; color: var(--txt2);
-  flex-shrink: 0; transition: all 0.15s;
-}
-.header-back:hover { border-color: var(--gold); color: var(--gold); }
-.header-icon {
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg, var(--purple), #a78bfa);
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; flex-shrink: 0;
-}
-.header-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
-.header-sub { font-size: 11px; color: var(--txt2); margin-top: 1px; }
+  /* HEADER */
+  .header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 52px 20px 18px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(5,5,13,0.92);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .header-back {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; font-size: 18px;
+    text-decoration: none; color: var(--txt); flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .header-back:active { transform: scale(0.93); }
+  .header-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--purple), #7c3aed);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(176,110,243,0.3);
+  }
+  .header-title { font-family: 'Bebas Neue', cursive; font-size: 24px; letter-spacing: 3px; color: var(--txt); }
+  .header-sub { font-size: 10px; color: var(--txt3); letter-spacing: 2px; font-weight: 700; }
 
-/* CONTROLS */
-.controls {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-.controls-title {
-  font-size: 10px; letter-spacing: 2px; color: var(--txt3);
-  font-weight: 700; margin-bottom: 12px;
-}
-.controls-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
-.ctrl-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
-.ctrl-label { font-size: 10px; letter-spacing: 1px; color: var(--txt3); font-weight: 600; text-transform: uppercase; }
-input[type="date"], select {
-  background: var(--bg3); border: 1px solid var(--border2);
-  color: var(--txt); padding: 9px 12px; border-radius: 10px;
-  font-size: 13px; font-family: inherit; outline: none;
-  transition: border-color 0.15s; color-scheme: dark;
-}
-input[type="date"]:focus, select:focus { border-color: var(--purple); }
+  /* CONTROLS */
+  .controls {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+  .controls-title {
+    font-size: 9px; letter-spacing: 3px; color: var(--txt3);
+    font-weight: 700; margin-bottom: 12px; text-transform: uppercase;
+  }
+  .controls-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+  .ctrl-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 110px; }
+  .ctrl-label { font-size: 9px; letter-spacing: 1.5px; color: var(--txt3); font-weight: 700; text-transform: uppercase; }
+  input[type="date"], select {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
+    color: var(--txt); padding: 10px 12px; border-radius: 12px;
+    font-size: 13px; font-family: 'Syne', inherit; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s; color-scheme: dark;
+    -webkit-appearance: none; appearance: none;
+    background-color: #111120 !important;
+    -webkit-text-fill-color: var(--txt) !important;
+  }
+  input[type="date"]:focus, select:focus {
+    border-color: rgba(176,110,243,0.5);
+    box-shadow: 0 0 0 3px rgba(176,110,243,0.1);
+  }
+  /* Forcer fond sombre global iOS */
+  html, body, .container, .controls, .header {
+    background-color: var(--bg) !important;
+    -webkit-text-fill-color: var(--txt);
+  }
 
-/* QUICK PERIOD CHIPS */
-.period-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-.period-chip {
-  padding: 5px 11px; border-radius: 20px;
-  background: var(--bg3); border: 1px solid var(--border2);
-  font-size: 11px; color: var(--txt2); cursor: pointer;
-  transition: all 0.15s; user-select: none;
-}
-.period-chip:hover { border-color: var(--purple); color: var(--txt); }
-.period-chip.active {
-  background: rgba(139,92,246,0.15);
-  border-color: var(--purple); color: #a78bfa; font-weight: 700;
-}
+  /* PERIOD CHIPS */
+  .period-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .period-chip {
+    padding: 6px 13px; border-radius: 20px;
+    background: var(--bg3); border: 1px solid var(--border);
+    font-size: 11px; color: var(--txt2); cursor: pointer;
+    transition: all 0.15s; user-select: none; font-weight: 700;
+  }
+  .period-chip:active { transform: scale(0.96); }
+  .period-chip.active {
+    background: rgba(176,110,243,0.12);
+    border-color: rgba(176,110,243,0.4); color: var(--purple);
+  }
 
+  /* RUN BUTTON */
+  .btn-run {
+    background: linear-gradient(135deg, var(--purple), #7c3aed);
+    color: #fff; border: none; border-radius: 14px;
+    padding: 13px 20px; font-family: 'Bebas Neue', cursive;
+    font-size: 16px; letter-spacing: 2px; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(176,110,243,0.3);
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .btn-run:active { transform: scale(0.96); opacity: 0.9; }
+  .btn-run:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* SUMMARY CARDS */
+  .summary {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; padding: 16px 20px 0;
+  }
+  .sum-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 18px; padding: 14px;
+    position: relative; overflow: hidden;
+  }
+  .sum-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(145deg, rgba(255,255,255,0.02), transparent);
+    pointer-events: none;
+  }
+  .sum-label { font-size: 9px; letter-spacing: 2px; color: var(--txt3); font-weight: 700; margin-bottom: 6px; }
+  .sum-value { font-family: 'Bebas Neue', cursive; font-size: 32px; line-height: 1; }
+  .sum-sub { font-size: 10px; color: var(--txt2); margin-top: 4px; }
+  .pos { color: var(--green); } .neg { color: var(--red); } .neu { color: var(--txt); }
+
+  /* MATCH ROWS */
+  .matches-section { padding: 16px 20px 0; }
+  .section-title {
+    font-size: 9px; letter-spacing: 3px; color: var(--txt3); font-weight: 700;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .match-row {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 16px; padding: 12px 14px; margin-bottom: 8px;
+    transition: all 0.15s; position: relative; overflow: hidden;
+  }
+  .match-row.win { border-color: var(--win-border); background: var(--win); }
+  .match-row.loss { border-color: var(--loss-border); background: var(--loss); }
+  .match-row.pending { border-color: rgba(245,200,66,0.2); background: rgba(245,200,66,0.04); }
+  .match-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .match-teams { font-weight: 700; font-size: 13px; }
+  .match-result-badge {
+    font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .match-result-badge.win { background: rgba(0,229,184,0.15); color: var(--green); }
+  .match-result-badge.loss { background: rgba(255,71,87,0.15); color: var(--red); }
+  .match-result-badge.pending { background: rgba(245,200,66,0.15); color: var(--gold); }
+  .match-bottom { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .match-bet { font-size: 11px; color: var(--txt2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .match-score { font-family: 'Bebas Neue', cursive; font-size: 13px; color: var(--txt3); }
+  .match-odds { font-size: 11px; color: var(--gold); font-weight: 700; }
+  .match-conf { font-size: 10px; color: var(--txt3); }
+
+  /* PROGRESS BAR */
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin: 4px 0; }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+
+  /* STATUS */
+  .status {
+    padding: 12px 20px;
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    font-size: 12px; color: var(--txt2); display: flex; align-items: center; gap: 10px;
+  }
+  .status-bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .status-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--blue)); transition: width 0.3s; }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 60px 24px; color: var(--txt3); }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-title { font-family: 'Bebas Neue', cursive; font-size: 22px; letter-spacing: 3px; margin-bottom: 8px; }
+  .empty-sub { font-size: 12px; line-height: 1.7; }
+
+  /* LOADER */
+  .spin { width: 20px; height: 20px; border: 2px solid var(--border2); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  ::-webkit-scrollbar { width: 0; }
 /* BUTTONS */
 .btn {
   background: linear-gradient(135deg, var(--purple), #a78bfa);
@@ -279,42 +387,40 @@ input[type="date"]:focus, select:focus { border-color: var(--purple); }
     <a href="Radar.html" class="header-back">←</a>
     <div class="header-icon">📊</div>
     <div>
-      <div class="header-title">Backtest <span style="color:var(--purple)">Radar</span></div>
-      <div class="header-sub">Validez la précision du modèle sur les matchs passés</div>
+      <div class="header-title">BACKTEST</div>
+      <div class="header-sub">PRÉCISION DU MODÈLE SUR LES MATCHS PASSÉS</div>
     </div>
   </div>
 
   <!-- DISCLAIMER -->
-  <div class="disclaimer">
-    ⚠️ <strong style="color:var(--gold)">Cotes estimées par notre modèle</strong> — pas des cotes bookmaker réelles.
-    Le ROI théorique est calculé en supposant que tu aurais misé 1 unité sur chaque top pick détecté.
-    C'est un indicateur de qualité du modèle, pas une garantie de performance future.
+  <div style="background:rgba(245,200,66,0.07);border-bottom:1px solid rgba(245,200,66,0.15);padding:10px 20px;font-size:11px;color:rgba(240,240,255,0.5);line-height:1.6;-webkit-text-fill-color:rgba(240,240,255,0.5)">
+    ⚠️ <strong style="color:var(--gold);-webkit-text-fill-color:var(--gold)">Cotes estimées par notre modèle</strong> — pas des cotes bookmaker réelles.
+    ROI théorique calculé à 1 unité par top pick. Indicateur de qualité, pas une garantie.
   </div>
 
   <!-- CONTROLS -->
   <div class="controls">
-    <div class="controls-title">⚙️ Paramètres du backtest</div>
-
-    <!-- Quick period chips -->
+    <div class="controls-title">⚙️ PARAMÈTRES</div>
     <div style="margin-bottom:12px">
       <div class="ctrl-label" style="margin-bottom:6px">Période rapide</div>
       <div class="period-chips">
-        <div class="period-chip active" data-days="7" onclick="selectPeriod(this,7)">7 jours</div>
-        <div class="period-chip" data-days="14" onclick="selectPeriod(this,14)">14 jours</div>
-        <div class="period-chip" data-days="30" onclick="selectPeriod(this,30)">30 jours</div>
-        <div class="period-chip" data-days="0" onclick="selectPeriod(this,0)">Personnalisé</div>
+        <div class="period-chip active" data-days="7" onclick="selectPeriod(this,7)">7j</div>
+        <div class="period-chip" data-days="14" onclick="selectPeriod(this,14)">14j</div>
+        <div class="period-chip" data-days="30" onclick="selectPeriod(this,30)">30j</div>
+        <div class="period-chip" data-days="0" onclick="selectPeriod(this,0)">Custom</div>
       </div>
     </div>
-
     <div class="controls-row">
-      <div class="ctrl-group" id="date-from-group">
+      <div class="ctrl-group">
         <label class="ctrl-label" for="dateFrom">Du</label>
         <input type="date" id="dateFrom">
       </div>
-      <div class="ctrl-group" id="date-to-group">
+      <div class="ctrl-group">
         <label class="ctrl-label" for="dateTo">Au</label>
         <input type="date" id="dateTo">
       </div>
+    </div>
+    <div class="controls-row" style="margin-top:10px">
       <div class="ctrl-group">
         <label class="ctrl-label" for="leagueSelect">Compétition</label>
         <select id="leagueSelect">
@@ -339,9 +445,16 @@ input[type="date"]:focus, select:focus { border-color: var(--purple); }
           <option value="DC">Double Chance</option>
         </select>
       </div>
-      <div style="align-self:flex-end">
-        <button class="btn" id="runBtn" onclick="runBacktest()">⚡ Lancer</button>
-      </div>
+    </div>
+    <button class="btn-run" id="runBtn" onclick="runBacktest()" style="width:100%;margin-top:12px">⚡ LANCER LE BACKTEST</button>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status" id="statusBar" style="display:none">
+    <span class="spin"></span>
+    <div style="flex:1">
+      <div id="statusText">Analyse en cours...</div>
+      <div class="status-bar"><div class="status-fill" id="statusFill" style="width:0%"></div></div>
     </div>
   </div>
 
@@ -538,34 +651,40 @@ function checkBet(bet, match) {
 
 /* ── BACKTEST PRINCIPAL ── */
 function runBacktest() {
-  var dateFrom = document.getElementById('dateFrom').value;
-  var dateTo = document.getElementById('dateTo').value;
-  var league = document.getElementById('leagueSelect').value;
-  var marketF = document.getElementById('marketFilter').value;
+  var dateFrom = document.getElementById("dateFrom").value;
+  var dateTo = document.getElementById("dateTo").value;
+  var league = document.getElementById("leagueSelect").value;
+  var marketF = document.getElementById("marketFilter").value;
 
-  if (!dateFrom || !dateTo) { alert('Sélectionne une période'); return; }
-  if (new Date(dateFrom) > new Date(dateTo)) { alert('La date de début doit être avant la date de fin'); return; }
+  if (!dateFrom || !dateTo) { showToast("Selectionne une periode"); return; }
+  if (new Date(dateFrom) > new Date(dateTo)) { showToast("La date de debut doit etre avant la date de fin"); return; }
 
-  var btn = document.getElementById('runBtn');
-  btn.disabled = true; btn.textContent = '⏳ Analyse...';
+  var btn = document.getElementById("runBtn");
+  btn.disabled = true;
+  btn.textContent = "ANALYSE...";
 
-  var results = document.getElementById('results');
-  results.innerHTML = '<div class="loader"><span class="spin"></span>Récupération des matchs passés...</div>';
+  var statusBar = document.getElementById("statusBar");
+  var statusText = document.getElementById("statusText");
+  var statusFill = document.getElementById("statusFill");
+  statusBar.style.display = "flex";
+  statusFill.style.width = "0%";
 
-  var compCodes = league === 'ALL_TOP' ? TOP5_PLUS_CL : [league];
+  document.getElementById("results").innerHTML = "";
 
-  // Récupérer tous les matchs TERMINÉS sur la période
+  var compCodes = league === "ALL_TOP" ? TOP5_PLUS_CL : [league];
   var allMatches = [];
   var fetchChain = Promise.resolve();
   var idx = 0;
 
   compCodes.forEach(function(code) {
     fetchChain = fetchChain.then(function() {
-      results.innerHTML = '<div class="loader"><span class="spin"></span>Récupération ' + code + ' (' + (++idx) + '/' + compCodes.length + ')...</div>';
-      return apiCall('/competitions/' + code + '/matches?dateFrom=' + dateFrom + '&dateTo=' + dateTo,
-        'bt_matches_' + code + '_' + dateFrom + '_' + dateTo)
+      idx++;
+      statusText.textContent = "Recuperation " + code + " (" + idx + "/" + compCodes.length + ")...";
+      statusFill.style.width = Math.round(idx / compCodes.length * 40) + "%";
+      return apiCall("/competitions/" + code + "/matches?dateFrom=" + dateFrom + "&dateTo=" + dateTo,
+        "bt_matches_" + code + "_" + dateFrom + "_" + dateTo)
         .then(function(data) {
-          var finished = (data.matches || []).filter(function(m) { return m.status === 'FINISHED'; });
+          var finished = (data.matches || []).filter(function(m) { return m.status === "FINISHED"; });
           allMatches = allMatches.concat(finished);
         })
         .catch(function(e) { console.warn(code, e.message); });
@@ -573,20 +692,26 @@ function runBacktest() {
   });
 
   fetchChain.then(function() {
+    var results = document.getElementById('results');
+    var statusBar = document.getElementById('statusBar');
+    var statusText = document.getElementById('statusText');
+    var statusFill = document.getElementById('statusFill');
+
     if (!allMatches.length) {
-      results.innerHTML = '<div class="empty">Aucun match terminé trouvé sur cette période.</div>';
-      btn.disabled = false; btn.textContent = '⚡ Lancer';
+      results.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Aucun match trouvé</div><div class="empty-sub">Aucun match terminé sur cette période et cette compétition.</div></div>';
+      btn.disabled = false; btn.textContent = '⚡ LANCER LE BACKTEST';
+      statusBar.style.display = 'none';
       return;
     }
 
-    results.innerHTML = '<div class="loader"><span class="spin"></span>Analyse de ' + allMatches.length + ' matchs...<br><small>(rate limit — ~' + Math.ceil(allMatches.length*20/60) + ' min estimé)</small></div>';
-
-    // Limiter à 15 matchs max pour ne pas saturer l'API
     var MAX = Math.min(allMatches.length, 15);
     var slice = allMatches.slice(0, MAX);
     if (allMatches.length > MAX) {
-      showToast('⚠️ ' + allMatches.length + ' matchs trouvés, ' + MAX + ' analysés (limite API)');
+      showToast('⚠️ ' + allMatches.length + ' matchs, ' + MAX + ' analysés (limite API)');
     }
+
+    statusText.textContent = '0/' + slice.length + ' matchs analysés...';
+    statusFill.style.width = '40%';
 
     var analyzed = [];
     var chain2 = Promise.resolve();
@@ -595,9 +720,8 @@ function runBacktest() {
     slice.forEach(function(match) {
       chain2 = chain2.then(function() {
         done++;
-        results.innerHTML = '<div class="loader"><span class="spin"></span>Match ' + done + '/' + slice.length + ' : '
-          + esc((match.homeTeam.shortName||match.homeTeam.name)) + ' vs '
-          + esc((match.awayTeam.shortName||match.awayTeam.name)) + '</div>';
+        statusText.textContent = done + '/' + slice.length + ' — ' + esc((match.homeTeam.shortName||match.homeTeam.name)) + ' vs ' + esc((match.awayTeam.shortName||match.awayTeam.name));
+        statusFill.style.width = Math.round(40 + done / slice.length * 55) + '%';
 
         var homeId = match.homeTeam.id;
         var awayId = match.awayTeam.id;
@@ -614,11 +738,9 @@ function runBacktest() {
                 var aStats = summarizeMatches(lastN(am, 8), awayId);
                 var bets = computeBets(hStats, aStats);
 
-                // Filtrer par marché si demandé
                 var filteredBets = marketF === 'all' ? bets
                   : bets.filter(function(b) { return b.market === marketF; });
 
-                // Vérifier les résultats réels
                 var enriched = filteredBets.map(function(b) {
                   var won = checkBet(b, match);
                   return Object.assign({}, b, { won: won });
@@ -635,11 +757,14 @@ function runBacktest() {
     });
 
     chain2.then(function() {
+      statusFill.style.width = '100%';
+      setTimeout(function() { statusBar.style.display = 'none'; }, 500);
       renderResults(analyzed, marketF);
-      btn.disabled = false; btn.textContent = '⚡ Lancer';
+      btn.disabled = false; btn.textContent = '⚡ LANCER LE BACKTEST';
     }).catch(function(err) {
-      results.innerHTML = '<div class="empty" style="color:var(--red)">Erreur : ' + esc(err.message) + '</div>';
-      btn.disabled = false; btn.textContent = '⚡ Lancer';
+      results.innerHTML = '<div class="empty"><div class="empty-icon">❌</div><div class="empty-title">Erreur</div><div class="empty-sub">' + esc(err.message) + '</div></div>';
+      btn.disabled = false; btn.textContent = '⚡ LANCER LE BACKTEST';
+      statusBar.style.display = 'none';
     });
   });
 }
@@ -648,25 +773,20 @@ function runBacktest() {
 function renderResults(analyzed, marketF) {
   var results = document.getElementById('results');
   if (!analyzed.length) {
-    results.innerHTML = '<div class="empty">Aucun résultat à afficher.</div>';
+    results.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Aucun résultat</div><div class="empty-sub">Aucun match à afficher pour cette période.</div></div>';
     return;
   }
 
-  // ── Calculs globaux ──
   var totalPredictions = 0, correctPredictions = 0;
-  var roi = 0; // ROI théorique (1 unité par top pick)
+  var roi = 0;
   var byMarket = {};
 
   analyzed.forEach(function(a) {
     if (!a.topBet || a.topBet.won === null) return;
     totalPredictions++;
     var won = a.topBet.won;
-    if (won) {
-      correctPredictions++;
-      roi += parseFloat(a.topBet.fairOdds) - 1;
-    } else {
-      roi -= 1;
-    }
+    if (won) { correctPredictions++; roi += parseFloat(a.topBet.fairOdds) - 1; }
+    else { roi -= 1; }
     var m = a.topBet.market;
     if (!byMarket[m]) byMarket[m] = { total: 0, correct: 0 };
     byMarket[m].total++;
@@ -677,31 +797,16 @@ function renderResults(analyzed, marketF) {
   var roiPct = totalPredictions > 0 ? (roi / totalPredictions * 100) : 0;
   var accColor = accuracy >= 60 ? 'var(--green)' : accuracy >= 50 ? 'var(--gold)' : 'var(--red)';
   var roiColor = roiPct >= 0 ? 'var(--green)' : 'var(--red)';
+  var avgScore = analyzed.reduce(function(s,a){ return s + (a.topBet?a.topBet.score:0); }, 0) / Math.max(1, analyzed.length);
 
   var html = '';
 
-  // ── Cards résumé ──
-  html += '<div class="summary-grid">';
-  html += '<div class="summary-card ' + (accuracy>=60?'highlight-green':accuracy>=50?'highlight-gold':'highlight-red') + '">';
-  html += '<div class="summary-value" style="color:' + accColor + '">' + accuracy.toFixed(1) + '%</div>';
-  html += '<div class="summary-label">Précision</div>';
-  html += '<div class="summary-sub">' + correctPredictions + '/' + totalPredictions + ' top picks</div></div>';
-
-  html += '<div class="summary-card ' + (roiPct>=0?'highlight-green':'highlight-red') + '">';
-  html += '<div class="summary-value" style="color:' + roiColor + '">' + (roiPct>=0?'+':'') + roiPct.toFixed(1) + '%</div>';
-  html += '<div class="summary-label">ROI théorique</div>';
-  html += '<div class="summary-sub">1 unité/top pick</div></div>';
-
-  html += '<div class="summary-card">';
-  html += '<div class="summary-value" style="color:var(--purple)">' + analyzed.length + '</div>';
-  html += '<div class="summary-label">Matchs analysés</div>';
-  html += '<div class="summary-sub">sur la période</div></div>';
-
-  var avgScore = analyzed.reduce(function(s,a){ return s + (a.topBet?a.topBet.score:0); }, 0) / Math.max(1, analyzed.length);
-  html += '<div class="summary-card">';
-  html += '<div class="summary-value" style="color:var(--gold)">' + avgScore.toFixed(0) + '</div>';
-  html += '<div class="summary-label">Score moyen</div>';
-  html += '<div class="summary-sub">top pick (0-100)</div></div>';
+  // ── Résumé ──
+  html += '<div class="summary">';
+  html += '<div class="sum-card"><div class="sum-label">PRÉCISION</div><div class="sum-value ' + (accuracy>=60?'pos':accuracy>=50?'':'neg') + '">' + accuracy.toFixed(1) + '%</div><div class="sum-sub">' + correctPredictions + '/' + totalPredictions + ' top picks</div></div>';
+  html += '<div class="sum-card"><div class="sum-label">ROI THÉORIQUE</div><div class="sum-value ' + (roiPct>=0?'pos':'neg') + '">' + (roiPct>=0?'+':'') + roiPct.toFixed(1) + '%</div><div class="sum-sub">1 unité/top pick</div></div>';
+  html += '<div class="sum-card"><div class="sum-label">MATCHS</div><div class="sum-value neu">' + analyzed.length + '</div><div class="sum-sub">analysés</div></div>';
+  html += '<div class="sum-card"><div class="sum-label">SCORE MOY.</div><div class="sum-value" style="color:var(--gold)">' + avgScore.toFixed(0) + '</div><div class="sum-sub">sur 100</div></div>';
   html += '</div>';
 
   // ── ROI Chart ──
@@ -714,9 +819,9 @@ function renderResults(analyzed, marketF) {
   });
 
   if (roiCumulative.length > 1) {
-    html += '<div class="roi-chart">';
-    html += '<div class="section-title" style="margin-bottom:10px">📈 ROI CUMULATIF (unités)</div>';
-    html += '<div class="roi-chart-inner">';
+    html += '<div class="matches-section">';
+    html += '<div class="section-title">📈 ROI CUMULATIF</div>';
+    html += '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:16px;overflow:hidden">';
     html += renderROIChart(roiCumulative);
     html += '</div></div>';
   }
@@ -724,97 +829,100 @@ function renderResults(analyzed, marketF) {
   // ── Par marché ──
   var marketKeys = Object.keys(byMarket);
   if (marketKeys.length > 1) {
-    html += '<div class="section-title" style="margin-bottom:10px">🎯 PAR MARCHÉ</div>';
-    html += '<div class="market-grid">';
+    html += '<div class="matches-section" style="margin-top:16px">';
+    html += '<div class="section-title">🎯 PAR MARCHÉ</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px">';
     marketKeys.forEach(function(m) {
       var d = byMarket[m];
       var acc = d.total > 0 ? d.correct / d.total * 100 : 0;
       var col = acc >= 60 ? 'var(--green)' : acc >= 50 ? 'var(--gold)' : 'var(--red)';
-      html += '<div class="market-card">';
-      html += '<div class="market-name">' + esc(m) + '</div>';
-      html += '<div class="market-bar-wrap"><div class="market-bar-fill" style="width:' + acc.toFixed(0) + '%;background:' + col + '"></div></div>';
-      html += '<div class="market-stats"><span class="market-acc" style="color:' + col + '">' + acc.toFixed(0) + '%</span><span class="market-count">' + d.correct + '/' + d.total + '</span></div>';
+      html += '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 14px">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+      html += '<div style="font-size:12px;font-weight:700">' + esc(m) + '</div>';
+      html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:' + col + '">' + acc.toFixed(0) + '%</div>';
+      html += '</div>';
+      html += '<div class="progress-bar"><div class="progress-fill" style="width:' + acc.toFixed(0) + '%;background:' + col + '"></div></div>';
+      html += '<div style="font-size:10px;color:var(--txt3);margin-top:4px">' + d.correct + '/' + d.total + ' paris gagnés</div>';
       html += '</div>';
     });
-    html += '</div>';
+    html += '</div></div>';
   }
 
-  // ── Détail match par match ──
-  html += '<div class="timeline-header">';
-  html += '<div class="section-title">📋 DÉTAIL MATCH PAR MATCH</div>';
-  html += '</div>';
+  // ── Détail matchs ──
+  html += '<div class="matches-section" style="margin-top:16px">';
+  html += '<div class="section-title">📋 MATCH PAR MATCH</div>';
 
   analyzed.forEach(function(a) {
     var match = a.match;
     var ft = match.score && match.score.fullTime;
     var scoreStr = ft ? ft.home + ' - ' + ft.away : '?';
     var topWon = a.topBet && a.topBet.won;
-    var rowClass = a.topBet && a.topBet.won !== null ? (topWon ? 'win' : 'loss') : '';
+    var rowClass = a.topBet && a.topBet.won !== null ? (topWon ? 'win' : 'loss') : 'pending';
 
     html += '<div class="match-row ' + rowClass + '">';
-    html += '<div class="match-row-header">';
-    html += '<span class="match-league">' + esc((match.competition&&match.competition.name)||'') + '</span>';
-    html += '<span class="match-date">' + formatDate(match.utcDate) + '</span>';
+    html += '<div class="match-top">';
+    html += '<div>';
+    html += '<div class="match-teams">' + esc((match.homeTeam.shortName||match.homeTeam.name)) + ' vs ' + esc((match.awayTeam.shortName||match.awayTeam.name)) + '</div>';
+    html += '<div style="font-size:10px;color:var(--txt3)">' + esc((match.competition&&match.competition.name)||'') + ' · ' + formatDate(match.utcDate) + '</div>';
     html += '</div>';
-    html += '<div class="match-teams">';
-    html += '<span>' + esc((match.homeTeam.shortName||match.homeTeam.name)) + '</span>';
-    html += '<span class="match-score">' + scoreStr + '</span>';
-    html += '<span>' + esc((match.awayTeam.shortName||match.awayTeam.name)) + '</span>';
+    if (a.topBet && a.topBet.won !== null) {
+      var badge = topWon ? 'win' : 'loss';
+      var label = topWon ? '✅ GAGNÉ' : '❌ PERDU';
+      html += '<div class="match-result-badge ' + badge + '">' + label + '</div>';
+    } else {
+      html += '<div class="match-result-badge pending">⏳ N/A</div>';
+    }
     html += '</div>';
-    html += '<div class="bets-list">';
-    a.bets.slice(0, 4).forEach(function(b) {
-      var wonClass = b.won === null ? 'na' : (b.won ? 'win' : 'loss');
-      var wonIcon = b.won === null ? '?' : (b.won ? '✓' : '✗');
-      var pnl = b.won === null ? '' : (b.won ? '+' + (parseFloat(b.fairOdds)-1).toFixed(2) : '-1.00');
-      var pnlColor = b.won ? 'var(--green)' : 'var(--red)';
-      html += '<div class="bet-item">';
-      html += '<div class="bet-result ' + wonClass + '">' + wonIcon + '</div>';
-      html += '<span class="bet-name">' + esc(b.name) + '</span>';
-      html += '<span class="bet-score-badge" style="color:' + scoreColor(b.score) + '">' + b.score + '</span>';
-      html += '<span class="bet-odds">@' + b.fairOdds + '</span>';
-      if (pnl) html += '<span class="bet-pnl" style="color:' + pnlColor + '">' + pnl + '</span>';
+
+    // Résultat réel
+    html += '<div class="match-score" style="margin:6px 0;font-size:14px;color:var(--txt2)">' + scoreStr + '</div>';
+
+    // Top bet
+    if (a.topBet) {
+      var b = a.topBet;
+      var pnl = b.won === null ? '' : (b.won ? '+' + (parseFloat(b.fairOdds)-1).toFixed(2) + 'u' : '-1.00u');
+      var pnlCol = b.won ? 'var(--green)' : 'var(--red)';
+      html += '<div class="match-bottom">';
+      html += '<span class="match-bet">' + esc(b.name) + '</span>';
+      html += '<span class="match-odds">@' + b.fairOdds + '</span>';
+      html += '<span class="match-conf" style="color:' + scoreColor(b.score) + '">' + b.score + '/100</span>';
+      if (pnl) html += '<span style="font-family:\'Bebas Neue\',cursive;font-size:14px;color:' + pnlCol + '">' + pnl + '</span>';
       html += '</div>';
-    });
-    html += '</div></div>';
+    }
+
+    html += '</div>';
   });
+  html += '</div>';
 
   results.innerHTML = html;
 }
-
 /* ── SVG ROI Chart ── */
 function renderROIChart(data) {
   if (data.length < 2) return '';
-  var W = 800, H = 80;
+  var W = 380, H = 100;
   var min = Math.min.apply(null, data.concat([0]));
   var max = Math.max.apply(null, data.concat([0]));
   var range = Math.max(max - min, 0.01);
   var stepX = W / (data.length - 1);
   var toY = function(v) { return H - ((v - min) / range * H * 0.85) - H * 0.075; };
   var zero = toY(0);
-  // Points
   var pts = data.map(function(v, i) { return (i * stepX).toFixed(1) + ',' + toY(v).toFixed(1); }).join(' ');
-  // Fill
   var fillPts = '0,' + zero + ' ' + pts + ' ' + ((data.length-1)*stepX).toFixed(1) + ',' + zero;
   var lastV = data[data.length-1];
-  var lineCol = lastV >= 0 ? '#10b981' : '#ef4444';
-  var fillCol = lastV >= 0 ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.08)';
+  var lineCol = lastV >= 0 ? 'var(--green)' : 'var(--red)';
+  var fillCol = lastV >= 0 ? 'rgba(0,229,184,0.12)' : 'rgba(255,71,87,0.08)';
 
-  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">';
-  // Zero line
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">';
   svg += '<line x1="0" y1="' + zero.toFixed(1) + '" x2="' + W + '" y2="' + zero.toFixed(1) + '" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4,4"/>';
-  // Fill
   svg += '<polygon points="' + fillPts + '" fill="' + fillCol + '"/>';
-  // Line
-  svg += '<polyline points="' + pts + '" fill="none" stroke="' + lineCol + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
-  // Last dot
+  svg += '<polyline points="' + pts + '" fill="none" stroke="' + lineCol + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
   var lx = ((data.length-1)*stepX).toFixed(1);
   var ly = toY(lastV).toFixed(1);
-  svg += '<circle cx="' + lx + '" cy="' + ly + '" r="4" fill="' + lineCol + '"/>';
-  svg += '<text x="' + (parseFloat(lx)+8) + '" y="' + (parseFloat(ly)+4) + '" font-size="11" fill="' + lineCol + '" font-weight="700">' + (lastV>=0?'+':'') + lastV.toFixed(2) + 'u</text>';
+  svg += '<circle cx="' + lx + '" cy="' + ly + '" r="5" fill="' + lineCol + '"/>';
+  svg += '<text x="' + (parseFloat(lx) - (lastV >= 0 ? -10 : 60)) + '" y="' + (parseFloat(ly)+4) + '" font-size="13" fill="' + lineCol + '" font-weight="700" font-family="Bebas Neue,cursive">' + (lastV>=0?'+':'') + lastV.toFixed(2) + 'u</text>';
   svg += '</svg>';
   return svg;
 }
-
 /* ── Helpers ── */
 function esc(s) {
   if (!s) return '';
