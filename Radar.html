@@ -1224,14 +1224,14 @@ function renderMatches() {
           '<div class="team home">' +
             '<div class="team-logo">' + (homeCrest ? '<img src="' + escapeHtml(homeCrest) + '" alt="">' : '') + '</div>' +
             '<span>' + escapeHtml(homeName) + '</span>' +
-            '<span class="star ' + (homeFav ? 'active' : '') + '" data-fav-team="' + match.homeTeam.id + '">★</span>' +
+            '<span class="star ' + (homeFav ? 'active' : '') + '" data-fav-team="' + match.homeTeam.id + '" data-fav-name="' + (match.homeTeam.name||'').replace(/"/g,'') + '">★</span>' +
           '</div>' +
           (homeFormHtml ? '<div class="form-row"><span class="form-label">Forme</span>' + homeFormHtml + '</div>' : '') +
         '</div>' +
         '<span class="vs">VS</span>' +
         '<div style="display:flex;flex-direction:column;gap:4px;flex:1;align-items:flex-end">' +
           '<div class="team away">' +
-            '<span class="star ' + (awayFav ? 'active' : '') + '" data-fav-team="' + match.awayTeam.id + '">★</span>' +
+            '<span class="star ' + (awayFav ? 'active' : '') + '" data-fav-team="' + match.awayTeam.id + '" data-fav-name="' + (match.awayTeam.name||'').replace(/"/g,'') + '">★</span>' +
             '<span>' + escapeHtml(awayName) + '</span>' +
             '<div class="team-logo">' + (awayCrest ? '<img src="' + escapeHtml(awayCrest) + '" alt="">' : '') + '</div>' +
           '</div>' +
@@ -1386,9 +1386,22 @@ function attachMatchListeners() {
     s.addEventListener('click', function (e) {
       e.stopPropagation();
       var teamId = parseInt(s.getAttribute('data-fav-team'), 10);
+      var teamName = s.getAttribute('data-fav-name') || '';
       var idx = state.favorites.indexOf(teamId);
-      if (idx === -1) { state.favorites.push(teamId); showToast('★ Équipe épinglée'); }
-      else { state.favorites.splice(idx, 1); showToast('Équipe retirée'); }
+      if (idx === -1) {
+        state.favorites.push(teamId);
+        // Sauvegarder aussi le nom pour les paramètres
+        var favNames = loadJSON(STORAGE_KEYS.favorites + '_names', {});
+        favNames[teamId] = teamName;
+        saveJSON(STORAGE_KEYS.favorites + '_names', favNames);
+        showToast('🔔 Alertes activées pour ' + (teamName || 'cette équipe'));
+      } else {
+        state.favorites.splice(idx, 1);
+        var favNames2 = loadJSON(STORAGE_KEYS.favorites + '_names', {});
+        delete favNames2[teamId];
+        saveJSON(STORAGE_KEYS.favorites + '_names', favNames2);
+        showToast('🔕 Alertes désactivées');
+      }
       saveJSON(STORAGE_KEYS.favorites, state.favorites);
       renderMatches();
     });
@@ -1993,7 +2006,42 @@ function sendLocalNotif(title, body, url) {
 function notifyValueBets(matches) {
   if (!notifEnabled) return;
 
-  // Trouver les meilleurs value bets (score >= 70)
+  var today = new Date().toISOString().slice(0, 10);
+  var notifKey = 'sd_last_notif_' + today;
+  var favNotifKey = 'sd_last_fav_notif_' + today;
+
+  // ── Alertes équipes favorites (priorité haute) ──
+  var favNames = loadJSON(STORAGE_KEYS.favorites + '_names', {});
+  var favAlerted = JSON.parse(localStorage.getItem(favNotifKey) || '[]');
+
+  matches.forEach(function(m) {
+    if (!m.bets || !m.match) return;
+    var homeId = m.match.homeTeam && m.match.homeTeam.id;
+    var awayId = m.match.awayTeam && m.match.awayTeam.id;
+    var homeName = m.match.homeTeam && m.match.homeTeam.name;
+    var awayName = m.match.awayTeam && m.match.awayTeam.name;
+
+    var isFavMatch = state.favorites.indexOf(homeId) !== -1 || state.favorites.indexOf(awayId) !== -1;
+    if (!isFavMatch) return;
+
+    var matchKey = homeId + '_' + awayId;
+    if (favAlerted.indexOf(matchKey) !== -1) return; // Déjà notifié
+
+    // Meilleur pari du match
+    var topBet = m.bets[0];
+    if (!topBet) return;
+
+    var favTeam = state.favorites.indexOf(homeId) !== -1 ? homeName : awayName;
+    var title = '⭐ ' + favTeam + ' — Value bet !';
+    var body = homeName + ' vs ' + awayName + '\n' + (topBet.name||'') + ' @' + topBet.fairOdds + ' · Score ' + topBet.score + '/100';
+
+    sendLocalNotif(title, body, '/Radar.html');
+    favAlerted.push(matchKey);
+  });
+
+  localStorage.setItem(favNotifKey, JSON.stringify(favAlerted));
+
+  // ── Alertes globales value bets (score ≥ 70) ──
   var topBets = [];
   matches.forEach(function(m) {
     if (!m.bets) return;
@@ -2001,7 +2049,7 @@ function notifyValueBets(matches) {
       if (b.score >= 70 && b.fairOdds && parseFloat(b.fairOdds) >= state.oddsMin) {
         topBets.push({
           match: m.match.homeTeam.name + ' vs ' + m.match.awayTeam.name,
-          bet: b.label || b.betType,
+          bet: b.name || b.betType,
           odds: b.fairOdds,
           score: b.score
         });
@@ -2011,14 +2059,12 @@ function notifyValueBets(matches) {
 
   if (topBets.length === 0) return;
 
-  // Notifier seulement si on n'a pas déjà notifié ces matchs
-  var notifKey = 'sd_last_notif_' + new Date().toISOString().slice(0, 10);
   var alreadyNotified = localStorage.getItem(notifKey) === '1';
   if (alreadyNotified) return;
 
   var best = topBets[0];
   var title = '📡 Value bet détecté ! (score ' + best.score + '/100)';
-  var body = best.match + '\n' + best.bet + ' @' + best.odds;
+  var body = best.match + '\n' + (best.bet||'') + ' @' + best.odds;
 
   sendLocalNotif(title, body, '/Radar.html');
   localStorage.setItem(notifKey, '1');
