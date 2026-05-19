@@ -2609,6 +2609,22 @@
       <div style="margin-left:auto;color:var(--text3);font-size:18px;">›</div>
     </div>
 
+    <!-- Équipes suivies -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:16px 18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;color:var(--green);font-weight:700;margin-bottom:3px;">🔔 ALERTES ÉQUIPES</div>
+          <div style="font-size:13px;font-weight:700;">Équipes suivies</div>
+        </div>
+        <div style="font-size:10px;color:var(--text3)" id="fav-teams-count">0 équipe</div>
+      </div>
+      <div id="fav-teams-list" style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">
+          Épingle des équipes ⭐ dans le Radar pour recevoir des alertes
+        </div>
+      </div>
+    </div>
+
     <!-- 1. Install PWA -->
     <div style="background:linear-gradient(135deg,rgba(176,110,243,0.1),rgba(91,155,255,0.05));border:1px solid rgba(176,110,243,0.25);border-radius:20px;padding:18px;">
       <div style="font-size:9px;letter-spacing:3px;color:var(--purple);font-weight:700;margin-bottom:6px;">📲 INSTALLER L'APP</div>
@@ -2857,6 +2873,44 @@
     // Naviguer vers l'onboarding
     goTo('screen-onboarding');
   }
+
+  function renderFavTeams() {
+    var names = {};
+    var ids = [];
+    try {
+      names = JSON.parse(localStorage.getItem("sd_radar_favorites_names") || "{}");
+      ids = JSON.parse(localStorage.getItem("sd_radar_favorites") || "[]");
+    } catch(e) {}
+    var list = document.getElementById("fav-teams-list");
+    var count = document.getElementById("fav-teams-count");
+    if (!list) return;
+    var teamIds = Object.keys(names);
+    if (count) count.textContent = teamIds.length + " equipe" + (teamIds.length > 1 ? "s" : "");
+    if (teamIds.length === 0) {
+      list.innerHTML = "<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">Epingle des equipes dans le Radar pour recevoir des alertes</div>";
+      return;
+    }
+    list.innerHTML = teamIds.map(function(id) {
+      var name = names[id] || "Equipe " + id;
+      return "<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,229,184,0.05);border:1px solid rgba(0,229,184,0.15);border-radius:12px;padding:10px 14px">" +
+        "<div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green)">⭐</span><span style="font-size:13px;font-weight:700">" + name + "</span></div>" +
+        "<button onclick="removeFavTeam(" + id + ")" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.2);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--red);cursor:pointer">Retirer</button>" +
+      "</div>";
+    }).join("");
+  }
+
+  function removeFavTeam(teamId) {
+    try {
+      var names = JSON.parse(localStorage.getItem("sd_radar_favorites_names") || "{}");
+      var ids = JSON.parse(localStorage.getItem("sd_radar_favorites") || "[]");
+      delete names[teamId];
+      ids = ids.filter(function(id) { return id !== teamId && id !== String(teamId); });
+      localStorage.setItem("sd_radar_favorites_names", JSON.stringify(names));
+      localStorage.setItem("sd_radar_favorites", JSON.stringify(ids));
+      renderFavTeams();
+      showToast("Alertes desactivees");
+    } catch(e) {}
+  }
     document.getElementById('screen-onboarding').style.display = 'none';
     document.getElementById('screen-onboarding').classList.remove('active');
     const hasAccounts = localStorage.getItem('sd_accounts');
@@ -3096,7 +3150,7 @@
     if (id === 'screen-deposits') { renderDeposits(); setDepositType('deposit'); }
     if (id === 'screen-prematch') initPreMatch();
     if (id === 'screen-gng') { try { initGNG(); } catch(e) { var gc = document.getElementById('gng-criteria'); if(gc) gc.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);font-size:13px;">Erreur de chargement. Rechargez la page.</div>'; } }
-    if (id === 'screen-settings') { try { renderSettings(); } catch(e) {} }
+    if (id === 'screen-settings') { try { renderSettings(); } catch(e) {} renderFavTeams(); }
     if (id === 'screen-dashboard') renderDashboard();
 
   }
