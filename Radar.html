@@ -1260,7 +1260,9 @@ function renderMatches() {
           '<button class="btn btn-sm" data-action="save" data-idx="' + idx + '">💾 Sauver le pari</button>' +
           '<button class="btn btn-secondary btn-sm" data-action="send-sd" data-idx="' + idx + '">📤 Envoyer dans SportsDecrypté</button>' +
           '<button class="btn btn-secondary btn-sm" data-action="send-predict" data-idx="' + idx + '">🔮 Analyser dans Predict</button>' +
+          '<button class="btn btn-secondary btn-sm" data-action="compare-odds" data-idx="' + idx + '" style="background:rgba(91,155,255,0.1);border-color:rgba(91,155,255,0.3);color:var(--blue)">📊 Cotes réelles</button>' +
         '</div>' +
+        '<div class="odds-comparator-wrap" id="odds-comp-' + idx + '" style="display:none;margin-top:10px"></div>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -1401,8 +1403,174 @@ function attachMatchListeners() {
       if (action === 'save') saveTopBet(match);
       else if (action === 'send-sd') sendToSportsDecrypte(match);
       else if (action === 'send-predict') sendToPredict(match);
+      else if (action === 'compare-odds') loadRadarOdds(match, idx, b);
     });
   });
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPARATEUR DE COTES — RADAR (cache 3h)
+// ═══════════════════════════════════════════════════════
+
+var RADAR_ODDS_SPORTS = [
+  'soccer_epl','soccer_spain_la_liga','soccer_germany_bundesliga',
+  'soccer_italy_serie_a','soccer_france_ligue_one',
+  'soccer_uefa_champs_league','soccer_uefa_europa_league',
+  'soccer_netherlands_eredivisie','soccer_portugal_primeira_liga'
+];
+
+var BOOKIE_LOGOS = {
+  bet365:'🟢',unibet:'🟡',williamhill:'⚫',betfair:'🔵',
+  betclic:'🔴',winamax:'🟠',ladbrokes:'🟤',paddypower:'🟢',
+  pinnacle:'🔷',bwin:'🔵',betsson:'🟡','1xbet':'⚪',
+  marathonbet:'🔴',betvictor:'🟢',coral:'🔵'
+};
+
+async function loadRadarOdds(matchData, idx, btn) {
+  var wrap = document.getElementById('odds-comp-' + idx);
+  if (!wrap) return;
+
+  var home = matchData.match.homeTeam.name;
+  var away = matchData.match.awayTeam.name;
+  var cacheKey = 'radar_odds_' + home.replace(/\s/g,'') + '_' + away.replace(/\s/g,'');
+
+  // Vérifier cache 3h
+  try {
+    var cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      var entry = JSON.parse(cached);
+      if (Date.now() - entry.ts < 3 * 3600 * 1000) {
+        wrap.style.display = 'block';
+        wrap.innerHTML = entry.html;
+        btn.style.display = 'none';
+        return;
+      }
+    }
+  } catch(e) {}
+
+  btn.textContent = '⏳ Chargement...';
+  btn.disabled = true;
+  wrap.style.display = 'block';
+  wrap.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-faint);font-size:12px"><span class="loader-spin" style="display:inline-block;width:16px;height:16px;border:2px solid var(--border-2);border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px"></span>Recherche des cotes...</div>';
+
+  try {
+    var foundBookmakers = null;
+    var foundHome = home;
+    var foundAway = away;
+    var homeLow = home.toLowerCase();
+    var awayLow = away.toLowerCase();
+
+    for (var i = 0; i < RADAR_ODDS_SPORTS.length; i++) {
+      var r = await fetch('/api/odds?sport=' + RADAR_ODDS_SPORTS[i] + '&regions=eu,uk&markets=h2h');
+      if (!r.ok) continue;
+      var data = await r.json();
+      if (!Array.isArray(data)) continue;
+
+      var event = data.find(function(e) {
+        var h = (e.home_team || '').toLowerCase();
+        var a = (e.away_team || '').toLowerCase();
+        var homeWord = homeLow.split(' ')[0];
+        var awayWord = awayLow.split(' ')[0];
+        return (h.indexOf(homeWord) !== -1 || homeLow.indexOf(h.split(' ')[0]) !== -1) &&
+               (a.indexOf(awayWord) !== -1 || awayLow.indexOf(a.split(' ')[0]) !== -1);
+      });
+
+      if (event && event.bookmakers && event.bookmakers.length > 0) {
+        foundBookmakers = event.bookmakers;
+        foundHome = event.home_team;
+        foundAway = event.away_team;
+        break;
+      }
+    }
+
+    var html = '';
+
+    if (!foundBookmakers || foundBookmakers.length === 0) {
+      html = '<div style="background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;font-size:11px;color:var(--text-faint)">📭 Cotes non disponibles pour ce match</div>';
+    } else {
+      // Meilleures cotes
+      var bestH = 0, bestD = 0, bestA = 0;
+      var bestHBook = '', bestDBook = '', bestABook = '';
+      foundBookmakers.forEach(function(bk) {
+        var m = bk.markets && bk.markets.find(function(m) { return m.key === 'h2h'; });
+        if (!m) return;
+        m.outcomes.forEach(function(o) {
+          if (o.name === foundHome && o.price > bestH) { bestH = o.price; bestHBook = bk.title; }
+          else if (o.name === foundAway && o.price > bestA) { bestA = o.price; bestABook = bk.title; }
+          else if (o.name === 'Draw' && o.price > bestD) { bestD = o.price; bestDBook = bk.title; }
+        });
+      });
+
+      html += '<div style="background:var(--bg-3);border:1px solid rgba(91,155,255,0.2);border-radius:16px;overflow:hidden">';
+
+      // Header
+      html += '<div style="padding:10px 14px;border-bottom:1px solid var(--border)">';
+      html += '<div style="font-size:9px;letter-spacing:2px;color:var(--blue);font-weight:700;margin-bottom:3px">📊 COTES EN DIRECT · ' + foundBookmakers.length + ' bookmakers</div>';
+      html += '<div style="font-size:11px;color:var(--text-dim)">Cache 3h · The Odds API</div>';
+      html += '</div>';
+
+      // Meilleures cotes
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)">';
+      [{label: foundHome.split(' ')[0], odds: bestH, book: bestHBook},
+       {label: 'Nul', odds: bestD, book: bestDBook},
+       {label: foundAway.split(' ')[0], odds: bestA, book: bestABook}
+      ].forEach(function(b, i) {
+        var border = i < 2 ? 'border-right:1px solid var(--border);' : '';
+        html += '<div style="padding:10px 8px;text-align:center;' + border + '">';
+        html += '<div style="font-size:8px;color:var(--text-faint);font-weight:700;letter-spacing:1px;margin-bottom:3px">' + b.label + '</div>';
+        html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:24px;color:var(--green)">' + (b.odds ? b.odds.toFixed(2) : '—') + '</div>';
+        html += '<div style="font-size:8px;color:var(--text-faint);margin-top:2px">' + (b.book || '—') + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+
+      // Tableau bookmakers
+      foundBookmakers.forEach(function(bk) {
+        var m = bk.markets && bk.markets.find(function(mk) { return mk.key === 'h2h'; });
+        if (!m) return;
+        var h = m.outcomes.find(function(o) { return o.name === foundHome; });
+        var d = m.outcomes.find(function(o) { return o.name === 'Draw'; });
+        var a = m.outcomes.find(function(o) { return o.name === foundAway; });
+        var logo = BOOKIE_LOGOS[bk.key] || '🎰';
+
+        html += '<div style="display:flex;align-items:center;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04)">';
+        html += '<div style="flex:1;font-size:11px;font-weight:700">' + logo + ' ' + bk.title + '</div>';
+        html += '<div style="display:flex;gap:6px">';
+        [{odds: h, best: h && h.price === bestH},
+         {odds: d, best: d && d.price === bestD},
+         {odds: a, best: a && a.price === bestA}
+        ].forEach(function(o) {
+          var col = o.best ? 'var(--green)' : 'var(--text-dim)';
+          var bg = o.best ? 'rgba(0,229,184,0.1)' : 'transparent';
+          var bdr = o.best ? '1px solid rgba(0,229,184,0.3)' : '1px solid transparent';
+          html += '<div style="width:46px;text-align:center;font-family:\'Bebas Neue\',cursive;font-size:15px;color:' + col + ';background:' + bg + ';border:' + bdr + ';border-radius:6px;padding:2px 0">' +
+            (o.odds ? o.odds.price.toFixed(2) : '—') + '</div>';
+        });
+        html += '</div></div>';
+      });
+
+      // Marge
+      var totalProb = (bestH ? 1/bestH : 0) + (bestD ? 1/bestD : 0) + (bestA ? 1/bestA : 0);
+      var margin = totalProb > 0 ? ((totalProb - 1) * 100).toFixed(1) : '—';
+      html += '<div style="padding:8px 14px;font-size:10px;color:var(--text-faint);text-align:center">';
+      html += 'Marge bookmaker : <strong style="color:var(--text-dim)">' + margin + '%</strong>';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    // Mettre en cache 3h
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({ html: html, ts: Date.now() }));
+    } catch(e) {}
+
+    wrap.innerHTML = html;
+    btn.style.display = 'none';
+
+  } catch(err) {
+    wrap.innerHTML = '<div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:12px;padding:10px;font-size:11px;color:var(--red)">Erreur : ' + err.message + '</div>';
+    btn.disabled = false;
+    btn.textContent = '📊 Cotes réelles';
+  }
 }
 
 function saveTopBet(matchData) {
