@@ -2264,6 +2264,19 @@
       </div>
       <div style="margin-bottom:12px;">
         <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:2px;margin-bottom:8px;">STRATÉGIES À COMPARER</div>
+
+        <!-- Explications -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:12px">
+          <div style="font-size:9px;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:10px">📖 C'EST QUOI ?</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--text2);line-height:1.5">
+            <div><strong style="color:var(--txt)">Mise plate</strong> — Tu mises toujours le même % de ta bankroll. Simple et sûr.</div>
+            <div><strong style="color:var(--txt)">Kelly</strong> — La mise est calculée selon la cote et ta probabilité estimée. Mathématiquement optimal mais agressif.</div>
+            <div><strong style="color:var(--txt)">Demi/Quart-Kelly</strong> — Même principe que Kelly mais divisé par 2 ou 4. Plus prudent.</div>
+            <div><strong style="color:var(--red)">Martingale ⚠️</strong> — Tu doubles ta mise après chaque perte. En théorie tu récupères tout à la première victoire. En pratique, une série de 6-7 défaites peut ruiner ta bankroll.</div>
+            <div><strong style="color:var(--orange)">Fibonacci</strong> — Tu suis la suite mathématique (1,1,2,3,5,8,13...) pour tes mises. Tu avances de 2 après une perte, tu recules de 1 après une victoire. Moins risqué que la Martingale.</div>
+          </div>
+        </div>
+
         <div style="display:flex;flex-direction:column;gap:8px;">
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
             <input type="checkbox" id="sc-flat2" checked style="width:18px;height:18px;accent-color:var(--gold);">
@@ -2288,6 +2301,14 @@
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
             <input type="checkbox" id="sc-actual" checked style="width:18px;height:18px;accent-color:var(--gold);">
             <span style="font-size:13px;color:var(--text);">Tes mises réelles</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="sc-martingale" style="width:18px;height:18px;accent-color:var(--red);">
+            <span style="font-size:13px;color:var(--text);">Martingale <span style="font-size:10px;color:var(--red)">⚠️ risqué</span></span>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="sc-fibonacci" style="width:18px;height:18px;accent-color:var(--orange);">
+            <span style="font-size:13px;color:var(--text);">Fibonacci</span>
           </label>
         </div>
       </div>
@@ -8431,6 +8452,8 @@ function runStratCompare() {
   var useKelly2 = document.getElementById('sc-kelly2').checked;
   var useKelly4 = document.getElementById('sc-kelly4').checked;
   var useActual = document.getElementById('sc-actual').checked;
+  var useMartingale = document.getElementById('sc-martingale') && document.getElementById('sc-martingale').checked;
+  var useFibonacci  = document.getElementById('sc-fibonacci') && document.getElementById('sc-fibonacci').checked;
 
   // Kelly fraction from odds + confidence
   // Edge supposé depuis le slider (utilisé quand confidence non dispo)
@@ -8485,10 +8508,58 @@ function runStratCompare() {
   if (useKelly2) strategies.push({ name:'Demi-Kelly',    color:'#f0c040', fn: function(bk,b){ return bk*kellyFraction(b.odds, b.confidence||0)*0.5; } });
   if (useKelly4) strategies.push({ name:'Quart-Kelly',   color:'#ff8c00', fn: function(bk,b){ return bk*kellyFraction(b.odds, b.confidence||0)*0.25; } });
   if (useActual) strategies.push({ name:'Tes mises réelles', color:'#00e5b8', fn: function(bk,b){
-    // Scale actual stake proportionally to simulated bankroll
     var ratio = startBK / (state.initialBankroll||startBK);
     return (b.stake||0) * ratio;
   }});
+
+  // ── MARTINGALE ──
+  // Principe : on double la mise après chaque perte pour récupérer toutes les pertes + gain de base
+  // Mise de base = 1% de la bankroll initiale
+  if (useMartingale) {
+    var martBase = startBK * 0.01;
+    var martCurrent = [martBase]; // on garde la mise courante dans un tableau pour la closure
+    var martLostStreak = [0];
+    strategies.push({
+      name: 'Martingale',
+      color: '#ff4757',
+      fn: function(bk, b) {
+        var stake = martCurrent[0];
+        // Après calcul du résultat, on met à jour pour le prochain pari
+        if (b.result === 'won') {
+          martCurrent[0] = martBase; // Reset après victoire
+          martLostStreak[0] = 0;
+        } else {
+          martLostStreak[0]++;
+          martCurrent[0] = Math.min(martBase * Math.pow(2, martLostStreak[0]), bk * 0.5); // cap à 50% bankroll
+        }
+        return Math.max(0, Math.min(stake, bk));
+      }
+    });
+  }
+
+  // ── FIBONACCI ──
+  // Principe : on suit la suite de Fibonacci pour les mises (1,1,2,3,5,8,13...)
+  // On avance de 2 positions après une perte, on recule de 1 après une victoire
+  // Mise de base = 1% de la bankroll initiale
+  if (useFibonacci) {
+    var fibSeq = [1,1,2,3,5,8,13,21,34,55,89,144,233];
+    var fibBase = startBK * 0.01;
+    var fibIdx = [0];
+    strategies.push({
+      name: 'Fibonacci',
+      color: '#ff8c00',
+      fn: function(bk, b) {
+        var idx = Math.min(fibIdx[0], fibSeq.length - 1);
+        var stake = fibBase * fibSeq[idx];
+        if (b.result === 'won') {
+          fibIdx[0] = Math.max(0, fibIdx[0] - 1); // Reculer d'un cran
+        } else {
+          fibIdx[0] = Math.min(fibIdx[0] + 2, fibSeq.length - 1); // Avancer de 2
+        }
+        return Math.max(0, Math.min(stake, bk * 0.3)); // cap à 30% bankroll
+      }
+    });
+  }
 
   if (!strategies.length) {
     document.getElementById('sc-results').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Sélectionne au moins une stratégie.</div>';
