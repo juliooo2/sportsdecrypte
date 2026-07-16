@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="fr" style="color-scheme:dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#05050d">
+<title>SportsDecrypté — Statistiques</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="/sd-auth.js"></script>
+<script src="/sd-gates.js"></script>
+<style>
+:root {
+  --bg:    #05050d;
+  --bg2:   #0a0a16;
+  --bg3:   #111120;
+  --bg4:   #181828;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --txt:   #f0f0ff;
+  --txt2:  rgba(240,240,255,0.55);
+  --txt3:  rgba(240,240,255,0.25);
+  --green: #00d4aa;
+  --red:   #ff4757;
+  --gold:  #f5c842;
+  --blue:  #5b9bff;
+  --purple:#b06ef3;
+  --orange:#ff6b35;
+  --casino:#ff9f43;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
+
+/* ── HEADER ── */
+.page-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(5,5,13,0.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:16px 20px 12px;
+}
+.header-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.back-btn{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--bg3);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;text-decoration:none;
+  color:var(--txt2);transition:all 0.15s;flex-shrink:0;
+}
+.back-btn:hover{border-color:var(--gold);color:var(--gold)}
+.header-title{font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:3px;color:var(--txt)}
+.header-sub{font-size:10px;color:var(--txt3);margin-top:1px;letter-spacing:1px}
+
+/* Period filter */
+.period-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.period-row::-webkit-scrollbar{display:none}
+.period-chip{
+  padding:6px 12px;border-radius:20px;
+  background:var(--bg3);border:1px solid var(--border);
+  font-size:11px;font-weight:700;color:var(--txt2);
+  cursor:pointer;white-space:nowrap;transition:all 0.15s;
+  letter-spacing:0.5px;
+}
+.period-chip.active{background:rgba(245,200,66,0.12);border-color:rgba(245,200,66,0.35);color:var(--gold)}
+
+/* Filter toggle */
+.filter-row{display:flex;gap:6px;padding:12px 20px 0}
+.filter-btn{
+  flex:1;padding:8px 6px;border-radius:10px;
+  background:var(--bg3);border:1px solid var(--border);
+  font-family:'Bebas Neue',cursive;font-size:11px;letter-spacing:2px;
+  color:var(--txt2);cursor:pointer;text-align:center;transition:all 0.15s;
+}
+.filter-btn.active.sport{background:rgba(0,212,170,0.12);border-color:rgba(0,212,170,0.35);color:var(--green)}
+.filter-btn.active.casino{background:rgba(255,159,67,0.12);border-color:rgba(255,159,67,0.35);color:var(--casino)}
+.filter-btn.active.all{background:rgba(91,155,255,0.12);border-color:rgba(91,155,255,0.35);color:var(--blue)}
+
+/* ── MAIN ── */
+.main{padding:16px 20px 100px}
+
+/* Cards */
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:16px;margin-bottom:12px;
+}
+.card-title{
+  font-size:10px;letter-spacing:2px;color:var(--txt3);
+  font-weight:700;text-transform:uppercase;margin-bottom:12px;
+}
+
+/* KPI Grid */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;padding:14px 12px;
+}
+.kpi-value{
+  font-family:'Bebas Neue',cursive;font-size:28px;
+  line-height:1;margin-bottom:4px;
+  font-variant-numeric:tabular-nums;
+}
+.kpi-label{font-size:9px;letter-spacing:2px;color:var(--txt3);font-weight:700;text-transform:uppercase}
+.kpi-sub{font-size:10px;color:var(--txt3);margin-top:3px}
+
+/* SVG Chart */
+.chart-wrap{position:relative;height:120px;margin:8px 0}
+.chart-wrap svg{width:100%;height:100%;overflow:visible}
+
+/* Bar Chart */
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:80px;padding-bottom:20px;position:relative}
+.bar-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;transition:height 0.4s ease;min-height:2px}
+.bar-label{font-size:8px;color:var(--txt3);text-align:center;position:absolute;bottom:0;font-variant-numeric:tabular-nums}
+
+/* Sport breakdown */
+.sport-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;background:rgba(255,255,255,0.03);
+  border-radius:10px;margin-bottom:6px;
+}
+.sport-icon{font-size:16px;width:28px;text-align:center;flex-shrink:0}
+.sport-info{flex:1;min-width:0}
+.sport-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.sport-bar-wrap{height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden}
+.sport-bar-fill{height:100%;border-radius:2px;transition:width 0.5s ease}
+.sport-stats{text-align:right;flex-shrink:0}
+.sport-roi{font-family:'Bebas Neue',cursive;font-size:14px}
+.sport-count{font-size:9px;color:var(--txt3)}
+
+/* Timeline */
+.timeline-entry{
+  display:flex;gap:10px;margin-bottom:8px;
+  padding:10px 12px;background:rgba(255,255,255,0.03);
+  border-radius:10px;
+}
+.tl-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;
+}
+.tl-info{flex:1;min-width:0}
+.tl-match{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-meta{font-size:10px;color:var(--txt3);margin-top:2px}
+.tl-profit{font-family:'Bebas Neue',cursive;font-size:16px;flex-shrink:0;font-variant-numeric:tabular-nums}
+
+/* Streak */
+.streak-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.streak-dot{
+  width:24px;height:24px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:800;
+}
+.streak-w{background:rgba(0,212,170,0.2);color:var(--green)}
+.streak-l{background:rgba(255,71,87,0.15);color:var(--red)}
+.streak-p{background:rgba(245,200,66,0.12);color:var(--gold)}
+
+/* Heatmap calendar */
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.hm-cell{
+  aspect-ratio:1;border-radius:4px;
+  background:rgba(255,255,255,0.04);
+  position:relative;cursor:default;
+}
+.hm-cell.win{background:rgba(0,212,170,0.35)}
+.hm-cell.loss{background:rgba(255,71,87,0.3)}
+.hm-cell.mixed{background:rgba(245,200,66,0.25)}
+.hm-cell.today{outline:1px solid var(--gold);outline-offset:1px}
+
+/* Compare periods */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.compare-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;padding:12px;text-align:center;
+}
+.compare-period{font-size:9px;letter-spacing:2px;color:var(--txt3);margin-bottom:8px;font-weight:700}
+.compare-value{font-family:'Bebas Neue',cursive;font-size:20px;margin-bottom:2px}
+.compare-sub{font-size:9px;color:var(--txt3)}
+.compare-delta{
+  font-size:11px;font-weight:700;margin-top:6px;
+  padding:3px 8px;border-radius:20px;display:inline-block;
+}
+.compare-delta.pos{background:rgba(0,212,170,0.1);color:var(--green)}
+.compare-delta.neg{background:rgba(255,71,87,0.1);color:var(--red)}
+
+/* Casino section */
+.casino-header{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;
+  background:rgba(255,159,67,0.06);
+  border:1px solid rgba(255,159,67,0.15);
+  border-radius:12px;margin-bottom:10px;
+}
+.casino-title{font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:2px;color:var(--casino)}
+
+/* Loading */
+.loading{text-align:center;padding:60px 20px;color:var(--txt3)}
+.loading-spin{
+  display:inline-block;width:24px;height:24px;
+  border:2px solid var(--border);border-top-color:var(--gold);
+  border-radius:50%;animation:spin 0.8s linear infinite;
+  margin-bottom:12px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Empty */
+.empty-state{
+  text-align:center;padding:48px 20px;
+  background:var(--bg2);border:1px dashed var(--border);
+  border-radius:16px;margin-bottom:12px;
+}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:3px;margin-bottom:6px}
+.empty-sub{font-size:12px;color:var(--txt2);line-height:1.6}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:0}
+
+/* Tooltip */
+.tooltip{
+  position:fixed;background:var(--bg4);border:1px solid var(--border2);
+  border-radius:8px;padding:6px 10px;font-size:11px;
+  pointer-events:none;z-index:999;display:none;
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-row">
+    <a href="/index.html" class="back-btn">←</a>
+    <div>
+      <div class="header-title">📊 Statistiques</div>
+      <div class="header-sub">ANALYSE APPROFONDIE DE TES PERFORMANCES</div>
+    </div>
+  </div>
+  <div class="period-row">
+    <div class="period-chip active" onclick="setPeriod('7d',this)">7 jours</div>
+    <div class="period-chip" onclick="setPeriod('30d',this)">30 jours</div>
+    <div class="period-chip" onclick="setPeriod('3m',this)">3 mois</div>
+    <div class="period-chip" onclick="setPeriod('6m',this)">6 mois</div>
+    <div class="period-chip" onclick="setPeriod('1y',this)">1 an</div>
+    <div class="period-chip" onclick="setPeriod('all',this)">Tout</div>
+  </div>
+</div>
+
+<div class="filter-row">
+  <div class="filter-btn active sport" onclick="setFilter('sport',this)">⚽ Sport</div>
+  <div class="filter-btn casino" onclick="setFilter('casino',this)">🎰 Casino</div>
+  <div class="filter-btn all" onclick="setFilter('all',this)">🔢 Tout</div>
+</div>
+
+<div class="main" id="main-content">
+  <div class="loading">
+    <div class="loading-spin"></div>
+    <div>Chargement des stats...</div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+'use strict';
+
+var currentPeriod = '7d';
+var currentFilter = 'sport';
+var allBets = [];
+var initialBankroll = 0;
+
+// ── Charger les données depuis localStorage ──
+function loadData() {
+  try {
+    var saved = localStorage.getItem('sd_accounts');
+    if (!saved) return [];
+    var data = JSON.parse(saved);
+    var acc = (data.accounts||[]).find(function(a){return a.id===data.currentId;}) || (data.accounts||[])[0];
+    if (!acc) return [];
+    initialBankroll = acc.state.initialBankroll || 0;
+    return acc.state.bets || [];
+  } catch(e) { return []; }
+}
+
+// ── Filtrer par période ──
+function filterByPeriod(bets, period) {
+  if (period === 'all') return bets;
+  var now = new Date();
+  var days = {
+    '7d': 7, '30d': 30, '3m': 90, '6m': 180, '1y': 365
+  }[period] || 7;
+  var cutoff = new Date(now.getTime() - days * 86400000);
+  return bets.filter(function(b) {
+    var d = parseDate(b.date);
+    return d && d >= cutoff;
+  });
+}
+
+// ── Parser la date ──
+function parseDate(str) {
+  if (!str) return null;
+  // Format dd/mm ou dd/mm/yyyy
+  var parts = str.split('/');
+  if (parts.length >= 2) {
+    var d = parseInt(parts[0]);
+    var m = parseInt(parts[1]) - 1;
+    var y = parts[2] ? parseInt(parts[2]) : new Date().getFullYear();
+    return new Date(y, m, d);
+  }
+  return null;
+}
+
+// ── Filtrer par type ──
+function filterByType(bets, filter) {
+  if (filter === 'all') return bets;
+  if (filter === 'casino') return bets.filter(function(b){return b.type==='casino'||b.sport==='casino';});
+  return bets.filter(function(b){return b.type!=='casino'&&b.sport!=='casino';});
+}
+
+function setPeriod(p, el) {
+  currentPeriod = p;
+  document.querySelectorAll('.period-chip').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  render();
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+  el.classList.add(f);
+  render();
+}
+
+// ── RENDU PRINCIPAL ──
+function render() {
+  var raw = filterByPeriod(allBets, currentPeriod);
+  var bets = filterByType(raw, currentFilter);
+  var settled = bets.filter(function(b){return b.result==='won'||b.result==='lost'||b.result==='push';});
+  var won = settled.filter(function(b){return b.result==='won';});
+  var lost = settled.filter(function(b){return b.result==='lost';});
+
+  var totalProfit = settled.reduce(function(s,b){return s+b.profit;},0);
+  var totalStake = settled.reduce(function(s,b){return s+(b.stake||0);},0);
+  var roi = totalStake>0 ? (totalProfit/totalStake*100) : 0;
+  var wr = settled.length>0 ? (won.length/settled.length*100) : 0;
+  var currentBankroll = initialBankroll + allBets.reduce(function(s,b){return s+b.profit;},0);
+
+  var html = '';
+
+  if (!settled.length) {
+    html += '<div class="empty-state"><div class="empty-icon">📊</div>';
+    html += '<div class="empty-title">Pas encore de stats</div>';
+    html += '<div class="empty-sub">Enregistre tes premiers paris<br>pour voir tes statistiques ici.</div></div>';
+    document.getElementById('main-content').innerHTML = html;
+    return;
+  }
+
+  // ═══ KPIs ═══
+  html += '<div class="kpi-grid">';
+  html += kpiCard(formatProfit(totalProfit), totalProfit>=0?'var(--green)':'var(--red)', 'PROFIT NET', settled.length+' paris');
+  html += kpiCard(roi.toFixed(1)+'%', roi>=0?'var(--green)':'var(--red)', 'ROI', totalStake.toFixed(0)+'€ misés');
+  html += kpiCard(wr.toFixed(0)+'%', wr>=50?'var(--green)':'var(--red)', 'WIN RATE', won.length+'/'+settled.length);
+  html += kpiCard(currentBankroll.toFixed(0)+'€', currentBankroll>=initialBankroll?'var(--green)':'var(--red)', 'BANKROLL', 'Initial: '+initialBankroll+'€');
+  html += '</div>';
+
+  // ═══ COURBE BANKROLL ═══
+  html += '<div class="card">';
+  html += '<div class="card-title">📈 ÉVOLUTION BANKROLL</div>';
+  html += '<div class="chart-wrap">' + renderBankrollChart(settled, initialBankroll) + '</div>';
+  html += '</div>';
+
+  // ═══ ROI PAR MOIS ═══
+  var monthlyData = getMonthlyData(settled);
+  if (monthlyData.length > 1) {
+    html += '<div class="card">';
+    html += '<div class="card-title">📅 ROI PAR MOIS</div>';
+    html += renderMonthlyChart(monthlyData);
+    html += '</div>';
+  }
+
+  // ═══ PAR SPORT ═══
+  if (currentFilter !== 'casino') {
+    var sportData = getSportData(settled.filter(function(b){return b.type!=='casino'&&b.sport!=='casino';}));
+    if (Object.keys(sportData).length > 0) {
+      html += '<div class="card">';
+      html += '<div class="card-title">⚽ PAR SPORT</div>';
+      html += renderSportBreakdown(sportData);
+      html += '</div>';
+    }
+  }
+
+  // ═══ CASINO ═══
+  if (currentFilter !== 'sport') {
+    var casinoBets = settled.filter(function(b){return b.type==='casino'||b.sport==='casino';});
+    if (casinoBets.length > 0) {
+      html += renderCasinoSection(casinoBets);
+    }
+  }
+
+  // ═══ SÉRIES ═══
+  html += '<div class="card">';
+  html += '<div class="card-title">🔥 SÉRIES RÉCENTES</div>';
+  html += renderStreaks(settled);
+  html += '</div>';
+
+  // ═══ HEATMAP CALENDRIER ═══
+  html += '<div class="card">';
+  html += '<div class="card-title">📆 CALENDRIER DES PARIS</div>';
+  html += renderHeatmap(settled);
+  html += '</div>';
+
+  // ═══ COMPARAISON PÉRIODES ═══
+  html += renderPeriodComparison();
+
+  // ═══ MEILLEURS / PIRES PARIS ═══
+  html += renderBestWorst(settled);
+
+  document.getElementById('main-content').innerHTML = html;
+}
+
+// ── KPI Card ──
+function kpiCard(value, color, label, sub) {
+  return '<div class="kpi-card">'
+    + '<div class="kpi-value" style="color:'+color+'">'+value+'</div>'
+    + '<div class="kpi-label">'+label+'</div>'
+    + (sub?'<div class="kpi-sub">'+sub+'</div>':'')
+    + '</div>';
+}
+
+// ── Courbe bankroll SVG ──
+function renderBankrollChart(bets, initial) {
+  if (bets.length < 2) return '<div style="text-align:center;color:var(--txt3);font-size:12px;padding:20px">Pas assez de données</div>';
+
+  // Trier par date
+  var sorted = bets.slice().sort(function(a,b){
+    return (parseDate(a.date)||new Date()) - (parseDate(b.date)||new Date());
+  });
+
+  var points = [initial];
+  var running = initial;
+  sorted.forEach(function(b){ running += b.profit; points.push(running); });
+
+  var W = 360, H = 100;
+  var min = Math.min.apply(null, points);
+  var max = Math.max.apply(null, points);
+  var range = Math.max(max - min, 1);
+  var stepX = W / (points.length - 1);
+  var toY = function(v){ return H - (v - min) / range * H * 0.85 - H * 0.075; };
+
+  var pts = points.map(function(v,i){ return (i*stepX).toFixed(1)+','+toY(v).toFixed(1); }).join(' ');
+  var zero = toY(initial);
+  var fillPts = '0,'+zero+' '+pts+' '+((points.length-1)*stepX).toFixed(1)+','+zero;
+  var lastV = points[points.length-1];
+  var lineCol = lastV >= initial ? 'var(--green)' : 'var(--red)';
+  var fillCol = lastV >= initial ? 'rgba(0,212,170,0.1)' : 'rgba(255,71,87,0.08)';
+
+  var svg = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">';
+  // Grille
+  svg += '<line x1="0" y1="'+zero.toFixed(1)+'" x2="'+W+'" y2="'+zero.toFixed(1)+'" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4,4"/>';
+  // Fill
+  svg += '<polygon points="'+fillPts+'" fill="'+fillCol+'"/>';
+  // Ligne
+  svg += '<polyline points="'+pts+'" fill="none" stroke="'+lineCol+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  // Dernier point
+  var lx = ((points.length-1)*stepX).toFixed(1);
+  var ly = toY(lastV).toFixed(1);
+  svg += '<circle cx="'+lx+'" cy="'+ly+'" r="4" fill="'+lineCol+'"/>';
+  // Labels
+  svg += '<text x="2" y="12" font-size="9" fill="rgba(255,255,255,0.3)" font-family="JetBrains Mono">'+max.toFixed(0)+'€</text>';
+  svg += '<text x="2" y="'+(H-2)+'" font-size="9" fill="rgba(255,255,255,0.3)" font-family="JetBrains Mono">'+min.toFixed(0)+'€</text>';
+  svg += '<text x="'+lx+'" y="'+(parseFloat(ly)+14)+'" font-size="10" fill="'+lineCol+'" font-family="JetBrains Mono" font-weight="700" text-anchor="end">'+lastV.toFixed(0)+'€</text>';
+  svg += '</svg>';
+  return svg;
+}
+
+// ── Données mensuelles ──
+function getMonthlyData(bets) {
+  var months = {};
+  bets.forEach(function(b) {
+    var d = parseDate(b.date);
+    if (!d) return;
+    var key = d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0');
+    if (!months[key]) months[key] = {profit:0, stake:0, won:0, total:0, label:''};
+    months[key].profit += b.profit;
+    months[key].stake += b.stake||0;
+    months[key].won += b.result==='won'?1:0;
+    months[key].total++;
+    var mo = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+    months[key].label = mo[d.getMonth()];
+  });
+  return Object.keys(months).sort().map(function(k){ return Object.assign({key:k},months[k]); });
+}
+
+// ── Graphique mensuel ──
+function renderMonthlyChart(data) {
+  var maxAbs = Math.max.apply(null, data.map(function(d){return Math.abs(d.profit);}));
+  if (maxAbs === 0) maxAbs = 1;
+  var html = '<div style="display:flex;align-items:flex-end;gap:4px;height:80px;margin-bottom:20px;position:relative">';
+  data.forEach(function(d) {
+    var pct = Math.abs(d.profit) / maxAbs * 70;
+    var col = d.profit >= 0 ? 'var(--green)' : 'var(--red)';
+    var roi = d.stake > 0 ? (d.profit/d.stake*100).toFixed(0) : 0;
+    html += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;justify-content:flex-end;height:100%">';
+    html += '<div style="font-size:8px;color:'+col+';font-weight:700">'+roi+'%</div>';
+    html += '<div style="width:100%;height:'+pct+'%;background:'+col+';border-radius:4px 4px 0 0;opacity:0.8;min-height:3px"></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  // Labels mois
+  html += '<div style="display:flex;gap:4px">';
+  data.forEach(function(d){
+    html += '<div style="flex:1;text-align:center;font-size:8px;color:var(--txt3)">'+d.label+'</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// ── Par sport ──
+function getSportData(bets) {
+  var sports = {};
+  bets.forEach(function(b) {
+    var s = b.sport || 'autre';
+    if (!sports[s]) sports[s] = {profit:0, stake:0, won:0, total:0};
+    sports[s].profit += b.profit;
+    sports[s].stake += b.stake||0;
+    sports[s].won += b.result==='won'?1:0;
+    sports[s].total++;
+  });
+  return sports;
+}
+
+function renderSportBreakdown(data) {
+  var ICONS = {football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉',autre:'🏅'};
+  var NAMES = {football:'Football',tennis:'Tennis',basket:'Basket',hockey:'Hockey',mma:'MMA',rugby:'Rugby',autre:'Autre'};
+  var maxTotal = Math.max.apply(null, Object.values(data).map(function(d){return d.total;}));
+  var html = '';
+  Object.keys(data).sort(function(a,b){return data[b].total-data[a].total;}).forEach(function(s) {
+    var d = data[s];
+    var roi = d.stake>0 ? (d.profit/d.stake*100) : 0;
+    var wr = d.total>0 ? (d.won/d.total*100) : 0;
+    var col = roi>=0 ? 'var(--green)' : 'var(--red)';
+    var barW = (d.total/maxTotal*100).toFixed(0)+'%';
+    html += '<div class="sport-row">';
+    html += '<div class="sport-icon">'+(ICONS[s]||'🏅')+'</div>';
+    html += '<div class="sport-info">';
+    html += '<div class="sport-name">'+(NAMES[s]||s)+'</div>';
+    html += '<div style="font-size:9px;color:var(--txt3)">'+d.won+'/'+d.total+' · WR '+wr.toFixed(0)+'%</div>';
+    html += '<div class="sport-bar-wrap"><div class="sport-bar-fill" style="width:'+barW+';background:'+col+'"></div></div>';
+    html += '</div>';
+    html += '<div class="sport-stats"><div class="sport-roi" style="color:'+col+'">'+(roi>=0?'+':'')+roi.toFixed(1)+'%</div>';
+    html += '<div class="sport-count">'+formatProfit(d.profit)+'</div></div>';
+    html += '</div>';
+  });
+  return html;
+}
+
+// ── Section Casino ──
+function renderCasinoSection(bets) {
+  var totalProfit = bets.reduce(function(s,b){return s+b.profit;},0);
+  var totalStake = bets.reduce(function(s,b){return s+(b.stake||0);},0);
+  var won = bets.filter(function(b){return b.result==='won';}).length;
+  var roi = totalStake>0?(totalProfit/totalStake*100):0;
+
+  var html = '<div class="card">';
+  html += '<div class="casino-header">';
+  html += '<span style="font-size:20px">🎰</span>';
+  html += '<div><div class="casino-title">SESSIONS CASINO</div>';
+  html += '<div style="font-size:10px;color:var(--txt3)">'+bets.length+' sessions enregistrées</div></div>';
+  html += '<div style="margin-left:auto;text-align:right">';
+  html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:20px;color:'+(totalProfit>=0?'var(--casino)':'var(--red)')+'">'+formatProfit(totalProfit)+'</div>';
+  html += '<div style="font-size:9px;color:var(--txt3)">ROI '+(roi>=0?'+':'')+roi.toFixed(1)+'%</div>';
+  html += '</div></div>';
+
+  // Par jeu
+  var games = {};
+  bets.forEach(function(b){
+    var g = b.casinoGame||'autre';
+    if(!games[g]) games[g]={profit:0,total:0};
+    games[g].profit+=b.profit; games[g].total++;
+  });
+  var GAME_ICONS = {slots:'🎰',blackjack:'🃏',roulette:'🎡',poker:'♠️',autre:'🎲'};
+  var GAME_NAMES = {slots:'Slots',blackjack:'Blackjack',roulette:'Roulette',poker:'Poker',autre:'Autre'};
+  Object.keys(games).forEach(function(g){
+    var d=games[g];
+    html+='<div class="sport-row">';
+    html+='<div class="sport-icon">'+(GAME_ICONS[g]||'🎲')+'</div>';
+    html+='<div class="sport-info"><div class="sport-name">'+(GAME_NAMES[g]||g)+'</div>';
+    html+='<div style="font-size:9px;color:var(--txt3)">'+d.total+' session'+(d.total>1?'s':'')+'</div></div>';
+    html+='<div class="sport-stats"><div class="sport-roi" style="color:'+(d.profit>=0?'var(--casino)':'var(--red)')+'">'+formatProfit(d.profit)+'</div></div>';
+    html+='</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// ── Séries ──
+function renderStreaks(bets) {
+  var sorted = bets.slice().sort(function(a,b){
+    return (parseDate(b.date)||new Date())-(parseDate(a.date)||new Date());
+  }).slice(0,20);
+
+  // Série actuelle
+  var current = 0, currentType = null;
+  for (var i=0; i<sorted.length; i++) {
+    var r = sorted[i].result;
+    if (i===0) { currentType=r; current=1; }
+    else if (r===currentType) current++;
+    else break;
+  }
+  var bestWin = 0, bestLoss = 0, cw = 0, cl = 0;
+  sorted.slice().reverse().forEach(function(b){
+    if(b.result==='won'){cw++;cl=0;bestWin=Math.max(bestWin,cw);}
+    else{cl++;cw=0;bestLoss=Math.max(bestLoss,cl);}
+  });
+
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">';
+  html += '<div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:10px;padding:10px">';
+  html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:22px;color:'+(currentType==='won'?'var(--green)':'var(--red)')+'">'+current+'</div>';
+  html += '<div style="font-size:9px;color:var(--txt3)">SÉRIE ACTUELLE</div></div>';
+  html += '<div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:10px;padding:10px">';
+  html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:22px;color:var(--green)">'+bestWin+'</div>';
+  html += '<div style="font-size:9px;color:var(--txt3)">MEILLEURE SÉRIE</div></div>';
+  html += '<div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:10px;padding:10px">';
+  html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:22px;color:var(--red)">'+bestLoss+'</div>';
+  html += '<div style="font-size:9px;color:var(--txt3)">PIRE SÉRIE</div></div>';
+  html += '</div>';
+
+  // Derniers résultats visuels
+  html += '<div class="streak-row">';
+  sorted.slice(0,15).reverse().forEach(function(b){
+    var cls = b.result==='won'?'streak-w':b.result==='push'?'streak-p':'streak-l';
+    var icon = b.result==='won'?'V':b.result==='push'?'P':'D';
+    html += '<div class="streak-dot '+cls+'">'+icon+'</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// ── Heatmap calendrier ──
+function renderHeatmap(bets) {
+  var dayMap = {};
+  bets.forEach(function(b){
+    var d = parseDate(b.date);
+    if (!d) return;
+    var key = d.toISOString().slice(0,10);
+    if (!dayMap[key]) dayMap[key] = {won:0,lost:0};
+    if (b.result==='won') dayMap[key].won++;
+    else if (b.result==='lost') dayMap[key].lost++;
+  });
+
+  // 5 semaines en arrière
+  var today = new Date(); today.setHours(0,0,0,0);
+  var startDow = today.getDay() || 7; // lundi = 1
+  var start = new Date(today.getTime() - (startDow-1+28)*86400000);
+
+  var html = '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">';
+  var days = ['L','M','M','J','V','S','D'];
+  days.forEach(function(d){ html+='<div style="text-align:center;font-size:8px;color:var(--txt3);padding-bottom:3px">'+d+'</div>'; });
+
+  for (var i=0; i<35; i++) {
+    var d = new Date(start.getTime()+i*86400000);
+    var key = d.toISOString().slice(0,10);
+    var todayKey = today.toISOString().slice(0,10);
+    var data = dayMap[key];
+    var cls = 'hm-cell';
+    if (data) {
+      if (data.won>0 && data.lost>0) cls += ' mixed';
+      else if (data.won>0) cls += ' win';
+      else if (data.lost>0) cls += ' loss';
+    }
+    if (key===todayKey) cls += ' today';
+    var title = data ? (data.won+' V / '+data.lost+' D') : '';
+    html += '<div class="'+cls+'" title="'+title+'"></div>';
+  }
+  html += '</div>';
+  html += '<div style="display:flex;gap:12px;margin-top:8px;justify-content:center">';
+  html += '<div style="font-size:9px;color:rgba(0,212,170,0.8)">■ Gagné</div>';
+  html += '<div style="font-size:9px;color:rgba(245,200,66,0.8)">■ Mixte</div>';
+  html += '<div style="font-size:9px;color:rgba(255,71,87,0.8)">■ Perdu</div>';
+  html += '</div>';
+  return html;
+}
+
+// ── Comparaison périodes ──
+function renderPeriodComparison() {
+  var sportBets = allBets.filter(function(b){return b.type!=='casino'&&b.sport!=='casino';});
+  var now = new Date();
+
+  var calcStats = function(bets, daysAgo, daysRange) {
+    var from = new Date(now.getTime() - daysAgo*86400000);
+    var to = new Date(now.getTime() - (daysAgo-daysRange)*86400000);
+    var filtered = bets.filter(function(b){
+      var d = parseDate(b.date);
+      return d && d >= from && d < to && (b.result==='won'||b.result==='lost');
+    });
+    var profit = filtered.reduce(function(s,b){return s+b.profit;},0);
+    var stake = filtered.reduce(function(s,b){return s+(b.stake||0);},0);
+    var won = filtered.filter(function(b){return b.result==='won';}).length;
+    return {
+      profit: profit,
+      roi: stake>0?(profit/stake*100):0,
+      wr: filtered.length>0?(won/filtered.length*100):0,
+      count: filtered.length
+    };
+  };
+
+  var curr = calcStats(sportBets, 30, 30);
+  var prev = calcStats(sportBets, 60, 30);
+
+  if (curr.count === 0 && prev.count === 0) return '';
+
+  var html = '<div class="card"><div class="card-title">⚖️ COMPARAISON PÉRIODES (30 jours)</div>';
+  html += '<div class="compare-grid">';
+
+  // Période actuelle
+  html += '<div class="compare-card">';
+  html += '<div class="compare-period">CE MOIS</div>';
+  html += '<div class="compare-value" style="color:'+(curr.profit>=0?'var(--green)':'var(--red)')+'">'+formatProfit(curr.profit)+'</div>';
+  html += '<div class="compare-sub">ROI: '+(curr.roi>=0?'+':'')+curr.roi.toFixed(1)+'%</div>';
+  html += '<div class="compare-sub">WR: '+curr.wr.toFixed(0)+'% ('+curr.count+' paris)</div>';
+  html += '</div>';
+
+  // Période précédente
+  html += '<div class="compare-card">';
+  html += '<div class="compare-period">MOIS DERNIER</div>';
+  html += '<div class="compare-value" style="color:'+(prev.profit>=0?'var(--green)':'var(--red)')+'">'+formatProfit(prev.profit)+'</div>';
+  html += '<div class="compare-sub">ROI: '+(prev.roi>=0?'+':'')+prev.roi.toFixed(1)+'%</div>';
+  html += '<div class="compare-sub">WR: '+prev.wr.toFixed(0)+'% ('+prev.count+' paris)</div>';
+  html += '</div>';
+
+  html += '</div>';
+
+  // Delta
+  if (curr.count > 0 && prev.count > 0) {
+    var delta = curr.roi - prev.roi;
+    html += '<div style="text-align:center;margin-top:10px">';
+    html += '<span class="compare-delta '+(delta>=0?'pos':'neg')+'">';
+    html += (delta>=0?'↑ +':'↓ ')+delta.toFixed(1)+'% de ROI vs mois dernier';
+    html += '</span></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ── Meilleurs / Pires paris ──
+function renderBestWorst(bets) {
+  var sorted = bets.slice().sort(function(a,b){return b.profit-a.profit;});
+  var best = sorted.slice(0,3);
+  var worst = sorted.slice(-3).reverse();
+
+  var html = '<div class="card"><div class="card-title">🏆 MEILLEURS PARIS</div>';
+  best.forEach(function(b){
+    html += timelineEntry(b, true);
+  });
+  html += '</div>';
+
+  html += '<div class="card"><div class="card-title">💔 PARIS À OUBLIER</div>';
+  worst.forEach(function(b){
+    html += timelineEntry(b, false);
+  });
+  html += '</div>';
+  return html;
+}
+
+function timelineEntry(b, isWin) {
+  var col = b.profit>=0?'var(--green)':'var(--red)';
+  var ICONS = {football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉',casino:'🎰',autre:'🏅'};
+  return '<div class="timeline-entry">'
+    + '<div class="tl-dot" style="background:'+col+'"></div>'
+    + '<div class="tl-info">'
+    + '<div class="tl-match">'+(ICONS[b.sport]||'🏅')+' '+(b.match||'Match inconnu')+'</div>'
+    + '<div class="tl-meta">'+(b.pick||'')+(b.odds?' · @'+b.odds:'')+(b.date?' · '+b.date:'')+'</div>'
+    + '</div>'
+    + '<div class="tl-profit" style="color:'+col+'">'+(b.profit>=0?'+':'')+b.profit.toFixed(2)+'€</div>'
+    + '</div>';
+}
+
+// ── Helpers ──
+function formatProfit(v) {
+  return (v>=0?'+':'')+v.toFixed(2)+'€';
+}
+
+// ── Init ──
+allBets = loadData();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr" style="color-scheme:dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#05050d">
+  <title>SportsDecrypté — Bienvenue PRO !</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #f5c842;
+      --gold2: #ffd700;
+      --orange: #ff6b35;
+      --bg: #05050d;
+      --bg3: #111120;
+      --text: #f0f0ff;
+      --text2: rgba(240,240,255,0.6);
+      --text3: rgba(240,240,255,0.35);
+      --green: #00d4aa;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: var(--bg3);
+      border: 1px solid rgba(245,200,66,0.2);
+      border-radius: 24px;
+      padding: 40px 28px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(245,200,66,0.08);
+    }
+    .confetti { font-size: 48px; margin-bottom: 20px; animation: pop 0.4s ease; }
+    @keyframes pop { 0%{transform:scale(0.5);opacity:0} 80%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+    .title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 36px;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, var(--orange), var(--gold2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+    .sub { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 28px; }
+    .features {
+      background: rgba(0,212,170,0.06);
+      border: 1px solid rgba(0,212,170,0.15);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+    .feature { font-size: 13px; color: var(--text2); margin-bottom: 8px; display: flex; gap: 8px; }
+    .feature:last-child { margin-bottom: 0; }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--orange), var(--gold2));
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="confetti">🎉</div>
+    <div class="title">Bienvenue PRO !</div>
+    <div class="sub">Ton abonnement est actif. Tu as maintenant accès à toutes les fonctionnalités premium.</div>
+    <div class="features">
+      <div class="feature">🔮 Predict tous sports illimité</div>
+      <div class="feature">📡 Radar en temps réel</div>
+      <div class="feature">🤖 IA Coach — 5 modes complets</div>
+      <div class="feature">🏦 Multi-bankroll illimité</div>
+      <div class="feature">📊 Export & historique illimité</div>
+    </div>
+    <button class="btn" onclick="goToApp()">Découvrir mon espace PRO →</button>
+  </div>
+
+  <script>
+    function goToApp() {
+      // Mettre à jour le statut PRO en localStorage
+      localStorage.setItem('sd_is_pro', '1');
+      // Forcer une vérification fraîche au prochain chargement
+      localStorage.removeItem('sd_auth_last_verify');
+      window.location.href = '/index.html';
+    }
+
+    // Mettre à jour automatiquement le statut PRO
+    (function() {
+      localStorage.setItem('sd_is_pro', '1');
+      localStorage.removeItem('sd_auth_last_verify');
+    })();
+  </script>
+</body>
+</html>

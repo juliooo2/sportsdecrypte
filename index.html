@@ -4,6 +4,8 @@
 <meta name="google-site-verification" content="VBqeajDthItC9gpubln9iXKx3JhVBg_Hh94V_Zrui0c" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="/sd-auth.js"></script>
+<script src="/sd-gates.js"></script>
 <meta name="color-scheme" content="dark">
 <title>SportsDecrypte v10</title>
 
@@ -62,8 +64,11 @@
     --text: #f0f0ff;
     --text2: rgba(240,240,255,0.5);
     --text3: rgba(240,240,255,0.22);
-    --shadow: 0 8px 32px rgba(0,0,0,0.5);
-    --shadow-gold: 0 8px 32px rgba(245,200,66,0.15);
+    --shadow: 0 8px 32px rgba(0,0,0,0.6);
+    --shadow-gold: 0 8px 40px rgba(245,200,66,0.18);
+    --shadow-card: 0 2px 16px rgba(0,0,0,0.4);
+    --radius: 20px;
+    --radius-sm: 14px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -116,6 +121,9 @@
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
     z-index: 1;
@@ -127,29 +135,32 @@
   .nav-bar {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 430px;
-    background: rgba(8,8,18,0.92);
-    backdrop-filter: blur(28px) saturate(180%);
-    border-top: 1px solid rgba(255,255,255,0.07);
+    background: rgba(5,5,13,0.88);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border-top: 1px solid rgba(255,255,255,0.09);
     display: flex; justify-content: space-around; align-items: center;
-    padding: 10px 0 20px; z-index: 100;
+    padding: 10px 0 22px; z-index: 100;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
   }
-  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 6px; transition: all 0.2s; }
-  .nav-icon { font-size: 19px; opacity: 0.3; transition: all 0.25s; }
-  .nav-label { font-size: 6px; letter-spacing: 1px; font-weight: 700; color: var(--text3); transition: all 0.25s; }
-  .nav-item.active .nav-icon { opacity: 1; }
-  .nav-item.active .nav-label { color: var(--gold); }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 6px 8px; transition: all 0.2s; border-radius: 12px; }
+  .nav-item:active { transform: scale(0.92); }
+  .nav-icon { font-size: 20px; opacity: 0.3; transition: all 0.25s; }
+  .nav-label { font-size: 7px; letter-spacing: 1px; font-weight: 700; color: var(--text3); transition: all 0.25s; }
+  .nav-item.active .nav-icon { opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+  .nav-item.active .nav-label { color: var(--gold); letter-spacing: 1.5px; }
   .nav-add {
-    width: 52px; height: 52px; border-radius: 50%;
+    width: 54px; height: 54px; border-radius: 50%;
     background: linear-gradient(135deg, var(--orange), var(--gold2));
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: #000; cursor: pointer;
-    box-shadow: 0 4px 24px rgba(255,215,0,0.35), 0 0 0 3px rgba(255,215,0,0.1);
-    margin-top: -18px; transition: all 0.25s; border: none; font-weight: 700;
+    font-size: 28px; color: #000; cursor: pointer;
+    box-shadow: 0 4px 28px rgba(255,107,53,0.45), 0 0 0 4px rgba(255,215,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3);
+    margin-top: -22px; transition: all 0.25s; border: none; font-weight: 700;
   }
-  .nav-add:active { transform: scale(0.88); }
+  .nav-add:active { transform: scale(0.88); box-shadow: 0 2px 12px rgba(255,107,53,0.3); }
 
   /* ── HEADER ── */
-  .header { padding: 52px 24px 16px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .header { padding: 48px 24px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
   .logo-sports {
     font-family: 'Bebas Neue', cursive; font-size: 24px; letter-spacing: 5px;
     background: linear-gradient(90deg, var(--orange), var(--gold2));
@@ -157,43 +168,29 @@
   }
   .logo-sub { font-size: 9px; letter-spacing: 3px; color: var(--text3); font-weight: 600; margin-top: 2px; }
 
-  /* ── BANKROLL CARD — PREMIUM GLASSMORPHISM ── */
+  /* ── BANKROLL CARD — PREMIUM ── */
   .bankroll-card {
-    margin: 0 20px 16px;
-    background: linear-gradient(135deg, rgba(245,200,66,0.1) 0%, rgba(255,107,53,0.06) 50%, rgba(91,155,255,0.04) 100%);
-    border: 1px solid rgba(245,200,66,0.22);
-    border-radius: 28px;
-    padding: 24px;
+    margin: 0 20px 14px;
+    background: linear-gradient(145deg, rgba(245,200,66,0.11) 0%, rgba(255,107,53,0.07) 40%, rgba(91,155,255,0.05) 100%);
+    border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 24px;
+    padding: 14px 16px 12px;
     position: relative;
-    box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255,255,255,0.08);
+    box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2);
   }
-  .bankroll-card::before {
-    content: '';
-    position: absolute; top: -60px; right: -60px;
-    width: 200px; height: 200px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(245,200,66,0.1) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .bankroll-card > * { position: relative; z-index: 1; }
-  .bankroll-label { font-size: 9px; letter-spacing: 4px; color: rgba(245,200,66,0.5); font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
+  .bankroll-label { font-size: 9px; letter-spacing: 4px; color: rgba(245,200,66,0.55); font-weight: 700; text-transform: uppercase; }
   .bankroll-amount {
-    font-family: 'Bebas Neue', cursive; font-size: 56px; letter-spacing: 2px;
-    color: var(--gold2); line-height: 1; margin-bottom: 4px;
-    text-shadow: 0 0 40px rgba(255,215,0,0.3);
+    font-family: 'Bebas Neue', cursive; font-size: 46px; letter-spacing: 2px;
+    color: var(--gold2); line-height: 1;
+    text-shadow: 0 0 60px rgba(255,215,0,0.4), 0 2px 4px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
   }
-  .bankroll-initial { font-size: 11px; color: var(--text2); }
+  .bankroll-initial { font-size: 11px; color: var(--text2); margin-bottom: 2px; }
   .bankroll-initial span { color: var(--text); font-weight: 700; }
-  .bankroll-stats {
-    display: flex; gap: 0; margin-top: 16px; padding-top: 16px;
-    border-top: 1px solid rgba(255,255,255,0.07);
-  }
-  .bk-stat { flex: 1; padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.06); margin-right: 12px; }
-  .bk-stat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
-  .bk-stat-label { font-size: 8px; letter-spacing: 2px; color: var(--text3); font-weight: 700; margin-bottom: 3px; }
-  .bk-stat-value { font-family: 'Bebas Neue', cursive; font-size: 19px; }
-  .bk-stat-value.pos { color: var(--green); }
-  .bk-stat-value.neg { color: var(--red); }
+  .bk-stat-label { font-size: 7px; letter-spacing: 2px; color: var(--text3); font-weight: 700; margin-bottom: 2px; }
+  .bk-stat-value { font-family: 'Bebas Neue', cursive; font-size: 17px; transition: color 0.3s; }
+  .bk-stat-value.pos { color: var(--green); text-shadow: 0 0 16px rgba(0,229,184,0.4); }
+  .bk-stat-value.neg { color: var(--red); text-shadow: 0 0 16px rgba(255,71,87,0.3); }
   .bk-stat-value.neutral { color: var(--text); }
 
   /* CONSEILS PERSONNALISÉS */
@@ -522,38 +519,51 @@
   .search-clear { font-size: 14px; color: var(--text3); cursor: pointer; flex-shrink: 0; display: none; }
 
   /* QUICK STATS */
-  .quick-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 20px 14px; }
-  .qs-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 18px; padding: 14px 16px; transition: all 0.2s; position: relative; overflow: hidden; }
+  .quick-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 20px 16px; }
+  .qs-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 20px; padding: 16px; transition: all 0.2s;
+    position: relative; overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
   .qs-card:active { transform: scale(0.97); }
-  .qs-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.02), transparent); }
-  .qs-icon { font-size: 16px; margin-bottom: 6px; display: block; }
-  .qs-value { font-family: 'Bebas Neue', cursive; font-size: 24px; color: var(--text); line-height: 1; margin-bottom: 3px; }
-  .qs-label { font-size: 9px; color: var(--text3); font-weight: 700; letter-spacing: 1px; }
+  .qs-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(145deg, rgba(255,255,255,0.025), transparent); pointer-events: none; }
+  .qs-icon { font-size: 18px; margin-bottom: 8px; display: block; }
+  .qs-value { font-family: 'Bebas Neue', cursive; font-size: 26px; color: var(--text); line-height: 1; margin-bottom: 4px; }
+  .qs-label { font-size: 9px; color: var(--text3); font-weight: 700; letter-spacing: 1.5px; }
 
   /* SECTION */
-  .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 12px; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 14px; }
   .section-title { font-size: 9px; letter-spacing: 4px; color: var(--text3); font-weight: 700; }
-  .see-all { font-size: 11px; color: var(--gold); font-weight: 700; cursor: pointer; opacity: 0.8; }
+  .see-all { font-size: 11px; color: var(--gold); font-weight: 700; cursor: pointer; opacity: 0.85; transition: opacity 0.15s; }
+  .see-all:hover { opacity: 1; }
 
   /* BETS */
   .bets-list { padding: 0 20px; display: flex; flex-direction: column; gap: 8px; padding-bottom: 120px; }
-  .bet-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 16px; padding: 13px 15px; display: flex; align-items: center; gap: 12px; transition: all 0.18s; cursor: pointer; position: relative; overflow: hidden; }
-  .bet-item::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.015), transparent); pointer-events: none; }
+  .bet-item {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 18px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 13px;
+    transition: all 0.18s; cursor: pointer; position: relative; overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+  .bet-item::before { content: ''; position: absolute; inset: 0; background: linear-gradient(145deg, rgba(255,255,255,0.02), transparent); pointer-events: none; }
   .bet-item:active { transform: scale(0.98); opacity: 0.85; }
-  .bet-item.won { border-left: 3px solid var(--green); background: linear-gradient(135deg, rgba(0,229,184,0.05), var(--bg3)); }
-  .bet-item.lost { border-left: 3px solid var(--red); background: linear-gradient(135deg, rgba(255,71,87,0.05), var(--bg3)); }
-  .bet-item.pending { border-left: 3px solid var(--gold); background: linear-gradient(135deg, rgba(245,200,66,0.04), var(--bg3)); }
-  .bet-item.combo { border-left: 3px solid var(--purple); background: linear-gradient(135deg, rgba(176,110,243,0.05), var(--bg3)); }
-  .bet-sport-icon { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
-  .bet-sport-icon.won { background: rgba(0,229,184,0.12); }
+  .bet-item.won { border-left: 3px solid var(--green); background: linear-gradient(135deg, rgba(0,229,184,0.06), var(--bg3) 60%); }
+  .bet-item.lost { border-left: 3px solid var(--red); background: linear-gradient(135deg, rgba(255,71,87,0.06), var(--bg3) 60%); }
+  .bet-item.pending { border-left: 3px solid var(--gold); background: linear-gradient(135deg, rgba(245,200,66,0.05), var(--bg3) 60%); }
+  .bet-item.combo { border-left: 3px solid var(--purple); background: linear-gradient(135deg, rgba(176,110,243,0.06), var(--bg3) 60%); }
+  .bet-sport-icon { width: 40px; height: 40px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .bet-sport-icon.won { background: rgba(0,229,184,0.14); box-shadow: 0 0 12px rgba(0,229,184,0.15); }
   .bet-sport-icon.lost { background: rgba(255,71,87,0.12); }
   .bet-sport-icon.pending { background: rgba(245,200,66,0.1); }
-  .bet-sport-icon.combo { background: rgba(176,110,243,0.12); }
+  .bet-sport-icon.combo { background: rgba(176,110,243,0.14); }
+  .bet-sport-icon.casino { background: rgba(255,255,255,0.06); }
   .bet-info { flex: 1; min-width: 0; }
   .bet-match { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .bet-pick { font-size: 10px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .bet-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
-  .bet-result { font-family: 'Bebas Neue', cursive; font-size: 15px; }
+  .bet-result { font-family: 'Bebas Neue', cursive; font-size: 16px; }
   .bet-result.won { color: var(--green); }
   .bet-result.lost { color: var(--red); }
   .bet-result.pending { color: var(--gold); }
@@ -567,14 +577,15 @@
   .form-input {
     background: var(--bg3);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
+    border-radius: 16px;
+    padding: 15px 16px;
     font-family: 'Syne', sans-serif;
     font-size: 14px; font-weight: 600;
     color: var(--text); outline: none; width: 100%;
     transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
   }
-  .form-input:focus { border-color: rgba(245,200,66,0.4); box-shadow: 0 0 0 3px rgba(245,200,66,0.08); }
+  .form-input:focus { border-color: rgba(245,200,66,0.45); box-shadow: 0 0 0 4px rgba(245,200,66,0.08); }
   .form-input::placeholder { color: var(--text3); font-weight: 400; }
   .currency-btn { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 6px; text-align: center; cursor: pointer; font-size: 9px; font-weight: 700; color: var(--text3); letter-spacing: 0.5px; transition: all 0.2s; }
   .currency-btn.selected { background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.4); color: var(--gold); }
@@ -582,20 +593,22 @@
 
   .sport-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .sport-btn {
-    background: var(--bg3); border: 1px solid var(--border); border-radius: 14px;
-    padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 16px;
+    padding: 13px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px;
     cursor: pointer; transition: all 0.2s;
+    box-shadow: var(--shadow-card);
   }
   .sport-btn:active { transform: scale(0.94); }
-  .sport-btn.selected { background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.4); box-shadow: 0 0 0 3px rgba(245,200,66,0.07); }
+  .sport-btn.selected { background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.4); box-shadow: 0 0 0 3px rgba(245,200,66,0.08); }
   .sport-btn span:first-child { font-size: 20px; }
   .sport-btn span:last-child { font-size: 8px; color: var(--text3); font-weight: 700; letter-spacing: 1px; }
   .sport-btn.selected span:last-child { color: var(--gold); }
   .result-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .result-btn {
-    background: var(--bg3); border: 1px solid var(--border); border-radius: 14px;
-    padding: 14px; text-align: center; cursor: pointer; transition: all 0.2s;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 16px;
+    padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s;
     font-size: 11px; font-weight: 700; color: var(--text2);
+    box-shadow: var(--shadow-card);
   }
   .result-btn:active { transform: scale(0.95); }
   .result-btn.won.selected { background: rgba(0,229,184,0.12); border-color: rgba(0,229,184,0.4); color: var(--green); box-shadow: 0 0 0 3px rgba(0,229,184,0.07); }
@@ -606,13 +619,28 @@
     position: sticky; bottom: 0; left: 0; right: 0;
     width: calc(100% - 48px); margin: 0 24px 28px;
     background: linear-gradient(135deg, var(--orange), var(--gold2));
-    border: none; border-radius: 16px; padding: 19px;
+    border: none; border-radius: 18px; padding: 20px;
     font-family: 'Bebas Neue', cursive; font-size: 20px; letter-spacing: 3px;
     color: #000; cursor: pointer; transition: all 0.2s; display: block;
-    box-shadow: 0 6px 24px rgba(255,215,0,0.25);
+    box-shadow: 0 8px 32px rgba(255,107,53,0.35), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.25);
   }
-  .submit-btn:active { transform: scale(0.97); box-shadow: 0 2px 12px rgba(255,215,0,0.15); }
-  .submit-btn.purple { background: linear-gradient(135deg, var(--purple), #c084fc); color: #fff; box-shadow: 0 6px 24px rgba(168,85,247,0.25); }
+  .submit-btn:active { transform: scale(0.97); box-shadow: 0 2px 12px rgba(255,215,0,0.2); }
+  .submit-btn.purple { background: linear-gradient(135deg, var(--purple), #c084fc); color: #fff; box-shadow: 0 8px 32px rgba(168,85,247,0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
+
+  /* Animations globales */
+  @keyframes fadeInUp {
+    from { opacity:0; transform:translateY(12px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  @keyframes pulse-gold {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245,200,66,0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(245,200,66,0); }
+  }
+  .bankroll-card { animation: fadeInUp 0.4s ease both; }
+  .quick-stats .qs-card:nth-child(1) { animation: fadeInUp 0.4s 0.05s ease both; }
+  .quick-stats .qs-card:nth-child(2) { animation: fadeInUp 0.4s 0.1s ease both; }
+  .quick-stats .qs-card:nth-child(3) { animation: fadeInUp 0.4s 0.15s ease both; }
+  .quick-stats .qs-card:nth-child(4) { animation: fadeInUp 0.4s 0.2s ease both; }
 
   /* COMBO */
   .combo-legs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
@@ -686,11 +714,18 @@
 
   /* NOTES */
   /* QUICK ACTIONS BAR */
-  .quick-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:0 24px 14px; }
-  .qa-btn { background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; cursor:pointer; transition:all 0.15s; }
-  .qa-btn:active { transform:scale(0.94); }
-  .qa-btn .qa-icon { font-size:20px; margin-bottom:4px; }
-  .qa-btn .qa-label { font-family:Bebas Neue,cursive; font-size:10px; letter-spacing:1.5px; color:var(--text3); }
+  .quick-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:0 20px 12px; }
+  .qa-btn {
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:14px; padding:10px 6px; text-align:center;
+    cursor:pointer; transition:all 0.15s;
+    box-shadow: var(--shadow-card);
+    position: relative; overflow: hidden;
+  }
+  .qa-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(145deg, rgba(255,255,255,0.025), transparent); pointer-events:none; }
+  .qa-btn:active { transform:scale(0.93); opacity:0.85; }
+  .qa-btn .qa-icon { font-size:20px; margin-bottom:4px; display:block; }
+  .qa-btn .qa-label { font-family:Bebas Neue,cursive; font-size:9px; letter-spacing:1.5px; color:var(--text3); }
 
   /* SWIPE BET ACTIONS */
   .bet-swipe-wrap { position:relative; overflow:hidden; border-radius:14px; margin-bottom:8px; }
@@ -745,6 +780,20 @@
   .ai-mode-card.selected { background:rgba(176,110,243,0.1); border-color:rgba(176,110,243,0.35); }
   .ai-mode-icon { font-size:26px; flex-shrink:0; }
   .ai-mode-info { flex:1; }
+  .coach-chip {
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: var(--text2);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+    font-family: inherit;
+  }
+  .coach-chip:hover { background: rgba(124,58,237,0.22); color: var(--text); }
   .ai-mode-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
   .ai-mode-desc { font-size:10px; color:var(--text3); line-height:1.4; }
   .ai-mode-card.selected .ai-mode-title { color:var(--purple); }
@@ -1034,73 +1083,83 @@
     <!-- Slides -->
     <div class="ob-slides" id="ob-slides">
 
+      <!-- SLIDE 1 — BIENVENUE -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:300px;height:300px;background:radial-gradient(circle,rgba(245,200,66,0.12),transparent);top:10%;right:-50px;"></div>
-        <div class="ob-visual animate" id="ob-vis-0">📊</div>
+        <div class="ob-bg-glow" style="width:320px;height:320px;background:radial-gradient(circle,rgba(255,107,53,0.14),transparent);top:5%;left:50%;transform:translateX(-50%);"></div>
+        <div class="ob-visual animate" id="ob-vis-0">🏆</div>
         <div class="ob-content">
           <div class="ob-tag">BIENVENUE</div>
           <div class="ob-title">SPORTS<br><span>DÉCRYPTÉ</span></div>
-          <div class="ob-desc">L'app de suivi de bankroll pour parieurs sérieux. Analyse tes performances et progresse.</div>
+          <div class="ob-desc">L'app tout-en-un pour parieurs sérieux. Suis ta bankroll, analyse tes performances et parie avec méthode.</div>
           <div class="ob-features">
-            <div class="ob-feature"><div class="ob-feature-icon">💰</div><div class="ob-feature-text"><strong>Suis ta bankroll</strong> en temps réel</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">📈</div><div class="ob-feature-text"><strong>Analyse tes stats</strong> : ROI, win rate, séries</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🏆</div><div class="ob-feature-text"><strong>Progresse</strong> du niveau Débutant à Légende</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">💰</div><div class="ob-feature-text"><strong>Bankroll tracker</strong> — suivi en temps réel</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">📊</div><div class="ob-feature-text"><strong>Stats avancées</strong> — ROI, win rate, séries, heatmap</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🎰</div><div class="ob-feature-text"><strong>Casino inclus</strong> — sessions casino dans ta bankroll</div></div>
           </div>
         </div>
       </div>
 
+      <!-- SLIDE 2 — BANKROLL & STATS -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:280px;height:280px;background:radial-gradient(circle,rgba(0,229,184,0.1),transparent);bottom:20%;left:-60px;"></div>
-        <div class="ob-visual" id="ob-vis-1">⚡</div>
+        <div class="ob-bg-glow" style="width:280px;height:280px;background:radial-gradient(circle,rgba(0,229,184,0.12),transparent);bottom:20%;left:-60px;"></div>
+        <div class="ob-visual" id="ob-vis-1">📈</div>
         <div class="ob-content">
-          <div class="ob-tag">SAISIE RAPIDE</div>
-          <div class="ob-title">ENREGISTRE<br><span>EN 10 SEC</span></div>
-          <div class="ob-desc">Le mode Express te permet d'enregistrer un pari avec seulement 3 champs.</div>
+          <div class="ob-tag">BANKROLL & STATS</div>
+          <div class="ob-title">SUIS TES<br><span>PERFORMANCES</span></div>
+          <div class="ob-desc">Enregistre tes paris en 10 secondes et accède à des statistiques dignes d'un professionnel.</div>
           <div class="ob-features">
-            <div class="ob-feature"><div class="ob-feature-icon">⚡</div><div class="ob-feature-text"><strong>Mode Express</strong> — match, mise, cote</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🎯</div><div class="ob-feature-text"><strong>Mode Simple</strong> — tous les détails</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🎰</div><div class="ob-feature-text"><strong>Mode Combiné</strong> — jusqu'à 8 matchs</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">⚡</div><div class="ob-feature-text"><strong>Mode Express</strong> — 3 champs, 10 secondes</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🧮</div><div class="ob-feature-text"><strong>Kelly & Value Bet</strong> — mise optimale calculée</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">📅</div><div class="ob-feature-text"><strong>Stats.html</strong> — courbe bankroll, ROI mensuel, heatmap</div></div>
           </div>
         </div>
       </div>
 
+      <!-- SLIDE 3 — PREDICT -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:260px;height:260px;background:radial-gradient(circle,rgba(91,155,255,0.1),transparent);top:15%;left:-40px;"></div>
-        <div class="ob-visual" id="ob-vis-2">🧮</div>
+        <div class="ob-bg-glow" style="width:260px;height:260px;background:radial-gradient(circle,rgba(124,58,237,0.12),transparent);top:15%;right:-40px;"></div>
+        <div class="ob-visual" id="ob-vis-2">🔮</div>
         <div class="ob-content">
-          <div class="ob-tag">OUTILS PRO</div>
-          <div class="ob-title">MISE<br><span>OPTIMALE</span></div>
-          <div class="ob-desc">Kelly et Value Bet t'aident à miser intelligemment et détecter les opportunités.</div>
+          <div class="ob-tag">PREDICT — 6 SPORTS</div>
+          <div class="ob-title">ANALYSE<br><span>SCIENTIFIQUE</span></div>
+          <div class="ob-desc">Modèle Dixon-Coles, ELO rating, H2H automatique. Les meilleures prédictions en quelques secondes.</div>
           <div class="ob-features">
-            <div class="ob-feature"><div class="ob-feature-icon">🧮</div><div class="ob-feature-text"><strong>Kelly</strong> — calcule ta mise idéale</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">💎</div><div class="ob-feature-text"><strong>Value Bet</strong> — détecte l'edge on chaque cote</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">💡</div><div class="ob-feature-text"><strong>Conseils IA</strong> — analyse automatique</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">⚽</div><div class="ob-feature-text"><strong>Football</strong> — auto-fill ELO + H2H + possession</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🎾</div><div class="ob-feature-text"><strong>Tennis, Basket, Hockey</strong> — modèles dédiés</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">💰</div><div class="ob-feature-text"><strong>Value Bet</strong> — cote juste vs cote bookmaker</div></div>
           </div>
         </div>
       </div>
 
+      <!-- SLIDE 4 — RADAR & IA -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:280px;height:280px;background:radial-gradient(circle,rgba(176,110,243,0.1),transparent);bottom:25%;right:-50px;"></div>
-        <div class="ob-visual" id="ob-vis-3">🔥</div>
+        <div class="ob-bg-glow" style="width:300px;height:300px;background:radial-gradient(circle,rgba(91,155,255,0.1),transparent);bottom:25%;right:-50px;"></div>
+        <div class="ob-visual" id="ob-vis-3">📡</div>
         <div class="ob-content">
-          <div class="ob-tag">GAMIFICATION</div>
-          <div class="ob-title">DÉBLOQUE<br><span>DES NIVEAUX</span></div>
-          <div class="ob-desc">8 niveaux selon ton ROI, 28 badges à collecter.</div>
+          <div class="ob-tag">RADAR & COACH IA</div>
+          <div class="ob-title">LES MEILLEURS<br><span>VALUE BETS</span></div>
+          <div class="ob-desc">Le Radar analyse automatiquement tous les matchs du jour et t'alerte sur les meilleures opportunités.</div>
           <div class="ob-features">
-            <div class="ob-feature"><div class="ob-feature-icon">🎮</div><div class="ob-feature-text"><strong>8 niveaux</strong> de Débutant à Légende</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🎖️</div><div class="ob-feature-text"><strong>28 badges</strong> à collecter</div></div>
-            <div class="ob-feature"><div class="ob-feature-icon">🧠</div><div class="ob-feature-text"><strong>Moteur GO/NO GO</strong> — décide intelligemment</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">📡</div><div class="ob-feature-text"><strong>Radar auto</strong> — value bets dès l'ouverture</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🔔</div><div class="ob-feature-text"><strong>Notifications push</strong> — alertes en temps réel</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🤖</div><div class="ob-feature-text"><strong>Coach IA</strong> — analyse, conseils, post-match</div></div>
           </div>
         </div>
       </div>
 
+      <!-- SLIDE 5 — PASSE PRO -->
       <div class="ob-slide">
-        <div class="ob-bg-glow" style="width:350px;height:350px;background:radial-gradient(circle,rgba(255,107,53,0.1),transparent);top:20%;left:50%;transform:translateX(-50%);"></div>
-        <div class="ob-visual" id="ob-vis-4">🚀</div>
+        <div class="ob-bg-glow" style="width:350px;height:350px;background:radial-gradient(circle,rgba(245,200,66,0.12),transparent);top:10%;left:50%;transform:translateX(-50%);"></div>
+        <div class="ob-visual" id="ob-vis-4">💎</div>
         <div class="ob-content">
-          <div class="ob-tag">C'EST PARTI</div>
-          <div class="ob-title">PRÊT À<br><span>PERFORMER ?</span></div>
-          <div class="ob-desc">Configure ta bankroll et commence à tracker tes performances maintenant. C'est gratuit et sans inscription.</div>
+          <div class="ob-tag">GRATUIT + PRO</div>
+          <div class="ob-title">TOUT EST<br><span>ACCESSIBLE</span></div>
+          <div class="ob-desc">L'app est gratuite. Pour débloquer Predict tous sports, Radar illimité et Coach IA complet, passe PRO.</div>
+          <div class="ob-features">
+            <div class="ob-feature"><div class="ob-feature-icon">✅</div><div class="ob-feature-text"><strong>Gratuit</strong> — Bankroll, Stats, Predict Football</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">💎</div><div class="ob-feature-text"><strong>PRO dès 4,99€/mois</strong> — tout débloquer</div></div>
+            <div class="ob-feature"><div class="ob-feature-icon">🔒</div><div class="ob-feature-text"><strong>Prix garanti à vie</strong> pour les 50 premiers</div></div>
+          </div>
         </div>
       </div>
 
@@ -1163,14 +1222,53 @@
   </div>
 
   <div class="bankroll-card">
-    <div class="bankroll-label">MA BANKROLL</div>
-    <div class="bankroll-amount" id="dash-bankroll">0 €</div>
-    <div class="bankroll-initial">Capital initial : <span id="dash-initial">0 €</span></div>
-    <div class="bankroll-stats">
-      <div class="bk-stat"><div class="bk-stat-label">PROFIT / PERTE</div><div class="bk-stat-value neutral" id="dash-profit">+0 €</div></div>
-      <div class="bk-stat"><div class="bk-stat-label">ROI</div><div class="bk-stat-value neutral" id="dash-roi">0%</div></div>
-      <div class="bk-stat"><div class="bk-stat-label">SÉRIE</div><div class="bk-stat-value neutral" id="dash-streak">—</div></div>
-      <div class="bk-stat"><div class="bk-stat-label">WIN RATE</div><div class="bk-stat-value neutral" id="dash-winrate">—</div></div>
+    <!-- Header : label + badge évolution -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <div class="bankroll-label" style="margin-bottom:0;">MA BANKROLL</div>
+      <span id="dash-evolution-badge" style="display:none;font-size:10px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:20px;"></span>
+    </div>
+    <!-- Montant + capital initial sur la même ligne -->
+    <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
+      <div class="bankroll-amount" id="dash-bankroll">0 €</div>
+      <div style="font-size:10px;color:var(--text2);">initial : <span id="dash-initial" style="color:var(--text);font-weight:700;">0 €</span></div>
+    </div>
+    <!-- Ligne 1 : ROI · Profit · Win Rate · Série -->
+    <div style="display:flex;gap:0;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:10px;">
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">ROI</div>
+        <div class="bk-stat-value neutral" id="dash-roi" style="font-size:17px;">0%</div>
+      </div>
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">PROFIT</div>
+        <div class="bk-stat-value neutral" id="dash-profit" style="font-size:17px;">+0 €</div>
+      </div>
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">WIN RATE</div>
+        <div class="bk-stat-value neutral" id="dash-winrate" style="font-size:17px;">—</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">SÉRIE</div>
+        <div class="bk-stat-value neutral" id="dash-streak" style="font-size:17px;">—</div>
+      </div>
+    </div>
+    <!-- Ligne 2 : Paris · Gagnés · Perdus · En cours -->
+    <div style="display:flex;gap:0;">
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">PARIS</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:17px;color:var(--text);" id="dash-bets-count">0</div>
+      </div>
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">GAGNÉS</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:17px;color:var(--green);" id="dash-won-count">0</div>
+      </div>
+      <div style="flex:1;padding-right:10px;border-right:1px solid rgba(255,255,255,0.07);margin-right:10px;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">PERDUS</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:17px;color:var(--red);" id="dash-lost-count">0</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--text3);font-weight:700;margin-bottom:2px;">EN COURS</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:17px;color:var(--gold);" id="dash-pending-count">0</div>
+      </div>
     </div>
   </div>
   <!-- Shortcuts row -->
@@ -1497,6 +1595,67 @@
     <div id="type-combo-btn" onclick="switchType('combo')" style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer;transition:all 0.2s;"><div style="font-size:16px;margin-bottom:3px;">🎰</div><div style="font-family:Bebas Neue,cursive;font-size:12px;letter-spacing:2px;color:var(--text2);">COMBINÉ</div></div>
   </div>
 
+  <!-- BOUTON CASINO DISCRET -->
+  <div style="padding:0 24px;margin-bottom:16px">
+    <div id="type-casino-btn" onclick="switchType('casino')" style="background:var(--bg2);border:1px dashed rgba(255,255,255,0.1);border-radius:12px;padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s">
+      <span style="font-size:14px">🎰</span>
+      <span style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:1px">SESSION CASINO</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--text3)">›</span>
+    </div>
+  </div>
+
+  <!-- FORMULAIRE CASINO -->
+  <div id="form-casino" class="form-body" style="display:none">
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;font-size:11px;color:var(--text2);margin-bottom:4px">🎰 <strong style="color:var(--text)">Session Casino</strong> — enregistre ton gain ou ta perte. Ta bankroll s'ajuste automatiquement.</div>
+
+    <div class="form-group">
+      <div class="form-label">JEU</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="casino-game-selector">
+        <div class="sport-btn selected" data-game="slots" onclick="selectCasinoGame(this)"><span>🎰</span><span>SLOTS</span></div>
+        <div class="sport-btn" data-game="blackjack" onclick="selectCasinoGame(this)"><span>🃏</span><span>BLACKJACK</span></div>
+        <div class="sport-btn" data-game="roulette" onclick="selectCasinoGame(this)"><span>🎡</span><span>ROULETTE</span></div>
+        <div class="sport-btn" data-game="poker" onclick="selectCasinoGame(this)"><span>♠️</span><span>POKER</span></div>
+        <div class="sport-btn" data-game="autre" onclick="selectCasinoGame(this)"><span>🎲</span><span>AUTRE</span></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group">
+        <div class="form-label">MISE INITIALE (€)</div>
+        <input type="number" class="form-input" id="casino-stake" placeholder="100" inputmode="decimal" style="font-size:18px;padding:16px;font-weight:700;color:var(--gold)" oninput="updateCasinoResult()">
+      </div>
+      <div class="form-group">
+        <div class="form-label">RÉSULTAT FINAL (€)</div>
+        <input type="number" class="form-input" id="casino-return" placeholder="150" inputmode="decimal" style="font-size:18px;padding:16px;font-weight:700;color:var(--gold)" oninput="updateCasinoResult()">
+      </div>
+    </div>
+
+    <!-- Résumé P&L -->
+    <div id="casino-pnl-preview" style="display:none;padding:12px 14px;border-radius:12px;margin-bottom:8px;text-align:center">
+      <div style="font-size:10px;letter-spacing:2px;color:var(--text2);margin-bottom:4px">RÉSULTAT SESSION</div>
+      <div id="casino-pnl-value" style="font-family:Bebas Neue,cursive;font-size:32px"></div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">BOOKMAKER (optionnel)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="bookie-selector-casino">
+        <div class="bookie-btn selected" data-bookie="" onclick="selectBookie('casino',this)">Aucun</div>
+        <div class="bookie-btn" data-bookie="Betclic" onclick="selectBookie('casino',this)">Betclic</div>
+        <div class="bookie-btn" data-bookie="Winamax" onclick="selectBookie('casino',this)">Winamax</div>
+        <div class="bookie-btn" data-bookie="Unibet" onclick="selectBookie('casino',this)">Unibet</div>
+        <div class="bookie-btn" data-bookie="Autre" onclick="selectBookie('casino',this)">Autre</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">NOTE (optionnel)</div>
+      <input type="text" class="form-input" id="casino-note" placeholder="Ex: Bonus bienvenue, tournoi poker...">
+    </div>
+
+    <button onclick="saveCasinoSession()" style="width:100%;background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04));border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px;font-family:Bebas Neue,cursive;font-size:16px;letter-spacing:3px;color:var(--text);cursor:pointer;margin-top:8px">
+      🎰 ENREGISTRER LA SESSION
+    </button>
+  </div>
   <!-- QUICK FORM -->
   <div id="form-quick" class="form-body">
     <div style="background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.2);border-radius:12px;padding:10px 14px;font-size:11px;color:var(--text2);">⚡ <strong style="color:var(--green)">Mode Express</strong> — 3 champs seulement, enregistrement en 10 secondes.</div>
@@ -1659,6 +1818,8 @@
     </div>
     <div class="goals-list" id="goals-list"></div>
   </div>
+
+
 </div>
 
 <!-- BADGES SCREEN -->
@@ -2042,56 +2203,8 @@
       <!-- Dynamic input area -->
       <div id="ai-input-area"></div>
 
-      <!-- Clear future launch message -->
-      <div style="background:linear-gradient(135deg,rgba(176,110,243,0.1),rgba(176,110,243,0.03));border:1px solid rgba(176,110,243,0.25);border-radius:20px;padding:20px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-          <div style="font-size:28px;">⏳</div>
-          <div>
-            <div style="font-family:Bebas Neue,cursive;font-size:18px;letter-spacing:2px;color:var(--purple);">EN COURS DE DÉVELOPPEMENT</div>
-            <div style="font-size:10px;color:rgba(176,110,243,0.5);font-weight:700;letter-spacing:1px;">DISPONIBLE PROCHAINEMENT</div>
-          </div>
-        </div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:16px;">
-          Ces 5 modes d'analyse IA sont <strong style="color:var(--text);">entièrement développés</strong> et prêts à être activés. Ils seront disponibles dans une <strong style="color:var(--purple);">version Pro</strong> qui arrive prochainement.<br><br>
-          En attendant, toutes les autres fonctionnalités de l'app restent <strong style="color:var(--green);">100% gratuites</strong> — le moteur GO/NO GO, Kelly, Value Bet, Conseils, Stats avancées, et bien plus.
-        </div>
-
-        <!-- Progress indicator -->
-        <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <div style="font-size:9px;letter-spacing:2px;color:var(--text3);font-weight:700;">AVANCEMENT</div>
-            <div style="font-size:11px;font-weight:700;color:var(--purple);">90%</div>
-          </div>
-          <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
-            <div style="height:100%;width:90%;background:linear-gradient(90deg,var(--purple),#c084fc);border-radius:3px;"></div>
-          </div>
-          <div style="font-size:10px;color:var(--text3);margin-top:6px;">Interface ✅ · Prompts ✅ · Connexion API ⏳</div>
-        </div>
-
-        <!-- What's free now -->
-        <div style="margin-bottom:14px;">
-          <div style="font-size:9px;letter-spacing:2px;color:var(--green);font-weight:700;margin-bottom:8px;">CE QUE TU PEUX FAIRE DÈS MAINTENANT</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-            <div onclick="navTo('screen-gng',null)" style="background:rgba(0,229,184,0.08);border:1px solid rgba(0,229,184,0.2);border-radius:10px;padding:10px;cursor:pointer;text-align:center;">
-              <div style="font-size:18px;margin-bottom:3px;">🧠</div>
-              <div style="font-size:9px;font-weight:700;color:var(--green);">GO/NO GO</div>
-              <div style="font-size:8px;color:var(--text3);">Analyse de match</div>
-            </div>
-            <div onclick="navTo('screen-advice',document.querySelectorAll('.nav-item')[3])" style="background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.15);border-radius:10px;padding:10px;cursor:pointer;text-align:center;">
-              <div style="font-size:18px;margin-bottom:3px;">💡</div>
-              <div style="font-size:9px;font-weight:700;color:var(--gold);">CONSEILS IA</div>
-              <div style="font-size:8px;color:var(--text3);">Analyse automatique</div>
-            </div>
-          </div>
-        </div>
-
-        <a href="https://www.tiktok.com/@sportsdecrypte" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--purple),#c084fc);border:none;border-radius:14px;padding:14px;font-family:Bebas Neue,cursive;font-size:15px;letter-spacing:3px;color:#fff;">
-          📲 SUIVRE POUR ÊTRE NOTIFIÉ
-        </a>
-      </div>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
 <!-- STATS -->
@@ -2102,7 +2215,14 @@
       <div onclick="navTo('screen-benchmark',null)" style="background:rgba(0,229,184,0.1);border:1px solid rgba(0,229,184,0.25);border-radius:12px;padding:8px 10px;font-family:'Bebas Neue',cursive;font-size:11px;letter-spacing:2px;color:var(--green);cursor:pointer;">📊 VS MOI</div>
       <div onclick="navTo('screen-advanced-stats',null)" style="background:rgba(91,155,255,0.1);border:1px solid rgba(91,155,255,0.25);border-radius:12px;padding:8px 10px;font-family:'Bebas Neue',cursive;font-size:11px;letter-spacing:2px;color:#5b9bff;cursor:pointer;">📈 AVANCÉ</div>
       <div onclick="navTo('screen-strat-compare',null)" style="background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);border-radius:12px;padding:8px 10px;font-family:'Bebas Neue',cursive;font-size:11px;letter-spacing:2px;color:var(--gold);cursor:pointer;">⚖️ STRAT.</div>
+      <a href="/stats.html" style="background:rgba(176,110,243,0.1);border:1px solid rgba(176,110,243,0.25);border-radius:12px;padding:8px 10px;font-family:'Bebas Neue',cursive;font-size:11px;letter-spacing:2px;color:var(--purple);cursor:pointer;text-decoration:none;">🔬 FULL</a>
     </div>
+  </div>
+  <!-- Toggle Sport / Casino / Tout -->
+  <div style="display:flex;gap:6px;padding:0 20px 12px;flex-shrink:0">
+    <div id="stats-filter-sport" onclick="setStatsFilter('sport')" style="flex:1;text-align:center;padding:8px 6px;background:rgba(0,212,170,0.12);border:1px solid rgba(0,212,170,0.35);border-radius:10px;font-family:Bebas Neue,cursive;font-size:11px;letter-spacing:2px;color:var(--green);cursor:pointer">⚽ Sport</div>
+    <div id="stats-filter-casino" onclick="setStatsFilter('casino')" style="flex:1;text-align:center;padding:8px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-family:Bebas Neue,cursive;font-size:11px;letter-spacing:2px;color:var(--text2);cursor:pointer">🎰 Casino</div>
+    <div id="stats-filter-all" onclick="setStatsFilter('all')" style="flex:1;text-align:center;padding:8px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-family:Bebas Neue,cursive;font-size:11px;letter-spacing:2px;color:var(--text2);cursor:pointer">🔢 Tout</div>
   </div>
   <div id="stats-page" style="padding:0 20px 120px;"></div>
 </div>
@@ -2145,6 +2265,19 @@
       </div>
       <div style="margin-bottom:12px;">
         <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:2px;margin-bottom:8px;">STRATÉGIES À COMPARER</div>
+
+        <!-- Explications -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:12px">
+          <div style="font-size:9px;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:10px">📖 C'EST QUOI ?</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--text2);line-height:1.5">
+            <div><strong style="color:var(--txt)">Mise plate</strong> — Tu mises toujours le même % de ta bankroll. Simple et sûr.</div>
+            <div><strong style="color:var(--txt)">Kelly</strong> — La mise est calculée selon la cote et ta probabilité estimée. Mathématiquement optimal mais agressif.</div>
+            <div><strong style="color:var(--txt)">Demi/Quart-Kelly</strong> — Même principe que Kelly mais divisé par 2 ou 4. Plus prudent.</div>
+            <div><strong style="color:var(--red)">Martingale ⚠️</strong> — Tu doubles ta mise après chaque perte. En théorie tu récupères tout à la première victoire. En pratique, une série de 6-7 défaites peut ruiner ta bankroll.</div>
+            <div><strong style="color:var(--orange)">Fibonacci</strong> — Tu suis la suite mathématique (1,1,2,3,5,8,13...) pour tes mises. Tu avances de 2 après une perte, tu recules de 1 après une victoire. Moins risqué que la Martingale.</div>
+          </div>
+        </div>
+
         <div style="display:flex;flex-direction:column;gap:8px;">
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
             <input type="checkbox" id="sc-flat2" checked style="width:18px;height:18px;accent-color:var(--gold);">
@@ -2169,6 +2302,14 @@
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
             <input type="checkbox" id="sc-actual" checked style="width:18px;height:18px;accent-color:var(--gold);">
             <span style="font-size:13px;color:var(--text);">Tes mises réelles</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="sc-martingale" style="width:18px;height:18px;accent-color:var(--red);">
+            <span style="font-size:13px;color:var(--text);">Martingale <span style="font-size:10px;color:var(--red)">⚠️ risqué</span></span>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <input type="checkbox" id="sc-fibonacci" style="width:18px;height:18px;accent-color:var(--orange);">
+            <span style="font-size:13px;color:var(--text);">Fibonacci</span>
           </label>
         </div>
       </div>
@@ -2368,40 +2509,45 @@
 <!-- SCREEN COACH IA                        -->
 <!-- ══════════════════════════════════════ -->
 <div class="screen" id="screen-coach">
-  <div style="padding:20px 20px 0">
+  <div style="padding:20px 20px 0;display:flex;flex-direction:column;height:100%">
 
     <!-- HEADER -->
-    <div style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(124,58,237,0.03));border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:18px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-        <div style="width:44px;height:44px;border-radius:14px;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🤖</div>
-        <div>
-          <div style="font-family:Bebas Neue,cursive;font-size:20px;letter-spacing:2px;color:var(--text)">COACH IA</div>
-          <div style="font-size:11px;color:var(--text2)">Analyse ta bankroll · Conseils personnalisés</div>
+    <div style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(124,58,237,0.03));border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:16px;margin-bottom:12px;flex-shrink:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;border-radius:12px;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🤖</div>
+          <div>
+            <div style="font-family:Bebas Neue,cursive;font-size:18px;letter-spacing:2px;color:var(--text)">COACH IA</div>
+            <div style="font-size:10px;color:var(--text2)">Analyse ta bankroll · Conseils personnalisés</div>
+          </div>
         </div>
+        <button id="coach-reset-btn" onclick="resetCoachIA()" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:6px 10px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap">🔄 Nouvelle conv.</button>
       </div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6">Je connais <strong style="color:var(--text)">toutes tes données</strong> — bankroll, ROI, sports, paris récents. Pose-moi n'importe quelle question sur ta gestion.</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.5">Je connais <strong style="color:var(--text)">toutes tes données</strong> — bankroll, ROI, sports, paris récents.</div>
     </div>
 
-    <!-- QUESTIONS RAPIDES -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:var(--text3);margin-bottom:10px">💬 QUESTIONS RAPIDES</div>
-      <div style="display:flex;flex-direction:column;gap:8px" id="coach-quick-questions">
-        <button onclick="askCoachIA('Analyse ma bankroll et dis-moi si ma gestion est bonne.')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">📊 Analyse ma gestion de bankroll</button>
-        <button onclick="askCoachIA('Sur quel sport je performe le mieux et pourquoi ?')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">🏆 Sur quel sport je performe le mieux ?</button>
-        <button onclick="askCoachIA('Est-ce que je mise trop par rapport à ma bankroll ?')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">💰 Est-ce que je mise trop ?</button>
-        <button onclick="askCoachIA('Mon ROI est négatif ce mois, qu analyse tu et quels conseils tu me donnes ?')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">📉 Mon ROI est négatif, que faire ?</button>
-        <button onclick="askCoachIA('Quels types de paris devrais-je éviter selon mes statistiques ?')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">🚫 Quels paris dois-je éviter ?</button>
-        <button onclick="askCoachIA('Donne-moi un plan d action pour améliorer mon ROI sur le prochain mois.')" style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:12px;font-size:12px;color:var(--text2);cursor:pointer;text-align:left">🎯 Plan d'action pour améliorer mon ROI</button>
+    <!-- MESSAGES (zone scrollable) -->
+    <div id="coach-messages" style="flex:1;overflow-y:auto;margin-bottom:10px;padding-bottom:4px"></div>
+
+    <!-- SUGGESTIONS CHIPS (toujours visibles) -->
+    <div style="flex-shrink:0;margin-bottom:8px">
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+        <button onclick="askCoachIA('Analyse ma bankroll et dis-moi si ma gestion est bonne.')" class="coach-chip">📊 Bankroll</button>
+        <button onclick="askCoachIA('Sur quel sport je performe le mieux et pourquoi ?')" class="coach-chip">🏆 Meilleur sport</button>
+        <button onclick="askCoachIA('Est-ce que je mise trop par rapport à ma bankroll ?')" class="coach-chip">💰 Mises trop élevées ?</button>
+        <button onclick="askCoachIA('Mon ROI est négatif ce mois, qu analyse tu et quels conseils tu me donnes ?')" class="coach-chip">📉 ROI négatif</button>
+        <button onclick="askCoachIA('Quels types de paris devrais-je éviter selon mes statistiques ?')" class="coach-chip">🚫 Paris à éviter</button>
+        <button onclick="askCoachIA('Donne-moi un plan d action pour améliorer mon ROI sur le prochain mois.')" class="coach-chip">🎯 Plan d'action</button>
+        <button onclick="askCoachIA('Quelle est ma série actuelle et que cela signifie-t-il ?')" class="coach-chip">🔥 Ma série</button>
+        <button onclick="askCoachIA('Quel est mon taux de réussite par type de pari ?')" class="coach-chip">📈 Win rate</button>
+        <button onclick="askCoachIA('Combien puis-je miser ce soir sans risquer ma bankroll ?')" class="coach-chip">🎲 Mise du soir</button>
       </div>
     </div>
-
-    <!-- MESSAGES -->
-    <div id="coach-messages" style="margin-bottom:14px"></div>
 
     <!-- INPUT -->
-    <div style="position:sticky;bottom:80px;background:var(--bg);padding:10px 0">
+    <div style="flex-shrink:0;padding-bottom:90px">
       <div style="display:flex;gap:8px;align-items:flex-end">
-        <textarea id="coach-input" rows="2" placeholder="Pose ta question..." style="flex:1;resize:none;border-radius:12px;padding:10px 14px;font-size:13px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);font-family:inherit"></textarea>
+        <textarea id="coach-input" rows="2" placeholder="Pose ta question..." style="flex:1;resize:none;border-radius:12px;padding:10px 14px;font-size:13px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);font-family:inherit" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendCoachIA();}"></textarea>
         <button onclick="sendCoachIA()" style="width:44px;height:44px;border-radius:12px;background:var(--purple);border:none;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">→</button>
       </div>
     </div>
@@ -2441,6 +2587,28 @@
 <div class="screen" id="screen-settings">
   <div class="header"><div><div class="logo-sports">PARAMÈTRES</div><div class="logo-sub">RÉGLAGES & OUTILS</div></div></div>
   <div style="padding:0 20px 120px;display:flex;flex-direction:column;gap:12px;">
+
+    <!-- 0. Revoir l'onboarding -->
+    <div onclick="restartOnboarding()" style="background:linear-gradient(135deg,rgba(245,200,66,0.08),rgba(255,107,53,0.05));border:1px solid rgba(245,200,66,0.2);border-radius:20px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+      <div style="font-size:24px">👋</div>
+      <div>
+        <div style="font-size:9px;letter-spacing:3px;color:var(--gold);font-weight:700;margin-bottom:3px;">TUTORIEL</div>
+        <div style="font-size:13px;font-weight:700;">Revoir l'introduction</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px;">Redécouvrir toutes les fonctionnalités</div>
+      </div>
+      <div style="margin-left:auto;color:var(--text3);font-size:18px;">›</div>
+    </div>
+
+    <!-- Profil tipster -->
+    <div onclick="window.location.href='/tipster.html'" style="background:linear-gradient(135deg,rgba(91,155,255,0.08),rgba(124,58,237,0.05));border:1px solid rgba(91,155,255,0.2);border-radius:20px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+      <div style="font-size:24px">🏆</div>
+      <div>
+        <div style="font-size:9px;letter-spacing:3px;color:var(--blue);font-weight:700;margin-bottom:3px;">TIPSTER</div>
+        <div style="font-size:13px;font-weight:700;">Mon profil public</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px;">Partage tes stats et pronostics</div>
+      </div>
+      <div style="margin-left:auto;color:var(--text3);font-size:18px;">›</div>
+    </div>
 
     <!-- 1. Install PWA -->
     <div style="background:linear-gradient(135deg,rgba(176,110,243,0.1),rgba(91,155,255,0.05));border:1px solid rgba(176,110,243,0.25);border-radius:20px;padding:18px;">
@@ -2674,6 +2842,22 @@
 
   function skipOnboarding() {
     localStorage.setItem('sd_onboarding_done', '1');
+
+  function restartOnboarding() {
+    // Réinitialiser l'onboarding
+    localStorage.removeItem('sd_onboarding_done');
+    // Revenir au slide 0
+    var slides = document.getElementById('ob-slides');
+    if (slides) { slides.style.transform = 'translateX(0)'; }
+    var dots = document.querySelectorAll('.ob-dot');
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === 0); });
+    var btn = document.getElementById('ob-btn');
+    if (btn) btn.textContent = 'SUIVANT →';
+    var progress = document.getElementById('ob-progress');
+    if (progress) progress.style.width = '20%';
+    // Naviguer vers l'onboarding
+    goTo('screen-onboarding');
+  }
     document.getElementById('screen-onboarding').style.display = 'none';
     document.getElementById('screen-onboarding').classList.remove('active');
     const hasAccounts = localStorage.getItem('sd_accounts');
@@ -2689,8 +2873,8 @@
   let currentAccountId = null;
   let state = { initialBankroll: 0, bets: [], goals: [] };
 
-  const ICONS = { football:'⚽', tennis:'🎾', basket:'🏀', autre:'🏅' };
-  const NAMES = { football:'Football', tennis:'Tennis', basket:'Basket', autre:'Autre' };
+  const ICONS = { football:'⚽', tennis:'🎾', basket:'🏀', autre:'🏅', casino:'🎰' };
+  const NAMES = { football:'Football', tennis:'Tennis', basket:'Basket', autre:'Autre', casino:'Casino' };
 
   let filterResult = 'all';
   let filterSport = 'all';
@@ -2702,9 +2886,32 @@
         document.getElementById('screen-onboarding').classList.remove('active');
         document.getElementById('screen-onboarding').style.display = 'none';
       }
-      const saved = localStorage.getItem('sd_accounts');
-      if (saved) {
-        const data = JSON.parse(saved);
+      var saved = localStorage.getItem('sd_accounts');
+
+      // Créer automatiquement un compte par défaut si aucune donnée
+      if (!saved) {
+        var defaultId = Date.now();
+        var defaultAccount = {
+          accounts: [{
+            id: defaultId,
+            name: 'Mon compte',
+            emoji: '💰',
+            state: {
+              initialBankroll: 0,
+              bets: [],
+              goals: [],
+              unlockedBadges: {},
+              deposits: [],
+              vbHistory: []
+            }
+          }],
+          currentId: defaultId
+        };
+        localStorage.setItem('sd_accounts', JSON.stringify(defaultAccount));
+        saved = localStorage.getItem('sd_accounts');
+      }
+
+      const data = JSON.parse(saved);
         allAccounts = data.accounts || [];
         currentAccountId = data.currentId || null;
         if (allAccounts.length > 0) {
@@ -2725,7 +2932,7 @@
               if (params.get('action') !== 'add_bet') return;
               var data = {match:params.get('match')||'',bet:params.get('bet')||'',odds:params.get('odds')||'',kelly:params.get('kelly')||'',prob:params.get('prob')||'',edge:params.get('edge')||'',verdict:params.get('verdict')||'',sport:params.get('sport')||''};
               if (!data.odds && !data.match) return;
-              var icons={football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉'};
+              var icons={football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉',casino:'🎰'};
               var icon=icons[data.sport]||'🔮';
               var vColor=data.verdict.includes('VALUE')?'#00e5b8':data.verdict.includes('ÉVITER')?'#ff4757':'#f5c842';
               var html='<div id="predict-banner" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,rgba(124,58,237,0.95),rgba(168,85,247,0.95));padding:14px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,0.4)"><div style="font-size:24px">'+icon+'</div><div style="flex:1"><div style="font-family:Bebas Neue,cursive;font-size:14px;letter-spacing:2px;color:#fff">IMPORTÉ DE PREDICT</div><div style="font-size:11px;color:rgba(255,255,255,0.8)">'+data.match+'</div></div><div style="text-align:right">'+(data.odds?'<div style="font-family:Bebas Neue,cursive;font-size:20px;color:#f5c842">@'+data.odds+'</div>':'')+(data.verdict?'<div style="font-size:10px;font-weight:700;color:'+vColor+'">'+data.verdict+'</div>':'')+'</div><div onclick="document.getElementById(\'predict-banner\').remove()" style="font-size:20px;color:rgba(255,255,255,0.6);cursor:pointer">✕</div></div>';
@@ -2737,13 +2944,14 @@
             } catch(err){ console.log('predict params error:',err); }
           }, 800);
           goTo('screen-dashboard');
-          renderDashboard();
+          setTimeout(function() { renderDashboard(); }, 50);
+          // Si bankroll pas encore configurée → aller vers setup
+          if (state.initialBankroll === 0 && localStorage.getItem('sd_onboarding_done')) {
+            setTimeout(function() { goTo('screen-setup'); }, 100);
+          }
         } else {
           if (localStorage.getItem('sd_onboarding_done')) goTo('screen-setup');
         }
-      } else {
-        if (localStorage.getItem('sd_onboarding_done')) goTo('screen-setup');
-      }
     } catch(e) { console.error('loadState crash:', e); }
   }
 
@@ -2854,10 +3062,12 @@
     });
     const target = document.getElementById(id);
     target.style.display = 'flex';
+    target.style.width = '100%';
+    target.style.height = '100%';
     target.classList.add('active');
     if (target.id === 'screen-dashboard') {
       target.style.opacity = '0';
-      requestAnimationFrame(() => { setTimeout(() => { target.style.opacity = '1'; }, 30); });
+      requestAnimationFrame(() => { setTimeout(() => { target.style.opacity = '1'; renderDashboard(); }, 30); });
     } else {
       target.style.opacity = '';
     }
@@ -2928,7 +3138,73 @@
     document.getElementById('form-quick').style.display=type==='quick'?'flex':'none';
     document.getElementById('form-single').style.display=type==='single'?'flex':'none';
     document.getElementById('form-combo').style.display=type==='combo'?'flex':'none';
+    document.getElementById('form-casino').style.display=type==='casino'?'flex':'none';
+    // Style bouton casino
+    var casinoBtn = document.getElementById('type-casino-btn');
+    if(casinoBtn) {
+      casinoBtn.style.background = type==='casino'?'rgba(255,255,255,0.06)':'var(--bg2)';
+      casinoBtn.style.borderColor = type==='casino'?'rgba(255,255,255,0.2)':'rgba(255,255,255,0.1)';
+      casinoBtn.querySelector('span:nth-child(2)').style.color = type==='casino'?'var(--text)':'var(--text3)';
+    }
     if(type==='combo') initComboLegs();
+  }
+
+  // ── CASINO ──
+  var selCasinoGame = 'slots';
+  var selCasinoBookie = '';
+
+  function selectCasinoGame(el) {
+    document.querySelectorAll('#casino-game-selector .sport-btn').forEach(function(b){ b.classList.remove('selected'); });
+    el.classList.add('selected');
+    selCasinoGame = el.dataset.game;
+  }
+
+  function updateCasinoResult() {
+    var stake = parseFloat(document.getElementById('casino-stake').value) || 0;
+    var ret = parseFloat(document.getElementById('casino-return').value);
+    var preview = document.getElementById('casino-pnl-preview');
+    var val = document.getElementById('casino-pnl-value');
+    if(!stake || isNaN(ret)) { preview.style.display='none'; return; }
+    var profit = ret - stake;
+    preview.style.display = 'block';
+    preview.style.background = profit >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)';
+    preview.style.border = '1px solid ' + (profit >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)');
+    val.style.color = profit >= 0 ? 'var(--green)' : 'var(--red)';
+    val.textContent = (profit >= 0 ? '+' : '') + profit.toFixed(2) + ' €';
+  }
+
+  function saveCasinoSession() {
+    var stake = parseFloat(document.getElementById('casino-stake').value);
+    var ret = parseFloat(document.getElementById('casino-return').value);
+    var note = document.getElementById('casino-note').value.trim();
+    if(!stake || stake <= 0) { showToast('Indique la mise initiale 💶'); return; }
+    if(isNaN(ret)) { showToast('Indique le résultat final 💶'); return; }
+    var profit = parseFloat((ret - stake).toFixed(2));
+    var gameLabels = {slots:'Slots',blackjack:'Blackjack',roulette:'Roulette',poker:'Poker',autre:'Casino'};
+    var gameLabel = gameLabels[selCasinoGame] || 'Casino';
+    state.bets.unshift({
+      id: Date.now(),
+      type: 'casino',
+      sport: 'casino',
+      match: gameLabel + (selCasinoBookie ? ' — ' + selCasinoBookie : ''),
+      pick: note || 'Session casino',
+      stake: stake,
+      odds: ret > 0 ? parseFloat((ret/stake).toFixed(2)) : 0,
+      result: profit >= 0 ? 'won' : 'lost',
+      profit: profit,
+      bookmaker: selCasinoBookie,
+      note: note,
+      casinoGame: selCasinoGame,
+      date: new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})
+    });
+    saveState();
+    document.getElementById('casino-stake').value = '';
+    document.getElementById('casino-return').value = '';
+    document.getElementById('casino-note').value = '';
+    document.getElementById('casino-pnl-preview').style.display = 'none';
+    showToast(profit >= 0 ? '🎰 Session gagnante ! +'+profit.toFixed(2)+'€' : '🎰 Session notée — '+Math.abs(profit).toFixed(2)+'€ perdus');
+    navTo('screen-dashboard', document.querySelectorAll('.nav-item')[0]);
+    renderDashboard();
   }
 
   function handleSubmit() {
@@ -3161,6 +3437,7 @@
     selector.querySelectorAll('.bookie-btn').forEach(b => b.classList.remove('selected'));
     el.classList.add('selected');
     if (mode === 'quick') selBookie = el.dataset.bookie;
+    else if (mode === 'casino') selCasinoBookie = el.dataset.bookie;
     else selBookieSingle = el.dataset.bookie;
   }
 
@@ -4960,47 +5237,159 @@
   function renderAIInputArea(mode) {
     const area = document.getElementById('ai-input-area');
     if (!area) return;
-
     const MODES = {
-      match: {
-        icon:'🎯',
-        title:'Analyse de match',
-        placeholder:'Décris le match en détail :\n- Les deux équipes\n- Forme récente, blesones\n- Contexte (derby, enjeu...)\n- La cote proposée\n\nEx: PSG joue contre Lyon ce soir. PSG 4 victoires de suite, Mbappé absent. Lyon sort d\'une défaite. Cote PSG @1.65.',
-        hint:'GO / ATTENDS / NO GO · Points forts & risques · Conseil de mise',
-        height:'120px'
-      },
-      coach: {
-        icon:'🧠',
-        title:'Coach personnel',
-        placeholder:'Dis-moi ce que tu veux améliorer, ou laisse vide pour une analyse complète de ton profil.\n\nEx: "Je perds souvent en tennis, aide-moi à comprendre pourquoi" ou laisse vide.',
-        hint:'Analyse complète · Points forts & faiblesses · Plan 30 jours personnalisé',
-        height:'80px'
-      },
-      postmatch: {
-        icon:'🔍',
-        title:'Analyse post-match',
-        placeholder:'Décris le pari que tu viens de perdre :\n- Le match et ton pronostic\n- Pourquoi tu as misé\n- Ce qui s\'est passé\n\nEx: J\'ai misé on PSG victoire @1.65, ils ont perdu 2-1. J\'avais misé parce que...',
-        hint:'Analyse des erreurs · Patterns · Conseils pour éviter',
-        height:'100px'
-      },
-      suggestions: {
-        icon:'💡',
-        title:'Suggestions du jour',
-        placeholder:'Optionnel : précise ce que tu cherches.\n\nEx: "Je veux parier ce soir on du football" ou laisse vide pour des suggestions générales basées on ton profil.',
-        hint:'Basé on tes stats · Ton sport fort · Ta tranche de cotes gagnante',
-        height:'70px'
-      },
-      chat: {
-        icon:'💬',
-        title:'Conversation libre',
-        placeholder:'Pose n\'importe quelle question on tes stats, ta méthode, tes performances...\n\nEx: "Pourquoi mon ROI est négatif en tennis ?" ou "Est-ce que je joue trop souvent ?" ou "Comment améliorer ma discipline ?"',
-        hint:'Toutes tes données analysées · Réponse personnalisée',
-        height:'100px'
-      }
+      match: { icon:'🎯', title:'Analyse de match', placeholder:'Décris le match :\n- Les deux équipes, forme récente, blessés\n- Contexte (derby, enjeu...)\n- La cote proposée\n\nEx: PSG vs Lyon, PSG 4V de suite, Mbappé absent. Cote PSG @1.65.', hint:'GO / ATTENDS / NO GO · Points forts & risques · Conseil de mise', height:'120px', btnLabel:'🎯 Analyser ce match' },
+      coach: { icon:'🧠', title:'Coach personnel', placeholder:'Dis-moi ce que tu veux améliorer, ou laisse vide pour une analyse complète.\n\nEx: Je perds souvent en tennis, aide-moi', hint:'Analyse complète · Points forts & faiblesses · Plan 30 jours', height:'80px', btnLabel:'🧠 Analyser mon profil' },
+      postmatch: { icon:'🔍', title:'Analyse post-match', placeholder:'Décris le pari :\n- Le match et ton pronostic\n- Pourquoi tu as misé\n- Ce qui se passa\n\nEx: PSG @1.65, ils ont perdu 2-1 parce que...', hint:'Analyse des erreurs · Patterns · Conseils pour éviter', height:'100px', btnLabel:'🔍 Analyser ce pari' },
+      suggestions: { icon:'💡', title:'Suggestions du jour', placeholder:'Optionnel : précise ce que tu cherches.\n\nEx: Je veux parier ce soir sur du football', hint:'Basé sur tes stats · Ton sport fort · Ta tranche de cotes gagnante', height:'70px', btnLabel:'💡 Générer des suggestions' },
+      chat: { icon:'💬', title:'Conversation libre', placeholder:'Pose ta question sur tes stats, ta méthode...\n\nEx: Pourquoi mon ROI est négatif en tennis ?', hint:'Toutes tes données analysées · Réponse personnalisée', height:'100px', btnLabel:'💬 Envoyer' }
     };
-
     const m = MODES[mode];
-    area.innerHTML = ("\n      <div class=\"ai-input-card\">\n        <div class=\"ai-input-label\">"+(m.icon)+" "+(m.title.toUpperCase())+"</div>\n        <textarea class=\"ai-textarea\" id=\"ai-mode-input\" placeholder=\""+(m.placeholder)+"\" style=\"height:"+(m.height)+";\"></textarea>\n        <div style=\"font-size:10px;color:rgba(176,110,243,0.5);line-height:1.5;\">✨ "+(m.hint)+"</div>\n      </div>\n      <div style=\"background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:14px;padding:14px;display:flex;align-items:center;gap:10px;\">\n        <div style=\"font-size:20px;opacity:0.4;\">⏳</div>\n        <div style=\"font-size:11px;color:var(--text3);line-height:1.5;flex:1;\">Ce mode sera disponible prochainement. En attendant, utilise le moteur <strong style=\"color:var(--green);\">GO/NO GO</strong> pour analyser tes matchs.</div>\n        <div onclick=\"navTo('screen-gng',null)\" style=\"flex-shrink:0;background:rgba(0,229,184,0.1);border:1px solid rgba(0,229,184,0.2);border-radius:10px;padding:7px 12px;font-family:Bebas Neue,cursive;font-size:11px;color:var(--green);cursor:pointer;white-space:nowrap;\">GO/NO GO →</div>\n      </div>");
+    area.innerHTML = '<div class="ai-input-card">'
+      + '<div class="ai-input-label">' + m.icon + ' ' + m.title.toUpperCase() + '</div>'
+      + '<textarea class="ai-textarea" id="ai-mode-input" placeholder="' + m.placeholder.replace(/\n/g,'&#10;').replace(/"/g,'&quot;') + '" style="height:' + m.height + '"></textarea>'
+      + '<div style="font-size:10px;color:rgba(176,110,243,0.5);line-height:1.5;margin-bottom:10px">✨ ' + m.hint + '</div>'
+      + '<button onclick="sendAIAnalysis()" style="width:100%;background:linear-gradient(135deg,var(--purple),#c084fc);border:none;border-radius:14px;padding:14px;font-family:Bebas Neue,cursive;font-size:14px;letter-spacing:2px;color:#fff;cursor:pointer">' + m.btnLabel + '</button>'
+      + '</div>'
+      + '<div id="ai-result-area" style="margin-top:10px"></div>';
+  }
+
+  async function sendAIAnalysis() {
+    const mode = currentAIMode;
+    const input = document.getElementById('ai-mode-input');
+    const resultArea = document.getElementById('ai-result-area');
+    if (!resultArea) return;
+    const userText = input ? input.value.trim() : '';
+    const profile = getProfileSummary();
+
+    // ─── PROMPTS V2 — Prompt engineering pro ───────────────────────────────
+    const PROMPTS = {
+
+      // MODE 1 : Analyse de match
+      // Objectif : verdict clair + structured output + chiffres précis
+      match: 'Tu es un analyste pro en paris sportifs avec 15 ans d\'expérience.\n\n'
+        + '=== PROFIL DU PARIEUR ===\n' + profile + '\n\n'
+        + '=== MATCH À ANALYSER ===\n' + (userText || 'Aucune description fournie — fais une analyse générale.') + '\n\n'
+        + '=== INSTRUCTIONS ===\n'
+        + 'Réponds EXACTEMENT dans ce format, sans t\'en écarter :\n\n'
+        + '**VERDICT : [GO ✅ / ATTENDS ⏸️ / NO GO ❌]**\n\n'
+        + '**POINTS FORTS**\n'
+        + '• [point 1]\n'
+        + '• [point 2]\n'
+        + '• [point 3 si pertinent]\n\n'
+        + '**RISQUES**\n'
+        + '• [risque principal]\n'
+        + '• [risque secondaire si pertinent]\n\n'
+        + '**MISE CONSEILLÉE**\n'
+        + '[X]% de la bankroll (soit environ [Y]€ pour une bankroll de [Z]€)\n\n'
+        + 'Règles : sois direct, utilise les données du profil pour personnaliser, '
+        + 'donne toujours un % de mise précis, max 180 mots au total.',
+
+      // MODE 2 : Coach personnel
+      // Objectif : analyse profonde + plan d'action concret avec délai
+      coach: 'Tu es un coach mental et stratégique spécialisé en paris sportifs.\n'
+        + 'Tu combines psychologie comportementale et analyse statistique.\n\n'
+        + '=== PROFIL COMPLET ===\n' + profile + '\n\n'
+        + (userText
+          ? '=== QUESTION SPÉCIFIQUE ===\n"' + userText + '"\n\n'
+            + 'Réponds à cette question en te basant sur le profil. Sois précis et personnalisé.\n\n'
+          : '=== DEMANDE ===\nAnalyse complète du profil — ce qui va, ce qui ne va pas, plan d\'action.\n\n')
+        + '=== FORMAT DE RÉPONSE ===\n'
+        + '**DIAGNOSTIC** : [1-2 phrases sur le profil global]\n\n'
+        + '**CE QUI VA BIEN ✅**\n'
+        + '• [force 1 avec chiffre si possible]\n'
+        + '• [force 2]\n\n'
+        + '**CE QUI FREINE ⚠️**\n'
+        + '• [problème 1 concret]\n'
+        + '• [problème 2 concret]\n\n'
+        + '**PLAN 7 JOURS 🎯**\n'
+        + '• Jour 1-3 : [action précise]\n'
+        + '• Jour 4-7 : [action précise]\n\n'
+        + 'Ton : bienveillant, honnête, jamais condescendant. Max 280 mots.',
+
+      // MODE 3 : Analyse post-match
+      // Objectif : distinguer variance vs erreur + leçon actionnable
+      postmatch: 'Tu es un analyste de décision spécialisé en paris sportifs.\n'
+        + 'Ta spécialité : distinguer les BONNES décisions malchanceuses '
+        + 'des MAUVAISES décisions chanceuses.\n\n'
+        + '=== PROFIL DU PARIEUR ===\n' + profile + '\n\n'
+        + '=== PARI À ANALYSER ===\n' + (userText || 'Aucun détail fourni — analyse les patterns du profil.') + '\n\n'
+        + '=== FORMAT DE RÉPONSE ===\n'
+        + '**VERDICT DÉCISIONNEL**\n'
+        + '✅ Bonne décision / ❌ Mauvaise décision / ⚠️ Décision discutable\n'
+        + '(peu importe le résultat final)\n\n'
+        + '**ANALYSE**\n'
+        + '[2-3 phrases : la décision était-elle justifiée par les infos disponibles avant le match ?]\n\n'
+        + '**ERREUR IDENTIFIÉE** (si applicable)\n'
+        + '[Type d\'erreur : biais émotionnel / données insuffisantes / sur-confiance / etc.]\n\n'
+        + '**LEÇON CONCRÈTE**\n'
+        + '→ [Une seule règle simple à appliquer pour éviter cette erreur]\n\n'
+        + 'Important : ne juge pas le résultat, juge la DÉCISION. Max 200 mots.',
+
+      // MODE 4 : Suggestions du jour
+      // Objectif : conseils hyper personnalisés basés sur les vraies stats
+      suggestions: 'Tu es un data analyst en paris sportifs.\n'
+        + 'Tu analyses les patterns statistiques pour identifier les opportunités.\n\n'
+        + '=== PROFIL ET STATISTIQUES ===\n' + profile + '\n\n'
+        + (userText
+          ? '=== CONTRAINTE DU JOUR ===\n"' + userText + '"\n\n'
+          : '=== MISSION ===\nTrouver le profil de pari optimal pour ce parieur aujourd\'hui.\n\n')
+        + '=== FORMAT DE RÉPONSE ===\n'
+        + '**PROFIL DE PARI OPTIMAL**\n'
+        + '🏆 Sport : [sport basé sur le meilleur ROI du profil]\n'
+        + '🎯 Type de pari : [ex: 1X2, Over/Under, etc.]\n'
+        + '📊 Tranche de cotes : [ex: @1.60 - @2.20]\n'
+        + '💰 Mise : [X]% de la bankroll max\n\n'
+        + '**POURQUOI CE PROFIL ?**\n'
+        + '[2 phrases basées sur les vraies stats du profil]\n\n'
+        + '**SIGNAL D\'ALARME**\n'
+        + '🚨 [1 chose à éviter absolument aujourd\'hui basée sur les patterns]\n\n'
+        + 'Important : ne mentionne JAMAIS de matchs spécifiques. '
+        + 'Base-toi uniquement sur les stats du profil. Max 160 mots.',
+
+      // MODE 5 : Conversation libre
+      // Objectif : réponse contextuelle ultra-personnalisée
+      chat: 'Tu es un assistant expert en paris sportifs et gestion de bankroll.\n'
+        + 'Tu as accès au profil complet de ce parieur et tu réponds de façon '
+        + 'personnalisée, directe et utile — jamais générique.\n\n'
+        + '=== PROFIL COMPLET ===\n' + profile + '\n\n'
+        + '=== QUESTION ===\n"' + (userText || 'Donne-moi un bilan global de mon profil de parieur.') + '"\n\n'
+        + '=== INSTRUCTIONS ===\n'
+        + '- Réponds directement à la question posée\n'
+        + '- Utilise les données réelles du profil (cite des chiffres)\n'
+        + '- Structure ta réponse avec des titres en gras si c\'est long\n'
+        + '- Termine par UNE recommandation concrète\n'
+        + '- Max 220 mots, langage naturel et accessible\n'
+        + '- Si la question est hors sujet (pas lié aux paris), '
+        + 'redirige poliment vers ce que tu peux faire.'
+    };
+    // ───────────────────────────────────────────────────────────────────────
+
+    resultArea.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:14px;background:rgba(176,110,243,0.06);border:1px solid rgba(176,110,243,0.15);border-radius:14px;font-size:13px;color:var(--text2)"><div style="width:18px;height:18px;border:2px solid rgba(176,110,243,0.3);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0"></div><span>Analyse en cours...</span></div>';
+    try {
+      const res = await fetch('/api/groq', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 700,
+          system: 'Tu es un expert en paris sportifs et gestion de bankroll. '
+            + 'Tu réponds TOUJOURS en français. '
+            + 'Tu utilises les données réelles du profil pour personnaliser chaque réponse. '
+            + 'Tu ne donnes jamais de conseils génériques — tout est basé sur les chiffres fournis. '
+            + 'Tu respectes scrupuleusement le format demandé dans chaque prompt.',
+          messages: [{ role: 'user', content: PROMPTS[mode] }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content && data.content[0] ? data.content[0].text : 'Pas de réponse.';
+      resultArea.innerHTML = '<div style="background:rgba(176,110,243,0.06);border:1px solid rgba(176,110,243,0.2);border-radius:14px;padding:16px">'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div style="width:28px;height:28px;border-radius:8px;background:rgba(176,110,243,0.2);display:flex;align-items:center;justify-content:center;font-size:14px">🤖</div><div style="font-size:10px;letter-spacing:2px;color:var(--purple);font-weight:700">ANALYSE IA</div></div>'
+        + '<div style="font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap">' + text.replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--text)">$1</strong>') + '</div>'
+        + '</div>';
+    } catch(e) {
+      resultArea.innerHTML = '<div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:14px;padding:14px;font-size:12px;color:var(--red)">Erreur : ' + (e.message||'inconnue') + '</div>';
+    }
   }
 
   // Initialize AI input area on tab switch is handled in the main switchCalcTab above
@@ -6065,7 +6454,7 @@
     const systemPrompt = ("Tu es un expert en analyse de paris sportifs. Tu aides les parieurs à prendre de meilleures décisions. \nTon profil utilisateur : Bankroll actuelle "+(fmt(current))+" "+(currency)+", ROI global "+(roi)+"%, Win rate "+(wr)+"%, "+(settled.length)+" paris enregistrés.\n"+(odds ? ("Cote proposée : @"+(odds)+"") : '')+"\n"+(stake ? ("Mise envisagée : "+(stake)+" "+(currency)+" ("+(((parseFloat(stake)/current)*100).toFixed(1))+"% de bankroll)") : '')+"\n\nRéponds UNIQUEMENT en JSON valide avec cette structure exacte :\n{\n  \"verdict\": \"GO\" | \"ATTENDS\" | \"NO GO\",\n  \"score\": 0-100,\n  \"resume\": \"Résumé en 1 phrase percutante\",\n  \"points_forts\": [\"point 1\", \"point 2\", \"point 3\"],\n  \"points_faibles\": [\"point 1\", \"point 2\"],\n  \"mise_conseille\": \"conseil de mise en 1 phrase\",\n  \"conclusion\": \"Conclusion actionnable en 2-3 phrases maximum\"\n}");
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/groq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -7195,7 +7584,63 @@ function renderAdvancedStats() {
     card.innerHTML = ("\n      <div style=\"background:var(--bg3);border:1px solid var(--border);border-radius:18px;padding:16px 18px;cursor:pointer;\" onclick=\"navTo('screen-advice',document.querySelectorAll('.nav-item')[3])\">\n        <div style=\"display:flex;align-items:center;gap:14px;\">\n          <div style=\"position:relative;width:64px;height:64px;flex-shrink:0;\">\n            <svg width=\"64\" height=\"64\" viewBox=\"0 0 64 64\" style=\"transform:rotate(-90deg)\">\n              <circle cx=\"32\" cy=\"32\" r=\"26\" fill=\"none\" stroke=\"rgba(255,255,255,0.06)\" stroke-width=\"7\"/>\n              <circle cx=\"32\" cy=\"32\" r=\"26\" fill=\"none\" stroke=\""+(col)+"\" stroke-width=\"7\"\n                stroke-dasharray=\""+(2*Math.PI*26)+"\" stroke-dashoffset=\""+(2*Math.PI*26*(1-score/100))+"\"\n                stroke-linecap=\"round\" style=\"filter:drop-shadow(0 0 6px "+(col)+"66)\"/>\n            </svg>\n            <div style=\"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,cursive;font-size:18px;color:"+(col)+";\">"+(score)+"</div>\n          </div>\n          <div style=\"flex:1;\">\n            <div style=\"font-size:9px;letter-spacing:3px;color:var(--text3);font-weight:700;margin-bottom:3px;\">SANTÉ DE PARIEUR</div>\n            <div style=\"font-family:Bebas Neue,cursive;font-size:22px;color:"+(col)+";letter-spacing:2px;\">"+(emoji)+" "+(label)+"</div>\n            <div style=\"font-size:10px;color:var(--text3);margin-top:3px;\">ROI "+(roi>=0?'+':'')+(roi.toFixed(1))+"% · WR "+(wr.toFixed(0))+"% · Mise moy. "+(avgStakePct.toFixed(1))+"% BK</div>\n          </div>\n          <div style=\"font-size:14px;color:var(--text3);\">💡</div>\n        </div>\n      </div>");
   }
 
-  function renderDashboard(){const current=getCurrentBankroll();const won=state.bets.filter(b=>b.result==='won');const lost=state.bets.filter(b=>b.result==='lost');const settled=won.concat(lost);const combos=state.bets.filter(b=>b.type==='combo');const totalProfit=state.bets.reduce((s,b)=>s+b.profit,0);const staked=settled.reduce((s,b)=>s+b.stake,0);const roi=staked>0?((totalProfit/staked)*100).toFixed(1):0;const wr=settled.length>0?((won.length/settled.length)*100).toFixed(0):null;document.getElementById('dash-bankroll').textContent=fmt(current)+' €';document.getElementById('dash-initial').textContent=fmt(state.initialBankroll)+' €';const pe=document.getElementById('dash-profit');pe.textContent=(totalProfit>=0?'+':'')+fmt(totalProfit)+' €';pe.className='bk-stat-value '+(totalProfit>0?'pos':totalProfit<0?'neg':'neutral');const re=document.getElementById('dash-roi');re.textContent=(roi>=0?'+':'')+roi+'%';re.className='bk-stat-value '+(roi>0?'pos':roi<0?'neg':'neutral');document.getElementById('dash-winrate').textContent=wr!==null?wr+'%':'—';document.getElementById('qs-total').textContent=state.bets.length;document.getElementById('qs-won').textContent=won.length;document.getElementById('qs-combo').textContent=combos.length;document.getElementById('qs-goals').textContent=state.goals.filter(g=>g.completed).length+'/'+state.goals.length;
+  function renderDashboard(){
+    var current=getCurrentBankroll();
+    var won=state.bets.filter(function(b){return b.result==='won';});
+    var lost=state.bets.filter(function(b){return b.result==='lost';});
+    var settled=won.concat(lost);
+    var combos=state.bets.filter(function(b){return b.type==='combo';});
+    var totalProfit=state.bets.reduce(function(s,b){return s+b.profit;},0);
+    var staked=settled.reduce(function(s,b){return s+b.stake;},0);
+    var roi=staked>0?((totalProfit/staked)*100).toFixed(1):0;
+    var wr=settled.length>0?((won.length/settled.length)*100).toFixed(0):null;
+
+    var dbEl=document.getElementById('dash-bankroll');
+    var diEl=document.getElementById('dash-initial');
+    if(dbEl) dbEl.textContent=fmt(current);
+    if(diEl) diEl.textContent=fmt(state.initialBankroll);
+
+    // Bouton config si bankroll = 0
+    var cfgBtn=document.getElementById('dash-config-btn');
+    if(cfgBtn) cfgBtn.style.display=state.initialBankroll===0?'block':'none';
+
+    // Badge évolution
+    var badge=document.getElementById('dash-evolution-badge');
+    if(badge && state.initialBankroll>0){
+      var evoPct=((current-state.initialBankroll)/state.initialBankroll*100).toFixed(1);
+      if(Math.abs(evoPct)>0.1){
+        badge.style.display='inline-block';
+        badge.textContent=(evoPct>0?'▲ +':'▼ ')+evoPct+'%';
+        badge.style.background=evoPct>0?'rgba(0,229,184,0.15)':'rgba(255,71,87,0.15)';
+        badge.style.color=evoPct>0?'var(--green)':'var(--red)';
+      } else { badge.style.display='none'; }
+    }
+
+    var pe=document.getElementById('dash-profit');
+    if(pe){pe.textContent=(totalProfit>=0?'+':'')+fmt(totalProfit);pe.className='bk-stat-value '+(totalProfit>0?'pos':totalProfit<0?'neg':'neutral');}
+    var re=document.getElementById('dash-roi');
+    if(re){re.textContent=(roi>=0?'+':'')+roi+'%';re.className='bk-stat-value '+(roi>0?'pos':roi<0?'neg':'neutral');}
+    var we=document.getElementById('dash-winrate');
+    if(we) we.textContent=wr!==null?wr+'%':'—';
+
+    var qt=document.getElementById('qs-total'); if(qt) qt.textContent=state.bets.length;
+    var qw=document.getElementById('qs-won'); if(qw) qw.textContent=won.length;
+    var qc=document.getElementById('qs-combo'); if(qc) qc.textContent=combos.length;
+    var qg=document.getElementById('qs-goals'); if(qg) qg.textContent=state.goals.filter(function(g){return g.completed;}).length+'/'+state.goals.length;
+    // Nouveaux éléments bankroll card
+    var bc=document.getElementById('dash-bets-count'); if(bc) bc.textContent=state.bets.length;
+    var wc=document.getElementById('dash-won-count'); if(wc) wc.textContent=won.length;
+    var lc=document.getElementById('dash-lost-count'); if(lc) lc.textContent=lost.length;
+    var pendingCount=state.bets.filter(function(b){return b.result==='pending';}).length;
+    var pc=document.getElementById('dash-pending-count'); if(pc) pc.textContent=pendingCount;
+    var streakEl=document.getElementById('dash-streak');
+    if(streakEl){
+      var wonStreak=getStreak(state,'won');
+      var lostStreak=getStreak(state,'lost');
+      if(wonStreak>=2){streakEl.textContent='🔥 '+wonStreak+'V';streakEl.style.color='var(--green)';}
+      else if(lostStreak>=2){streakEl.textContent='❄️ '+lostStreak+'D';streakEl.style.color='var(--red)';}
+      else{streakEl.textContent='—';streakEl.style.color='var(--text)';}
+    }
   // Update mini shortcuts
   const goalsDone = state.goals.filter(g=>g.completed).length;
   const goalsTotal = state.goals.length;
@@ -7218,14 +7663,42 @@ function renderAdvancedStats() {
     });}
 
   // ── STATS ──
+  var currentStatsFilter = 'sport';
+
+  function setStatsFilter(filter) {
+    currentStatsFilter = filter;
+    var filters = {sport:'stats-filter-sport', casino:'stats-filter-casino', all:'stats-filter-all'};
+    var colors = {sport:'rgba(0,212,170,0.12)', casino:'rgba(255,255,255,0.06)', all:'rgba(91,155,255,0.1)'};
+    var borders = {sport:'rgba(0,212,170,0.35)', casino:'rgba(255,255,255,0.15)', all:'rgba(91,155,255,0.3)'};
+    var textCols = {sport:'var(--green)', casino:'var(--text)', all:'#5b9bff'};
+    Object.keys(filters).forEach(function(f) {
+      var el = document.getElementById(filters[f]);
+      if(!el) return;
+      var isActive = f === filter;
+      el.style.background = isActive ? colors[f] : 'var(--bg3)';
+      el.style.borderColor = isActive ? borders[f] : 'var(--border)';
+      el.style.color = isActive ? textCols[f] : 'var(--text2)';
+    });
+    renderStats();
+  }
+
   function renderStats() {
     var page = document.getElementById("stats-page");
     if (!page) return;
+
+    // Filtrer les paris selon le toggle
+    var allBets = state.bets;
+    if (currentStatsFilter === 'sport') {
+      allBets = state.bets.filter(function(b){ return b.type !== 'casino'; });
+    } else if (currentStatsFilter === 'casino') {
+      allBets = state.bets.filter(function(b){ return b.type === 'casino'; });
+    }
+
     var won = []; var lost = []; var push2 = [];
-    for (var i = 0; i < state.bets.length; i++) {
-      if (state.bets[i].result === "won") won.push(state.bets[i]);
-      else if (state.bets[i].result === "lost") lost.push(state.bets[i]);
-      else if (state.bets[i].result === "push") push2.push(state.bets[i]);
+    for (var i = 0; i < allBets.length; i++) {
+      if (allBets[i].result === "won") won.push(allBets[i]);
+      else if (allBets[i].result === "lost") lost.push(allBets[i]);
+      else if (allBets[i].result === "push") push2.push(allBets[i]);
     }
     var settled = won.concat(lost).concat(push2);
     if (!settled.length) {
@@ -7615,10 +8088,30 @@ function renderAdvancedStats() {
     }
   })();
 
-  var coachHistory = [];
+  var COACH_STORAGE_KEY = 'sd_coach_history';
+
+  var coachHistory = (function() {
+    try {
+      var saved = localStorage.getItem(COACH_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch(e) { return []; }
+  })();
+
+  function saveCoachHistory() {
+    try {
+      localStorage.setItem(COACH_STORAGE_KEY, JSON.stringify(coachHistory.slice(-50)));
+    } catch(e) {}
+  }
+
+  function resetCoachIA() {
+    if (!coachHistory.length) return;
+    if (!confirm('Effacer la conversation et repartir de zéro ?')) return;
+    coachHistory = [];
+    saveCoachHistory();
+    renderCoachMessages();
+  }
 
   function renderCoachScreen() {
-    // Render existing messages
     renderCoachMessages();
   }
 
@@ -7626,7 +8119,11 @@ function renderAdvancedStats() {
     var container = document.getElementById('coach-messages');
     if (!container) return;
     if (!coachHistory.length) {
-      container.innerHTML = '';
+      container.innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--text3);font-size:13px;line-height:1.8">'
+        + '<div style="font-size:32px;margin-bottom:10px">🤖</div>'
+        + '<div>Bonjour ! Je connais toutes tes stats.</div>'
+        + '<div style="margin-top:4px">Choisis une suggestion ou pose ta question.</div>'
+        + '</div>';
       return;
     }
     var html = '';
@@ -7634,16 +8131,21 @@ function renderAdvancedStats() {
       if (msg.role === 'user') {
         html += '<div style="display:flex;justify-content:flex-end;margin-bottom:10px">'
           + '<div style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.2);border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:85%;font-size:13px;color:var(--text)">'
-          + msg.content + '</div></div>';
+          + escHtml(msg.content) + '</div></div>';
       } else {
         html += '<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">'
           + '<div style="width:32px;height:32px;border-radius:10px;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🤖</div>'
           + '<div style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:4px 16px 16px 16px;padding:12px 14px;max-width:85%;font-size:13px;color:var(--text2);line-height:1.6">'
-          + msg.content.replace(/\n/g, "<br>") + '</div></div>';
+          + msg.content.replace(/\n/g, '<br>') + '</div></div>';
       }
     });
     container.innerHTML = html;
     container.scrollTop = container.scrollHeight;
+  }
+
+  function escHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   function buildBankrollContext() {
@@ -7728,7 +8230,7 @@ function renderAdvancedStats() {
     const systemPrompt = ("Tu es un coach expert en paris sportifs et gestion de bankroll. Reponds en francais de facon precise. Donnees parieur: " + ctx);
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/groq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -7951,6 +8453,8 @@ function runStratCompare() {
   var useKelly2 = document.getElementById('sc-kelly2').checked;
   var useKelly4 = document.getElementById('sc-kelly4').checked;
   var useActual = document.getElementById('sc-actual').checked;
+  var useMartingale = document.getElementById('sc-martingale') && document.getElementById('sc-martingale').checked;
+  var useFibonacci  = document.getElementById('sc-fibonacci') && document.getElementById('sc-fibonacci').checked;
 
   // Kelly fraction from odds + confidence
   // Edge supposé depuis le slider (utilisé quand confidence non dispo)
@@ -8005,10 +8509,58 @@ function runStratCompare() {
   if (useKelly2) strategies.push({ name:'Demi-Kelly',    color:'#f0c040', fn: function(bk,b){ return bk*kellyFraction(b.odds, b.confidence||0)*0.5; } });
   if (useKelly4) strategies.push({ name:'Quart-Kelly',   color:'#ff8c00', fn: function(bk,b){ return bk*kellyFraction(b.odds, b.confidence||0)*0.25; } });
   if (useActual) strategies.push({ name:'Tes mises réelles', color:'#00e5b8', fn: function(bk,b){
-    // Scale actual stake proportionally to simulated bankroll
     var ratio = startBK / (state.initialBankroll||startBK);
     return (b.stake||0) * ratio;
   }});
+
+  // ── MARTINGALE ──
+  // Principe : on double la mise après chaque perte pour récupérer toutes les pertes + gain de base
+  // Mise de base = 1% de la bankroll initiale
+  if (useMartingale) {
+    var martBase = startBK * 0.01;
+    var martCurrent = [martBase]; // on garde la mise courante dans un tableau pour la closure
+    var martLostStreak = [0];
+    strategies.push({
+      name: 'Martingale',
+      color: '#ff4757',
+      fn: function(bk, b) {
+        var stake = martCurrent[0];
+        // Après calcul du résultat, on met à jour pour le prochain pari
+        if (b.result === 'won') {
+          martCurrent[0] = martBase; // Reset après victoire
+          martLostStreak[0] = 0;
+        } else {
+          martLostStreak[0]++;
+          martCurrent[0] = Math.min(martBase * Math.pow(2, martLostStreak[0]), bk * 0.5); // cap à 50% bankroll
+        }
+        return Math.max(0, Math.min(stake, bk));
+      }
+    });
+  }
+
+  // ── FIBONACCI ──
+  // Principe : on suit la suite de Fibonacci pour les mises (1,1,2,3,5,8,13...)
+  // On avance de 2 positions après une perte, on recule de 1 après une victoire
+  // Mise de base = 1% de la bankroll initiale
+  if (useFibonacci) {
+    var fibSeq = [1,1,2,3,5,8,13,21,34,55,89,144,233];
+    var fibBase = startBK * 0.01;
+    var fibIdx = [0];
+    strategies.push({
+      name: 'Fibonacci',
+      color: '#ff8c00',
+      fn: function(bk, b) {
+        var idx = Math.min(fibIdx[0], fibSeq.length - 1);
+        var stake = fibBase * fibSeq[idx];
+        if (b.result === 'won') {
+          fibIdx[0] = Math.max(0, fibIdx[0] - 1); // Reculer d'un cran
+        } else {
+          fibIdx[0] = Math.min(fibIdx[0] + 2, fibSeq.length - 1); // Avancer de 2
+        }
+        return Math.max(0, Math.min(stake, bk * 0.3)); // cap à 30% bankroll
+      }
+    });
+  }
 
   if (!strategies.length) {
     document.getElementById('sc-results').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">Sélectionne au moins une stratégie.</div>';

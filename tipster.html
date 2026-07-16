@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr" style="color-scheme:dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <meta name="theme-color" content="#05050d">
+  <title>Profil Tipster — SportsDecrypté</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:    #05050d;
+      --bg2:   #0a0a16;
+      --bg3:   #111120;
+      --bdr:   rgba(255,255,255,0.07);
+      --bdr2:  rgba(255,255,255,0.12);
+      --txt:   #f0f0ff;
+      --txt2:  rgba(240,240,255,0.55);
+      --txt3:  rgba(240,240,255,0.25);
+      --gold:  #f5c842;
+      --orange:#ff6b35;
+      --green: #00e5b8;
+      --red:   #ff4757;
+      --blue:  #5b9bff;
+      --purple:#b06ef3;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{background:var(--bg);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+
+    /* Ambient glows */
+    body::before{content:'';position:fixed;top:-100px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(255,107,53,0.08) 0%,transparent 65%);pointer-events:none;z-index:0}
+    body::after{content:'';position:fixed;bottom:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(124,58,237,0.07) 0%,transparent 65%);pointer-events:none;z-index:0}
+
+    .container{max-width:430px;margin:0 auto;padding:0 0 80px;position:relative;z-index:1}
+
+    /* ── HERO ── */
+    .hero{
+      padding:52px 24px 28px;
+      text-align:center;
+      border-bottom:1px solid var(--bdr);
+      position:relative;
+    }
+    .hero-logo{
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      margin-bottom:28px;
+      font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:3px;color:var(--txt3);
+    }
+    .hero-logo-icon{
+      width:28px;height:28px;background:linear-gradient(135deg,var(--orange),var(--gold));
+      border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;
+    }
+    .avatar{
+      width:88px;height:88px;border-radius:50%;
+      background:linear-gradient(135deg,var(--orange),var(--gold));
+      display:flex;align-items:center;justify-content:center;
+      font-size:36px;margin:0 auto 14px;
+      box-shadow:0 8px 32px rgba(255,107,53,0.3),0 0 0 3px rgba(245,200,66,0.2);
+    }
+    .tipster-name{
+      font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:4px;
+      color:var(--txt);margin-bottom:4px;
+    }
+    .tipster-level{
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);
+      border-radius:20px;padding:4px 14px;
+      font-size:11px;font-weight:700;color:var(--gold);letter-spacing:1px;
+      margin-bottom:12px;
+    }
+    .tipster-since{font-size:11px;color:var(--txt3);margin-bottom:16px}
+    .share-btn{
+      display:inline-flex;align-items:center;gap:8px;
+      background:linear-gradient(135deg,var(--orange),var(--gold));
+      color:#000;border:none;border-radius:14px;padding:12px 24px;
+      font-family:'Bebas Neue',cursive;font-size:15px;letter-spacing:2px;
+      cursor:pointer;box-shadow:0 6px 20px rgba(255,107,53,0.3);
+      transition:all 0.15s;
+    }
+    .share-btn:active{transform:scale(0.96)}
+
+    /* ── BANKROLL CARD ── */
+    .bk-card{
+      margin:20px 20px 0;
+      background:linear-gradient(135deg,rgba(245,200,66,0.08),rgba(255,107,53,0.05));
+      border:1px solid rgba(245,200,66,0.2);border-radius:24px;padding:20px;
+      position:relative;overflow:hidden;
+    }
+    .bk-card::before{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(145deg,rgba(255,255,255,0.03),transparent);
+    }
+    .bk-label{font-size:9px;letter-spacing:3px;color:rgba(245,200,66,0.6);font-weight:700;margin-bottom:6px}
+    .bk-amount{font-family:'Bebas Neue',cursive;font-size:52px;color:var(--gold);line-height:1;margin-bottom:4px}
+    .bk-initial{font-size:11px;color:var(--txt3);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .bk-evo{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px}
+    .bk-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .bk-stat{text-align:center;background:rgba(255,255,255,0.04);border-radius:12px;padding:10px 6px}
+    .bk-stat-lbl{font-size:8px;letter-spacing:1.5px;color:var(--txt3);font-weight:700;margin-bottom:4px}
+    .bk-stat-val{font-family:'Bebas Neue',cursive;font-size:18px}
+    .pos{color:var(--green)} .neg{color:var(--red)} .neutral{color:var(--txt)}
+
+    /* ── SECTION ── */
+    .section{padding:20px 20px 0}
+    .section-title{
+      font-size:9px;letter-spacing:3px;color:var(--txt3);font-weight:700;
+      margin-bottom:14px;display:flex;align-items:center;gap:8px;
+    }
+    .section-title::after{content:'';flex:1;height:1px;background:var(--bdr)}
+
+    /* ── GRAPHIQUE BANKROLL ── */
+    .chart-wrap{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:16px;overflow:hidden}
+    svg.chart{width:100%;height:120px;display:block}
+
+    /* ── STATS GRID ── */
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .stat-card{
+      background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;padding:16px;
+      display:flex;flex-direction:column;gap:4px;
+    }
+    .stat-card-lbl{font-size:9px;letter-spacing:2px;color:var(--txt3);font-weight:700}
+    .stat-card-val{font-family:'Bebas Neue',cursive;font-size:32px;line-height:1}
+    .stat-card-sub{font-size:10px;color:var(--txt3)}
+
+    /* ── TOP PRONOS ── */
+    .prono-card{
+      background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;padding:14px;
+      margin-bottom:8px;position:relative;overflow:hidden;
+    }
+    .prono-card.value{border-color:rgba(0,229,184,0.25);background:rgba(0,229,184,0.04)}
+    .prono-card.edge{border-color:rgba(245,200,66,0.25);background:rgba(245,200,66,0.04)}
+    .prono-match{font-size:13px;font-weight:700;margin-bottom:6px}
+    .prono-bet{font-size:11px;color:var(--txt2);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .prono-footer{display:flex;align-items:center;justify-content:space-between}
+    .prono-odds{font-family:'Bebas Neue',cursive;font-size:20px;color:var(--gold)}
+    .prono-verdict{font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:1px}
+    .prono-conf{font-size:11px;color:var(--txt2)}
+    .prono-sport{position:absolute;top:12px;right:12px;font-size:18px}
+    .prono-date{font-size:9px;color:var(--txt3);margin-top:4px}
+
+    /* ── PARIS ── */
+    .paris-card{
+      background:var(--bg2);border:1px solid var(--bdr);border-radius:16px;
+      padding:12px 14px;margin-bottom:6px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .paris-match{font-size:12px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .paris-result{font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;flex-shrink:0}
+    .paris-profit{font-family:'Bebas Neue',cursive;font-size:16px;flex-shrink:0;min-width:60px;text-align:right}
+
+    /* ── EMPTY ── */
+    .empty{text-align:center;padding:32px;color:var(--txt3);font-size:12px}
+    .empty-icon{font-size:32px;margin-bottom:10px}
+
+    /* ── FOOTER CTA ── */
+    .cta{
+      margin:28px 20px 0;
+      background:linear-gradient(135deg,rgba(245,200,66,0.08),rgba(255,107,53,0.06));
+      border:1px solid rgba(245,200,66,0.15);border-radius:24px;padding:24px;text-align:center;
+    }
+    .cta-title{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:3px;margin-bottom:8px}
+    .cta-sub{font-size:12px;color:var(--txt2);margin-bottom:16px;line-height:1.6}
+    .cta-btn{
+      display:inline-flex;align-items:center;gap:8px;
+      background:linear-gradient(135deg,var(--orange),var(--gold));
+      color:#000;border:none;border-radius:14px;padding:14px 28px;
+      font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:2px;
+      text-decoration:none;cursor:pointer;
+      box-shadow:0 6px 20px rgba(255,107,53,0.3);
+    }
+
+    /* ── LOADING ── */
+    .loading{text-align:center;padding:60px 20px;color:var(--txt3)}
+    .spin{width:32px;height:32px;border:3px solid var(--bdr);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── NOT FOUND ── */
+    .not-found{text-align:center;padding:80px 24px}
+    .not-found-icon{font-size:64px;margin-bottom:16px}
+    .not-found-title{font-family:'Bebas Neue',cursive;font-size:32px;letter-spacing:3px;margin-bottom:8px}
+    .not-found-sub{font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:24px}
+
+    ::-webkit-scrollbar{width:0}
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="loading">
+    <div class="spin"></div>
+    <div>Chargement du profil...</div>
+  </div>
+</div>
+
+<script>
+var HIST_KEY = 'sd_predict_historique';
+var ACCOUNTS_KEY = 'sd_accounts';
+
+// ── Charger les données ──────────────────────────────────────────────────
+function loadData() {
+  var accounts = null;
+  var state = null;
+  try {
+    var raw = localStorage.getItem(ACCOUNTS_KEY);
+    if (raw) {
+      accounts = JSON.parse(raw);
+      var acc = accounts.accounts && accounts.accounts.find(function(a) { return a.id === accounts.currentId; });
+      if (!acc && accounts.accounts && accounts.accounts.length > 0) acc = accounts.accounts[0];
+      if (acc) state = acc.state;
+    }
+  } catch(e) {}
+
+  var historique = [];
+  try {
+    var histRaw = localStorage.getItem(HIST_KEY);
+    if (histRaw) historique = JSON.parse(histRaw);
+  } catch(e) {}
+
+  return { state: state, historique: historique };
+}
+
+// ── Formater ──────────────────────────────────────────────────────────────
+function fmt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return parseFloat(n).toLocaleString('fr-FR', {minimumFractionDigits:0,maximumFractionDigits:2});
+}
+function fmtPct(n) { return n === null || isNaN(n) ? '—' : (n >= 0 ? '+' : '') + parseFloat(n).toFixed(1) + '%'; }
+function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function getCurrentBankroll(state) {
+  if (!state) return 0;
+  var bk = state.initialBankroll || 0;
+  (state.bets || []).forEach(function(b) { bk += (b.profit || 0); });
+  (state.deposits || []).forEach(function(d) { bk += (d.amount || 0); });
+  return bk;
+}
+
+function getStreak(bets) {
+  if (!bets || bets.length === 0) return '—';
+  var settled = bets.filter(function(b) { return b.result === 'won' || b.result === 'lost'; });
+  if (settled.length === 0) return '—';
+  var last = settled[settled.length - 1].result;
+  var count = 0;
+  for (var i = settled.length - 1; i >= 0; i--) {
+    if (settled[i].result === last) count++;
+    else break;
+  }
+  return (last === 'won' ? '🔥 ' : '❄️ ') + count + (last === 'won' ? 'V' : 'D');
+}
+
+// ── Graphique SVG ─────────────────────────────────────────────────────────
+function buildChart(bets, initialBankroll) {
+  if (!bets || bets.length === 0) {
+    return '<svg class="chart" viewBox="0 0 300 80"><text x="150" y="45" text-anchor="middle" fill="rgba(240,240,255,0.2)" font-size="11" font-family="Syne,sans-serif">Pas encore de données</text></svg>';
+  }
+
+  var points = [initialBankroll || 0];
+  var running = initialBankroll || 0;
+  bets.forEach(function(b) { running += (b.profit || 0); points.push(running); });
+
+  var minV = Math.min.apply(null, points);
+  var maxV = Math.max.apply(null, points);
+  var range = maxV - minV || 1;
+  var W = 300, H = 80, PAD = 10;
+
+  var coords = points.map(function(v, i) {
+    var x = PAD + (i / (points.length - 1)) * (W - 2 * PAD);
+    var y = PAD + (1 - (v - minV) / range) * (H - 2 * PAD);
+    return [x, y];
+  });
+
+  var path = coords.map(function(c, i) { return (i === 0 ? 'M' : 'L') + c[0].toFixed(1) + ' ' + c[1].toFixed(1); }).join(' ');
+  var area = path + ' L' + coords[coords.length-1][0].toFixed(1) + ' ' + (H-PAD) + ' L' + PAD + ' ' + (H-PAD) + ' Z';
+
+  var isPos = points[points.length-1] >= (initialBankroll || 0);
+  var color = isPos ? '#00e5b8' : '#ff4757';
+
+  return '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + color + '" stop-opacity="0.3"/><stop offset="100%" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>' +
+    '<path d="' + area + '" fill="url(#cg)"/>' +
+    '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '</svg>';
+}
+
+// ── Rendre le profil ──────────────────────────────────────────────────────
+function render() {
+  var data = loadData();
+  var state = data.state;
+  var historique = data.historique;
+  var app = document.getElementById('app');
+
+  // Pas de données
+  if (!state || (!state.initialBankroll && (!state.bets || state.bets.length === 0) && historique.length === 0)) {
+    app.innerHTML = '<div class="not-found">' +
+      '<div class="not-found-icon">🏆</div>' +
+      '<div class="not-found-title">Profil non trouvé</div>' +
+      '<div class="not-found-sub">Ce profil tipster n\'a pas encore de données.<br>Configure ta bankroll sur SportsDecrypté pour créer ton profil !</div>' +
+      '<a href="/index.html" class="cta-btn">🏠 Ouvrir SportsDecrypté</a>' +
+      '</div>';
+    return;
+  }
+
+  var bets = state.bets || [];
+  var won = bets.filter(function(b) { return b.result === 'won'; });
+  var lost = bets.filter(function(b) { return b.result === 'lost'; });
+  var settled = won.concat(lost);
+  var totalProfit = bets.reduce(function(s,b) { return s + (b.profit||0); }, 0);
+  var staked = settled.reduce(function(s,b) { return s + (b.stake||0); }, 0);
+  var roi = staked > 0 ? (totalProfit / staked * 100) : 0;
+  var wr = settled.length > 0 ? (won.length / settled.length * 100) : 0;
+  var current = getCurrentBankroll(state);
+  var initial = state.initialBankroll || 0;
+  var evoPct = initial > 0 ? ((current - initial) / initial * 100) : 0;
+  var streak = getStreak(bets);
+
+  // Niveaux
+  var levels = [
+    {min:-Infinity,name:'Débutant',emoji:'🎮'},
+    {min:5,name:'Amateur',emoji:'🎯'},
+    {min:10,name:'Confirmé',emoji:'⚡'},
+    {min:20,name:'Expert',emoji:'🔥'},
+    {min:50,name:'Pro',emoji:'💎'},
+    {min:100,name:'Légende',emoji:'👑'}
+  ];
+  var level = levels[0];
+  for (var i = 0; i < levels.length; i++) { if (roi >= levels[i].min) level = levels[i]; }
+
+  // Top pronos depuis l'historique
+  var topPronos = historique
+    .filter(function(h) { return h.verdict && (h.verdict.includes('VALUE') || h.verdict.includes('EDGE')); })
+    .slice(0, 5);
+
+  // Derniers paris
+  var lastBets = bets.slice().reverse().slice(0, 8);
+
+  var html = '';
+
+  // ── HERO ──
+  html += '<div class="hero">' +
+    '<div class="hero-logo"><div class="hero-logo-icon">📡</div>SPORTSDÉCRYPTÉ</div>' +
+    '<div class="avatar">' + level.emoji + '</div>' +
+    '<div class="tipster-name">' + esc(state.name || 'Tipster') + '</div>' +
+    '<div class="tipster-level">✦ ' + level.name + '</div>' +
+    '<div class="tipster-since">' + bets.length + ' paris enregistrés</div>' +
+    '<button class="share-btn" onclick="shareProfile()">📤 Partager mon profil</button>' +
+    '</div>';
+
+  // ── BANKROLL CARD ──
+  var evoBadge = Math.abs(evoPct) > 0.1 ?
+    '<span class="bk-evo" style="background:' + (evoPct>0?'rgba(0,229,184,0.15)':'rgba(255,71,87,0.15)') + ';color:' + (evoPct>0?'var(--green)':'var(--red)') + '">' +
+    (evoPct>0?'▲ +':'▼ ') + evoPct.toFixed(1) + '%</span>' : '';
+
+  html += '<div class="bk-card">' +
+    '<div class="bk-label">MA BANKROLL</div>' +
+    '<div class="bk-amount">' + fmt(current) + ' €</div>' +
+    '<div class="bk-initial">Capital initial : ' + fmt(initial) + ' €' + evoBadge + '</div>' +
+    '<div class="bk-stats">' +
+      '<div class="bk-stat"><div class="bk-stat-lbl">PROFIT</div><div class="bk-stat-val ' + (totalProfit>0?'pos':totalProfit<0?'neg':'neutral') + '">' + (totalProfit>=0?'+':'') + fmt(totalProfit) + '€</div></div>' +
+      '<div class="bk-stat"><div class="bk-stat-lbl">ROI</div><div class="bk-stat-val ' + (roi>0?'pos':roi<0?'neg':'neutral') + '">' + fmtPct(roi) + '</div></div>' +
+      '<div class="bk-stat"><div class="bk-stat-lbl">WIN RATE</div><div class="bk-stat-val neutral">' + (settled.length>0?Math.round(wr)+'%':'—') + '</div></div>' +
+      '<div class="bk-stat"><div class="bk-stat-lbl">SÉRIE</div><div class="bk-stat-val neutral" style="font-size:12px">' + streak + '</div></div>' +
+    '</div>' +
+    '</div>';
+
+  // ── GRAPHIQUE ──
+  html += '<div class="section">' +
+    '<div class="section-title">📈 ÉVOLUTION BANKROLL</div>' +
+    '<div class="chart-wrap">' + buildChart(bets, initial) + '</div>' +
+    '</div>';
+
+  // ── STATS ──
+  html += '<div class="section" style="margin-top:20px">' +
+    '<div class="section-title">📊 STATISTIQUES</div>' +
+    '<div class="stats-grid">' +
+      '<div class="stat-card"><div class="stat-card-lbl">PARIS JOUÉS</div><div class="stat-card-val neutral">' + bets.length + '</div><div class="stat-card-sub">' + won.length + ' gagnés · ' + lost.length + ' perdus</div></div>' +
+      '<div class="stat-card"><div class="stat-card-lbl">MISE TOTALE</div><div class="stat-card-val neutral">' + fmt(staked) + '€</div><div class="stat-card-sub">Stake moyen : ' + fmt(settled.length>0?staked/settled.length:0) + '€</div></div>' +
+      '<div class="stat-card"><div class="stat-card-lbl">MEILLEUR PARI</div><div class="stat-card-val pos">' + (bets.length>0?'+'+fmt(Math.max.apply(null,bets.map(function(b){return b.profit||0;})))+'€':'—') + '</div><div class="stat-card-sub">Profit max sur un pari</div></div>' +
+      '<div class="stat-card"><div class="stat-card-lbl">ANALYSES IA</div><div class="stat-card-val" style="color:var(--blue)">' + historique.length + '</div><div class="stat-card-sub">' + historique.filter(function(h){return h.verdict&&h.verdict.includes('VALUE');}).length + ' value bets détectés</div></div>' +
+    '</div>' +
+    '</div>';
+
+  // ── TOP PRONOS ──
+  html += '<div class="section" style="margin-top:20px">' +
+    '<div class="section-title">🔮 MEILLEURS PRONOSTICS</div>';
+
+  if (topPronos.length === 0) {
+    html += '<div class="empty"><div class="empty-icon">🔮</div>Aucun pronostic value bet encore</div>';
+  } else {
+    var sportEmojis = {football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉'};
+    topPronos.forEach(function(p) {
+      var isValue = p.verdict && p.verdict.includes('VALUE');
+      var vColor = isValue ? 'var(--green)' : 'var(--gold)';
+      var vBg = isValue ? 'rgba(0,229,184,0.15)' : 'rgba(245,200,66,0.15)';
+      var dateStr = p.date ? new Date(p.date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '';
+      html += '<div class="prono-card ' + (isValue?'value':'edge') + '">' +
+        '<div class="prono-sport">' + (sportEmojis[p.sport]||'🏆') + '</div>' +
+        '<div class="prono-match">' + esc(p.home) + ' vs ' + esc(p.away) + '</div>' +
+        '<div class="prono-bet">' + esc(p.betLabel) + '</div>' +
+        '<div class="prono-footer">' +
+          '<div class="prono-odds">@' + (p.odds||'—') + '</div>' +
+          '<div class="prono-conf">' + (p.prob?Math.round(p.prob*100)+'% confiance':'') + '</div>' +
+          '<div class="prono-verdict" style="background:' + vBg + ';color:' + vColor + '">' + (p.verdict||'') + '</div>' +
+        '</div>' +
+        '<div class="prono-date">' + dateStr + '</div>' +
+        '</div>';
+    });
+  }
+  html += '</div>';
+
+  // ── DERNIERS PARIS ──
+  html += '<div class="section" style="margin-top:20px">' +
+    '<div class="section-title">🎯 DERNIERS PARIS</div>';
+
+  if (lastBets.length === 0) {
+    html += '<div class="empty"><div class="empty-icon">🎯</div>Aucun pari enregistré</div>';
+  } else {
+    lastBets.forEach(function(b) {
+      var isWon = b.result === 'won';
+      var isLost = b.result === 'lost';
+      var rColor = isWon ? 'var(--green)' : isLost ? 'var(--red)' : 'var(--gold)';
+      var rBg = isWon ? 'rgba(0,229,184,0.12)' : isLost ? 'rgba(255,71,87,0.12)' : 'rgba(245,200,66,0.12)';
+      var rLabel = isWon ? '✅ GAGNÉ' : isLost ? '❌ PERDU' : '⏳ EN COURS';
+      var profitStr = b.profit !== undefined ? (b.profit>=0?'+':'')+fmt(b.profit)+'€' : '—';
+      html += '<div class="paris-card">' +
+        '<div class="paris-match">' + esc(b.match||b.description||'Paris') + '</div>' +
+        '<div class="paris-result" style="background:' + rBg + ';color:' + rColor + '">' + rLabel + '</div>' +
+        '<div class="paris-profit ' + (b.profit>0?'pos':b.profit<0?'neg':'neutral') + '">' + profitStr + '</div>' +
+        '</div>';
+    });
+  }
+  html += '</div>';
+
+  // ── CTA ──
+  html += '<div class="cta">' +
+    '<div class="cta-title">🏆 SportsDecrypté</div>' +
+    '<div class="cta-sub">Rejoins des milliers de parieurs qui utilisent SportsDecrypté pour tracker leur bankroll et trouver des value bets.</div>' +
+    '<a href="/index.html" class="cta-btn">🚀 Essayer gratuitement</a>' +
+    '</div>';
+
+  app.innerHTML = html;
+}
+
+function shareProfile() {
+  var url = window.location.href;
+  if (navigator.share) {
+    navigator.share({
+      title: 'Mon profil tipster — SportsDecrypté',
+      text: 'Découvrez mes stats et pronostics sur SportsDecrypté !',
+      url: url
+    }).catch(function(){});
+  } else {
+    navigator.clipboard.writeText(url).then(function() {
+      showToast('🔗 Lien copié !');
+    });
+  }
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(17,17,32,0.95);border:1px solid rgba(245,200,66,0.3);border-radius:20px;padding:10px 20px;font-size:13px;font-weight:700;color:#f0f0ff;z-index:9999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5)';
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 2500);
+}
+
+// Lancer
+render();
+</script>
+</body>
+</html>

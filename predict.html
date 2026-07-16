@@ -3,118 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<script src="/sd-auth.js"></script>
+<script src="/sd-gates.js"></script>
 <title>SportsDecrypté · Predict</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#05050d;--bg2:#0a0a18;--bg3:#111122;
-  --bdr:rgba(255,255,255,0.07);
-  --txt:#f0f0ff;--txt2:#9090bb;--txt3:#4040778;
+  --bg:#05050d;--bg2:#0a0a16;--bg3:#111120;
+  --bdr:rgba(255,255,255,0.07);--bdr2:rgba(255,255,255,0.12);
+  --txt:#f0f0ff;--txt2:rgba(240,240,255,0.5);--txt3:rgba(240,240,255,0.22);
   --gold:#f5c842;--green:#00e5b8;--red:#ff4757;--blue:#5b9bff;--purple:#b06ef3;
+  --orange:#ff6b35;
   --acc:#7c3aed;
+  --shadow:0 4px 20px rgba(0,0,0,0.5);
+  --shadow-card:0 2px 12px rgba(0,0,0,0.35);
 }
-html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;overflow-x:hidden}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Syne','Outfit',sans-serif;overflow-x:hidden}
 body{padding-bottom:40px}
-.sport-tab{text-align:center;padding:9px;font-family:Bebas Neue,cursive;font-size:13px;letter-spacing:1px;color:var(--txt2);cursor:pointer;border-radius:10px;border:1px solid rgba(255,255,255,0.05);transition:all .2s;line-height:1.2;background:rgba(255,255,255,0.02)}
-.sport-tab:hover{background:rgba(255,255,255,0.05)}
-.sport-tab.active{background:rgba(245,200,66,0.12);border-color:rgba(245,200,66,0.35);color:var(--gold)}
+
+/* Ambient glow */
+body::before{content:'';position:fixed;top:-150px;right:-150px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.06) 0%,transparent 65%);pointer-events:none;z-index:0}
+
+/* SPORT TABS */
+.sport-tab{text-align:center;padding:10px 6px;font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:1px;color:var(--txt2);cursor:pointer;border-radius:14px;border:1px solid var(--bdr);transition:all .2s;line-height:1.2;background:rgba(255,255,255,0.02);box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.sport-tab:active{transform:scale(0.95)}
+.sport-tab.active{background:rgba(245,200,66,0.12);border-color:rgba(245,200,66,0.4);color:var(--gold);box-shadow:0 0 0 3px rgba(245,200,66,0.07)}
 
 /* HEADER */
-.hdr{background:linear-gradient(180deg,rgba(124,58,237,0.15) 0%,transparent 100%);padding:56px 20px 20px;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:50;backdrop-filter:blur(20px);background-color:rgba(5,5,13,0.9)}
-.hdr-top{display:flex;align-items:center;gap:12px;margin-bottom:4px}
-.hdr-back{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;text-decoration:none;color:var(--txt);flex-shrink:0}
-.hdr-title{font-family:Bebas Neue,cursive;font-size:28px;letter-spacing:3px;color:var(--gold)}
-.hdr-sub{font-size:10px;color:var(--txt2);letter-spacing:2px;font-weight:600}
-.hdr-reset{margin-left:auto;background:rgba(255,255,255,0.05);border:1px solid var(--bdr);border-radius:10px;padding:6px 12px;font-family:Bebas Neue,cursive;font-size:11px;letter-spacing:2px;color:var(--txt2);cursor:pointer}
+.hdr{background:rgba(5,5,13,0.92);padding:52px 20px 18px;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:50;backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%)}
+.hdr-top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.hdr-back{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;text-decoration:none;color:var(--txt);flex-shrink:0;transition:all 0.15s}
+.hdr-back:active{transform:scale(0.93)}
+.hdr-title{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:3px;color:var(--gold);text-shadow:0 0 40px rgba(245,200,66,0.3)}
+.hdr-sub{font-size:10px;color:var(--txt3);letter-spacing:2px;font-weight:700}
+.hdr-reset{margin-left:auto;background:rgba(255,255,255,0.04);border:1px solid var(--bdr);border-radius:12px;padding:7px 13px;font-family:'Bebas Neue',cursive;font-size:11px;letter-spacing:2px;color:var(--txt2);cursor:pointer;transition:all 0.15s}
+.hdr-reset:active{transform:scale(0.95)}
 
 /* STEPS */
 .steps{display:flex;align-items:center;padding:14px 20px;background:var(--bg);position:sticky;top:88px;z-index:40;border-bottom:1px solid var(--bdr)}
-.step{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;cursor:pointer}
-.step-num{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--bdr);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,cursive;font-size:13px;color:var(--txt2);transition:all .2s}
+.step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;cursor:pointer}
+.step-num{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--bdr);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:13px;color:var(--txt2);transition:all .2s}
 .step-lbl{font-size:8px;font-weight:700;letter-spacing:1.5px;color:var(--txt2);transition:all .2s}
-.step.active .step-num{background:rgba(245,200,66,0.15);border-color:var(--gold);color:var(--gold)}
+.step.active .step-num{background:rgba(245,200,66,0.15);border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 3px rgba(245,200,66,0.08)}
 .step.active .step-lbl{color:var(--gold)}
 .step.done .step-num{background:rgba(0,229,184,0.12);border-color:var(--green);color:var(--green)}
 .step.done .step-lbl{color:var(--green)}
 .step-line{flex:0 0 16px;height:1px;background:var(--bdr);margin-bottom:14px}
 
 /* CONTENT */
-.content{padding:16px 20px 20px;display:none}
+.content{padding:16px 20px 20px;display:none;background:var(--bg);color:var(--txt)}
 .content.active{display:block}
 
 /* CARDS */
-.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;padding:16px;margin-bottom:12px}
-.card-title{font-size:9px;letter-spacing:3px;color:var(--txt2);font-weight:700;margin-bottom:14px}
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow-card);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,0.02),transparent);pointer-events:none}
+.card-title{font-size:9px;letter-spacing:3px;color:var(--txt3);font-weight:700;margin-bottom:14px;text-transform:uppercase}
 
 /* INPUTS */
-.lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--txt2);margin-bottom:6px}
-input,select{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;color:var(--txt);font-size:14px;font-family:'Outfit',sans-serif;outline:none;-webkit-appearance:none;appearance:none}
-input:focus,select:focus{border-color:rgba(124,58,237,0.5)}
-input::placeholder{color:var(--txt2)}
+.lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--txt3);margin-bottom:6px;text-transform:uppercase}
+input,select{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--bdr);border-radius:12px;padding:12px 14px;color:var(--txt);font-size:14px;font-family:'Syne','Outfit',sans-serif;outline:none;-webkit-appearance:none;appearance:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus{border-color:rgba(124,58,237,0.5);box-shadow:0 0 0 3px rgba(124,58,237,0.1)}
+input::placeholder{color:var(--txt3)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .vs-row{display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:end}
-.vs-mid{font-family:Bebas Neue,cursive;font-size:20px;color:var(--txt2);text-align:center;padding-bottom:11px}
+.vs-mid{font-family:'Bebas Neue',cursive;font-size:20px;color:var(--txt2);text-align:center;padding-bottom:11px}
 
 /* FORM BUTTONS */
 .form-btns{display:flex;gap:6px;margin-top:4px}
-.fb{flex:1;height:36px;border-radius:8px;border:1.5px solid var(--bdr);background:var(--bg3);font-family:Bebas Neue,cursive;font-size:15px;color:var(--txt2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;user-select:none}
-.fb.W{background:rgba(0,229,184,0.12);border-color:var(--green);color:var(--green)}
-.fb.N{background:rgba(245,200,66,0.12);border-color:var(--gold);color:var(--gold)}
+.fb{flex:1;height:38px;border-radius:10px;border:1.5px solid var(--bdr);background:var(--bg3);font-family:'Bebas Neue',cursive;font-size:15px;color:var(--txt2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;user-select:none}
+.fb:active{transform:scale(0.95)}
+.fb.W{background:rgba(0,229,184,0.12);border-color:var(--green);color:var(--green);box-shadow:0 0 0 2px rgba(0,229,184,0.08)}
+.fb.N{background:rgba(245,200,66,0.12);border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 2px rgba(245,200,66,0.08)}
 .fb.D{background:rgba(255,71,87,0.12);border-color:var(--red);color:var(--red)}
-.form-hint{font-size:10px;color:var(--txt2);margin-top:5px}
+.form-hint{font-size:10px;color:var(--txt3);margin-top:5px}
 
 /* BUTTONS */
-.btn-next{width:100%;background:linear-gradient(135deg,var(--acc),#a855f7);border:none;border-radius:14px;padding:15px;font-family:Bebas Neue,cursive;font-size:17px;letter-spacing:3px;color:#fff;cursor:pointer;margin-top:12px}
-.btn-next:active{opacity:.85}
-.btn-back{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--bdr);border-radius:14px;padding:14px;font-family:Bebas Neue,cursive;font-size:14px;letter-spacing:2px;color:var(--txt2);cursor:pointer;margin-top:8px}
-.btn-ai{width:100%;background:linear-gradient(135deg,rgba(168,85,247,0.8),rgba(124,58,237,0.8));border:none;border-radius:14px;padding:15px;font-family:Bebas Neue,cursive;font-size:16px;letter-spacing:3px;color:#fff;cursor:pointer;margin-top:10px}
+.btn-next{width:100%;background:linear-gradient(135deg,var(--acc),#a855f7);border:none;border-radius:16px;padding:17px;font-family:'Bebas Neue',cursive;font-size:17px;letter-spacing:3px;color:#fff;cursor:pointer;margin-top:12px;box-shadow:0 8px 28px rgba(124,58,237,0.35),inset 0 1px 0 rgba(255,255,255,0.2);transition:all .15s}
+.btn-next:active{transform:scale(0.97);box-shadow:0 4px 12px rgba(124,58,237,0.2)}
+.btn-back{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--bdr);border-radius:16px;padding:14px;font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:2px;color:var(--txt2);cursor:pointer;margin-top:8px;transition:all .15s}
+.btn-back:active{transform:scale(0.97)}
+.btn-ai{width:100%;background:linear-gradient(135deg,rgba(168,85,247,0.85),rgba(124,58,237,0.85));border:none;border-radius:16px;padding:16px;font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:3px;color:#fff;cursor:pointer;margin-top:10px;box-shadow:0 6px 24px rgba(124,58,237,0.3),inset 0 1px 0 rgba(255,255,255,0.15);transition:all .15s}
+.btn-ai:active{transform:scale(0.97)}
 
 /* RESULTS */
-.verdict-card{border-radius:18px;padding:18px;margin-bottom:12px}
-.verdict-big{font-family:Bebas Neue,cursive;font-size:48px;line-height:1;margin-bottom:6px}
+.verdict-card{border-radius:20px;padding:20px;margin-bottom:12px;box-shadow:var(--shadow-card)}
+.verdict-big{font-family:'Bebas Neue',cursive;font-size:52px;line-height:1;margin-bottom:6px}
 .prob-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.prob-bar{flex:1;height:7px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden}
-.prob-fill{height:100%;border-radius:4px;transition:width .8s .2s}
-.prob-lbl{font-family:Bebas Neue,cursive;font-size:17px;width:46px;text-align:right;flex-shrink:0}
+.prob-bar{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.prob-fill{height:100%;border-radius:3px;transition:width .8s .2s}
+.prob-lbl{font-family:'Bebas Neue',cursive;font-size:17px;width:46px;text-align:right;flex-shrink:0}
 .prob-team{font-size:12px;font-weight:700;width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.score-item{background:rgba(255,255,255,0.04);border:1px solid var(--bdr);border-radius:10px;padding:8px;text-align:center}
-.score-val{font-family:Bebas Neue,cursive;font-size:16px}
+.score-item{background:rgba(255,255,255,0.04);border:1px solid var(--bdr);border-radius:12px;padding:8px;text-align:center}
+.score-val{font-family:'Bebas Neue',cursive;font-size:16px}
 .score-pct{font-size:9px;color:var(--txt2)}
-.stat-mini{text-align:center;background:rgba(255,255,255,0.03);border-radius:10px;padding:10px}
-.stat-mini-v{font-family:Bebas Neue,cursive;font-size:22px}
-.stat-mini-l{font-size:9px;color:var(--txt2);font-weight:700;letter-spacing:1px;margin-top:2px}
-.model-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px}
+.stat-mini{text-align:center;background:rgba(255,255,255,0.03);border-radius:12px;padding:10px}
+.stat-mini-v{font-family:'Bebas Neue',cursive;font-size:22px}
+.stat-mini-l{font-size:9px;color:var(--txt3);font-weight:700;letter-spacing:1px;margin-top:2px}
+.model-row{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;background:rgba(255,255,255,0.03);border-radius:10px;margin-bottom:6px;border:1px solid var(--bdr)}
 .model-name{font-size:11px;font-weight:700}
 .model-status{font-size:10px}
-.ai-result{background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:16px;padding:16px;margin-top:10px}
+.ai-result{background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:18px;padding:16px;margin-top:10px}
 
 /* CALCULATEUR RAPIDE */
-.calc-btn{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--gold);background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);border-radius:6px;padding:3px 7px;cursor:pointer;margin-top:4px;transition:all .2s}
+.calc-btn{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--gold);background:rgba(245,200,66,0.08);border:1px solid rgba(245,200,66,0.2);border-radius:8px;padding:4px 8px;cursor:pointer;margin-top:4px;transition:all .2s}
 .calc-btn:hover{background:rgba(245,200,66,0.15)}
-.calc-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9000;align-items:flex-end;justify-content:center}
+.calc-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9000;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
 .calc-modal.open{display:flex}
-.calc-panel{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px;border-top:1px solid var(--bdr)}
+.calc-panel{background:var(--bg2);border-radius:24px 24px 0 0;padding:22px;width:100%;max-width:430px;border-top:1px solid var(--bdr2);box-shadow:0 -8px 32px rgba(0,0,0,0.5)}
 
 /* MULTI-MATCH */
-.multi-match-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:10px}
-.value-bet-card{border-radius:14px;padding:14px;margin-bottom:8px;position:relative;overflow:hidden}
-.value-rank{position:absolute;top:10px;right:10px;font-family:Bebas Neue,cursive;font-size:28px;opacity:0.15}
+.multi-match-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow-card)}
+.value-bet-card{border-radius:16px;padding:14px;margin-bottom:8px;position:relative;overflow:hidden}
+.value-rank{position:absolute;top:10px;right:10px;font-family:'Bebas Neue',cursive;font-size:28px;opacity:0.15}
 
 /* HISTORIQUE */
-.hist-filter{padding:6px 12px;border-radius:20px;border:1px solid var(--bdr);background:rgba(255,255,255,0.04);font-size:11px;font-weight:700;color:var(--txt2);cursor:pointer;letter-spacing:1px}
-.hist-filter.active{background:rgba(245,200,66,0.1);border-color:rgba(245,200,66,0.3);color:var(--gold)}
-.hist-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:16px;padding:14px;margin-bottom:10px}
+.hist-filter{padding:6px 13px;border-radius:20px;border:1px solid var(--bdr);background:rgba(255,255,255,0.04);font-size:11px;font-weight:700;color:var(--txt2);cursor:pointer;letter-spacing:1px;transition:all .15s}
+.hist-filter.active{background:rgba(245,200,66,0.1);border-color:rgba(245,200,66,0.35);color:var(--gold)}
+.hist-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow-card)}
 .hist-card.win{border-left:3px solid var(--green)}
 .hist-card.loss{border-left:3px solid var(--red)}
 .hist-card.pending{border-left:3px solid var(--gold)}
 .hist-card.void{border-left:3px solid var(--txt2)}
 
 /* TOAST */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(20,20,40,0.95);border:1px solid rgba(124,58,237,0.3);border-radius:14px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--txt);z-index:999;transition:transform .25s;white-space:nowrap;pointer-events:none}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(17,17,32,0.96);border:1px solid rgba(124,58,237,0.3);border-radius:20px;padding:11px 20px;font-size:13px;font-weight:700;color:var(--txt);z-index:999;transition:transform .25s;white-space:nowrap;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
 #toast.show{transform:translateX(-50%) translateY(0)}
+
+::-webkit-scrollbar{width:0}
 </style>
 </head>
 <body>
@@ -151,10 +169,11 @@ input::placeholder{color:var(--txt2)}
 
   <!-- RANGÉE 2 : OUTILS -->
   <div style="font-size:8px;font-weight:700;letter-spacing:2px;color:var(--txt2);margin-bottom:6px">🛠️ OUTILS</div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:10px">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px">
     <div class="sport-tab" id="tab-tendances" onclick="setSport('tendances')" style="padding:8px 4px;font-size:11px;color:#ff6b35;border-color:rgba(255,107,53,0.2)">🔥<br><span style="font-size:9px">TENDANCES</span></div>
     <div class="sport-tab" id="tab-live" onclick="setSport('live')" style="padding:8px 4px;font-size:11px;color:#ff4444;border-color:rgba(255,68,68,0.2)">🔴<br><span style="font-size:9px">LIVE</span></div>
     <div class="sport-tab" id="tab-precision" onclick="setSport('precision')" style="padding:8px 4px;font-size:11px;color:var(--purple);border-color:rgba(124,58,237,0.2)">🎯<br><span style="font-size:9px">PRÉCISION</span></div>
+    <div class="sport-tab" id="tab-historique" onclick="setSport('historique')" style="padding:8px 4px;font-size:11px;color:var(--blue);border-color:rgba(91,155,255,0.2)">📋<br><span style="font-size:9px">HISTORIQUE</span></div>
   </div>
 
 </div>
@@ -627,13 +646,25 @@ input::placeholder{color:var(--txt2)}
     <div class="vs-row" style="margin-bottom:14px">
       <div>
         <div class="lbl">JOUEUR A</div>
-        <input type="text" id="t-p1" placeholder="Ex: Djokovic" style="text-align:center;font-weight:700">
+        <input type="text" id="t-p1" placeholder="Ex: Djokovic" style="text-align:center;font-weight:700" oninput="onTennisPlayerInput()">
       </div>
       <div class="vs-mid">VS</div>
       <div>
         <div class="lbl">JOUEUR B</div>
-        <input type="text" id="t-p2" placeholder="Ex: Alcaraz" style="text-align:center;font-weight:700">
+        <input type="text" id="t-p2" placeholder="Ex: Alcaraz" style="text-align:center;font-weight:700" oninput="onTennisPlayerInput()">
       </div>
+    </div>
+
+    <!-- BOUTON AUTO-FILL TENNIS -->
+    <div id="tennis-autofill-banner" style="display:none;background:linear-gradient(135deg,rgba(0,229,184,0.08),rgba(91,155,255,0.08));border:1px solid rgba(0,229,184,0.25);border-radius:12px;padding:10px 12px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div>
+          <div style="font-size:11px;letter-spacing:2px;color:var(--green);font-weight:700;margin-bottom:2px">⚡ AUTO-REMPLISSAGE TENNIS</div>
+          <div style="font-size:10px;color:var(--txt2)">Stats ATP/WTA en temps réel</div>
+        </div>
+        <button id="btn-tennis-autofill" type="button" onclick="runTennisAutoFill()" style="background:linear-gradient(135deg,var(--green),var(--blue));color:#000;border:none;padding:9px 14px;border-radius:10px;font-weight:800;font-size:11px;cursor:pointer;letter-spacing:1px;white-space:nowrap">🎾 AUTO-REMPLIR</button>
+      </div>
+      <div id="tennis-autofill-status" style="display:none;font-size:11px;color:var(--txt2);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)"></div>
     </div>
     <div class="grid2" style="margin-bottom:12px">
       <div>
@@ -2708,10 +2739,58 @@ input::placeholder{color:var(--txt2)}
   <div id="precision-container"></div>
 </div>
 
+<!-- ══════════════════════════════════════ -->
+<!-- HISTORIQUE DES ANALYSES               -->
+<!-- ══════════════════════════════════════ -->
+<div class="content" id="historique-screen" style="display:none;padding:16px 20px 80px;background:var(--bg);color:var(--txt);min-height:100vh">
 
-<!-- ══════════════════════════════════════ -->
-<!-- CALCULATEUR RAPIDE                     -->
-<!-- ══════════════════════════════════════ -->
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:3px;color:var(--blue)">📋 HISTORIQUE</div>
+      <div style="font-size:10px;color:var(--txt2);letter-spacing:1px">Toutes vos analyses Predict</div>
+    </div>
+    <button onclick="clearHistorique()" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--red);cursor:pointer">🗑️ Vider</button>
+  </div>
+
+  <!-- Filtres sport -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="hist-sport-filters">
+    <button class="hist-filter active" data-sport="all" onclick="filterHistorique('sport','all',this)">Tous</button>
+    <button class="hist-filter" data-sport="football" onclick="filterHistorique('sport','football',this)">⚽</button>
+    <button class="hist-filter" data-sport="tennis" onclick="filterHistorique('sport','tennis',this)">🎾</button>
+    <button class="hist-filter" data-sport="basket" onclick="filterHistorique('sport','basket',this)">🏀</button>
+    <button class="hist-filter" data-sport="hockey" onclick="filterHistorique('sport','hockey',this)">🏒</button>
+    <button class="hist-filter" data-sport="mma" onclick="filterHistorique('sport','mma',this)">🥊</button>
+    <button class="hist-filter" data-sport="rugby" onclick="filterHistorique('sport','rugby',this)">🏉</button>
+  </div>
+
+  <!-- Filtres verdict -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px" id="hist-verdict-filters">
+    <button class="hist-filter active" data-verdict="all" onclick="filterHistorique('verdict','all',this)">Tous verdicts</button>
+    <button class="hist-filter" data-verdict="value" onclick="filterHistorique('verdict','value',this)" style="color:var(--green);border-color:rgba(0,229,184,0.3)">✅ Value</button>
+    <button class="hist-filter" data-verdict="edge" onclick="filterHistorique('verdict','edge',this)" style="color:var(--gold);border-color:rgba(245,200,66,0.3)">⚡ Edge</button>
+    <button class="hist-filter" data-verdict="eviter" onclick="filterHistorique('verdict','eviter',this)" style="color:var(--red);border-color:rgba(255,71,87,0.3)">❌ Éviter</button>
+  </div>
+
+  <!-- Stats rapides -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px" id="hist-quick-stats">
+    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:10px;text-align:center">
+      <div style="font-size:9px;letter-spacing:2px;color:var(--txt2);font-weight:700;margin-bottom:4px">ANALYSES</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--blue)" id="hist-stat-total">0</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:10px;text-align:center">
+      <div style="font-size:9px;letter-spacing:2px;color:var(--txt2);font-weight:700;margin-bottom:4px">VALUE BETS</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--green)" id="hist-stat-value">0</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:10px;text-align:center">
+      <div style="font-size:9px;letter-spacing:2px;color:var(--txt2);font-weight:700;margin-bottom:4px">AUJOURD'HUI</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:22px;color:var(--gold)" id="hist-stat-today">0</div>
+    </div>
+  </div>
+
+  <!-- Liste -->
+  <div id="hist-list-predict"></div>
+</div>
 <div class="calc-modal" id="calc-modal" onclick="closeCalcModal(event)">
   <div class="calc-panel">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -3229,6 +3308,30 @@ function applyAutoFillData(data, homeId, awayId) {
     setVal('h2h-d', h2h.draws);
     setVal('h2h-a', h2h.awayWins);
   }
+
+  // ── 6. Possession estimée ──
+  // Basée sur le ratio d'attaque : l'équipe qui crée plus tend à posséder plus
+  var hGF = hAll.played > 0 ? hAll.gf : (hHome.played > 0 ? hHome.gf : 1.5);
+  var aGF = aAll.played > 0 ? aAll.gf : (aAway.played > 0 ? aAway.gf : 1.5);
+  var hGA = hAll.played > 0 ? hAll.ga : (hHome.played > 0 ? hHome.ga : 1.5);
+  var aGA = aAll.played > 0 ? aAll.ga : (aAway.played > 0 ? aAway.ga : 1.5);
+  // Indice de domination = buts marqués + (buts encaissés adversaire)
+  var hDom = hGF + aGA;
+  var aDom = aGF + hGA;
+  var totalDom = hDom + aDom;
+  if (totalDom > 0) {
+    var hPoss = Math.round((hDom / totalDom) * 100);
+    // Ajustement avantage domicile (+3%)
+    hPoss = Math.min(75, Math.max(35, hPoss + 3));
+    var aPoss = 100 - hPoss;
+    setVal('h-poss', hPoss);
+    setVal('a-poss', aPoss);
+  }
+
+  // ── 7. ELO via ClubElo.com ──
+  var homeName = afSelected.home ? afSelected.home.name : '';
+  var awayName = afSelected.away ? afSelected.away.name : '';
+  fetchClubElo(homeName, awayName);
 }
 
 function setVal(id, val) {
@@ -3341,6 +3444,162 @@ function computeH2H(matches, homeId) {
   };
 }
 
+// ── ELO via ClubElo.com (API publique gratuite) ──────────────────────────
+// Normalise le nom d'équipe pour ClubElo (ex: "Manchester City" → "ManCity")
+function normalizeClubEloName(name) {
+  var map = {
+    'manchester city': 'ManCity',
+    'manchester united': 'ManUtd',
+    'tottenham hotspur': 'Tottenham',
+    'tottenham': 'Tottenham',
+    'newcastle united': 'Newcastle',
+    'west ham united': 'WestHam',
+    'wolverhampton wanderers': 'Wolves',
+    'wolverhampton': 'Wolves',
+    'nottingham forest': 'NottsForest',
+    'sheffield united': 'SheffieldUtd',
+    'brighton & hove albion': 'Brighton',
+    'brighton': 'Brighton',
+    'aston villa': 'AstonVilla',
+    'brentford': 'Brentford',
+    'crystal palace': 'CrystalPalace',
+    'fulham': 'Fulham',
+    'luton town': 'Luton',
+    'burnley': 'Burnley',
+    'everton': 'Everton',
+    'chelsea': 'Chelsea',
+    'arsenal': 'Arsenal',
+    'liverpool': 'Liverpool',
+    'bournemouth': 'Bournemouth',
+    'real madrid': 'RealMadrid',
+    'barcelona': 'Barcelona',
+    'atletico madrid': 'AtleticoMadrid',
+    'atletico de madrid': 'AtleticoMadrid',
+    'sevilla': 'Sevilla',
+    'real sociedad': 'RealSociedad',
+    'villarreal': 'Villarreal',
+    'athletic club': 'AthleticBilbao',
+    'real betis': 'Betis',
+    'osasuna': 'Osasuna',
+    'valencia': 'Valencia',
+    'bayern munich': 'Bayern',
+    'fc bayern münchen': 'Bayern',
+    'borussia dortmund': 'Dortmund',
+    'bayer leverkusen': 'Leverkusen',
+    'rb leipzig': 'RBLeipzig',
+    'eintracht frankfurt': 'Frankfurt',
+    'union berlin': 'UnionBerlin',
+    'vfb stuttgart': 'Stuttgart',
+    'borussia mönchengladbach': 'MGladbach',
+    'juventus': 'Juventus',
+    'inter milan': 'Inter',
+    'internazionale': 'Inter',
+    'ac milan': 'Milan',
+    'napoli': 'Napoli',
+    'roma': 'Roma',
+    'as roma': 'Roma',
+    'lazio': 'Lazio',
+    'ss lazio': 'Lazio',
+    'fiorentina': 'Fiorentina',
+    'atalanta': 'Atalanta',
+    'paris saint-germain': 'PSG',
+    'psg': 'PSG',
+    'olympique de marseille': 'Marseille',
+    'marseille': 'Marseille',
+    'olympique lyonnais': 'Lyon',
+    'lyon': 'Lyon',
+    'monaco': 'Monaco',
+    'as monaco': 'Monaco',
+    'lille': 'Lille',
+    'losc lille': 'Lille',
+    'rennes': 'Rennes',
+    'stade rennais': 'Rennes',
+    'nice': 'Nice',
+    'ogc nice': 'Nice',
+    'lens': 'Lens',
+    'rc lens': 'Lens',
+    'porto': 'Porto',
+    'fc porto': 'Porto',
+    'benfica': 'Benfica',
+    'sl benfica': 'Benfica',
+    'sporting cp': 'Sporting',
+    'ajax': 'Ajax',
+    'psv eindhoven': 'PSV',
+    'psv': 'PSV',
+    'celtic': 'Celtic',
+    'rangers': 'Rangers',
+    'porto': 'Porto',
+    'benfica': 'Benfica'
+  };
+  var lower = (name || '').toLowerCase().trim();
+  return map[lower] || name.replace(/\s+/g, '');
+}
+
+function fetchClubElo(homeName, awayName) {
+  if (!homeName || !awayName) return;
+
+  var homeEloName = normalizeClubEloName(homeName);
+  var awayEloName = normalizeClubEloName(awayName);
+
+  var today = new Date().toISOString().slice(0, 10);
+
+  // Appel via notre proxy /api/clubelo (évite le CORS)
+  fetch('/api/clubelo?club=' + encodeURIComponent(homeEloName))
+    .then(function(r) { return r.text(); })
+    .then(function(csv) {
+      var elo = parseClubEloCsv(csv, today);
+      if (elo) {
+        setVal('h-elo', Math.round(elo));
+        setAutofillStatus('⚡ ELO chargé — ' + homeName + ' : ' + Math.round(elo), 'ok');
+        setTimeout(function() { hideAutofillStatus(); }, 2000);
+      }
+    })
+    .catch(function() {
+      console.log('[ELO] ' + homeName + ' non trouvé sur ClubElo');
+    });
+
+  fetch('/api/clubelo?club=' + encodeURIComponent(awayEloName))
+    .then(function(r) { return r.text(); })
+    .then(function(csv) {
+      var elo = parseClubEloCsv(csv, today);
+      if (elo) {
+        setVal('a-elo', Math.round(elo));
+      }
+    })
+    .catch(function() {
+      console.log('[ELO] ' + awayName + ' non trouvé sur ClubElo');
+    });
+}
+
+function parseClubEloCsv(csv, targetDate) {
+  // Format CSV ClubElo : Rank,Club,Country,Level,Elo,From,To
+  var lines = csv.trim().split('\n');
+  if (lines.length < 2) return null;
+
+  var latest = null;
+  var latestDate = null;
+
+  for (var i = 1; i < lines.length; i++) {
+    var parts = lines[i].split(',');
+    if (parts.length < 7) continue;
+    var elo = parseFloat(parts[4]);
+    var from = parts[5] && parts[5].trim();
+    var to = parts[6] && parts[6].trim();
+    if (!elo || isNaN(elo)) continue;
+
+    // Prendre la ligne la plus récente dont la période inclut aujourd'hui
+    if (from && to && from <= targetDate && to >= targetDate) {
+      return elo;
+    }
+    // Fallback : garder la dernière ligne
+    if (!latestDate || from > latestDate) {
+      latestDate = from;
+      latest = elo;
+    }
+  }
+  return latest;
+}
+
 // Initialisation au chargement
 window.addEventListener('DOMContentLoaded', function () {
   // Charger silencieusement les équipes pour la compétition par défaut
@@ -3366,6 +3625,237 @@ window.addEventListener('DOMContentLoaded', function () {
 
 // ═══════════════════════════════════════════════════════
 // FIN AUTO-FILL MODULE
+
+// ═══════════════════════════════════════════════════════
+// AUTO-FILL TENNIS — RapidAPI ATP WTA ITF
+// ═══════════════════════════════════════════════════════
+
+function onTennisPlayerInput() {
+  var p1 = (document.getElementById('t-p1').value || '').trim();
+  var p2 = (document.getElementById('t-p2').value || '').trim();
+  var banner = document.getElementById('tennis-autofill-banner');
+  if (banner) banner.style.display = (p1.length >= 2 && p2.length >= 2) ? 'block' : 'none';
+}
+
+function setTennisStatus(msg, type) {
+  var el = document.getElementById('tennis-autofill-status');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.color = type === 'ok' ? 'var(--green)' : type === 'error' ? 'var(--red)' : 'var(--txt2)';
+  el.textContent = msg;
+}
+
+function setTVal(id, val) {
+  var el = document.getElementById(id);
+  if (el && val !== null && val !== undefined && val !== '') el.value = val;
+}
+
+async function runTennisAutoFill() {
+  var p1Name = (document.getElementById('t-p1').value || '').trim();
+  var p2Name = (document.getElementById('t-p2').value || '').trim();
+  var surface = document.getElementById('t-surface').value || 'hard';
+
+  if (!p1Name || !p2Name) { setTennisStatus('Entrez les deux noms de joueurs', 'error'); return; }
+
+  var btn = document.getElementById('btn-tennis-autofill');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Chargement...'; }
+  setTennisStatus('Recherche des joueurs dans le classement ATP/WTA...', 'loading');
+
+  try {
+    // 1. Charger classements ATP + WTA pour trouver les IDs des joueurs
+    var [atpRank, wtaRank] = await Promise.all([
+      fetch('/api/tennis-data?endpoint=ranking/live&tour=ATP').then(function(r){return r.json();}),
+      fetch('/api/tennis-data?endpoint=ranking/live&tour=WTA').then(function(r){return r.json();})
+    ]);
+
+    var allPlayers = [];
+    if (atpRank && atpRank.rankings) allPlayers = allPlayers.concat(atpRank.rankings.map(function(p){return Object.assign({tour:'ATP',player_key:p.player_key||p.id},p);}));
+    if (wtaRank && wtaRank.rankings) allPlayers = allPlayers.concat(wtaRank.rankings.map(function(p){return Object.assign({tour:'WTA',player_key:p.player_key||p.id},p);}));
+
+    // Trouver les joueurs par nom (fuzzy match sur nom de famille)
+    function findPlayer(name) {
+      var nameLow = name.toLowerCase();
+      var nameParts = nameLow.split(' ');
+      var lastName = nameParts[nameParts.length - 1];
+      // Cherche d'abord correspondance exacte
+      var found = allPlayers.find(function(p) {
+        return (p.player || '').toLowerCase() === nameLow;
+      });
+      if (!found) {
+        // Puis correspondance sur le nom de famille
+        found = allPlayers.find(function(p) {
+          var pLow = (p.player || '').toLowerCase();
+          return pLow.indexOf(lastName) !== -1 || pLow.indexOf(nameLow) !== -1;
+        });
+      }
+      if (!found) {
+        // Puis correspondance partielle
+        found = allPlayers.find(function(p) {
+          var pLow = (p.player || '').toLowerCase();
+          return nameParts.some(function(part) { return part.length > 3 && pLow.indexOf(part) !== -1; });
+        });
+      }
+      return found;
+    }
+
+    var p1Player = findPlayer(p1Name);
+    var p2Player = findPlayer(p2Name);
+
+    if (!p1Player && !p2Player) {
+      setTennisStatus('Joueurs non trouvés dans le classement ATP/WTA. Vérifie l\'orthographe.', 'error');
+      if (btn) { btn.disabled = false; btn.textContent = '🎾 AUTO-REMPLIR'; }
+      return;
+    }
+
+    setTennisStatus('Joueurs trouvés — chargement des stats...', 'loading');
+
+    // 2. Remplir les classements immédiatement
+    if (p1Player) {
+      setTVal('t-p1-rank', p1Player.place || p1Player.ranking);
+      document.getElementById('t-lbl-p1').textContent = p1Player.player || p1Name;
+    }
+    if (p2Player) {
+      setTVal('t-p2-rank', p2Player.place || p2Player.ranking);
+      document.getElementById('t-lbl-p2').textContent = p2Player.player || p2Name;
+    }
+
+    // 3. Charger les matchs récents pour les stats
+    var promises = [];
+    if (p1Player && p1Player.player_key) {
+      promises.push(fetch('/api/tennis-data?endpoint=getPlayerFixtures&player_key=' + p1Player.player_key).then(function(r){return r.json();}));
+    } else promises.push(Promise.resolve(null));
+
+    if (p2Player && p2Player.player_key) {
+      promises.push(fetch('/api/tennis-data?endpoint=getPlayerFixtures&player_key=' + p2Player.player_key).then(function(r){return r.json();}));
+    } else promises.push(Promise.resolve(null));
+
+    if (p1Player && p1Player.player_key && p2Player && p2Player.player_key) {
+      promises.push(fetch('/api/tennis-data?endpoint=getH2HFixtures&first_player_key=' + p1Player.player_key + '&second_player_key=' + p2Player.player_key).then(function(r){return r.json();}));
+    } else promises.push(Promise.resolve(null));
+
+    var results = await Promise.all(promises);
+    var p1Data = results[0], p2Data = results[1], h2hData = results[2];
+
+    // 4. Calculer et remplir les stats
+    var p1Stats = computeTennisStats(p1Data, p1Player ? p1Player.player_key : null, surface);
+    var p2Stats = computeTennisStats(p2Data, p2Player ? p2Player.player_key : null, surface);
+
+    if (p1Stats) {
+      if (p1Stats.s1in) setTVal('t-p1-s1in', p1Stats.s1in);
+      if (p1Stats.s1w) setTVal('t-p1-s1w', p1Stats.s1w);
+      if (p1Stats.s2w) setTVal('t-p1-s2w', p1Stats.s2w);
+      if (p1Stats.bp) setTVal('t-p1-bp', p1Stats.bp);
+      if (p1Stats.sg) setTVal('t-p1-sg', p1Stats.sg);
+      if (p1Stats.aces) setTVal('t-p1-aces', p1Stats.aces);
+      if (p1Stats.df) setTVal('t-p1-df', p1Stats.df);
+    }
+    if (p2Stats) {
+      if (p2Stats.s1in) setTVal('t-p2-s1in', p2Stats.s1in);
+      if (p2Stats.s1w) setTVal('t-p2-s1w', p2Stats.s1w);
+      if (p2Stats.s2w) setTVal('t-p2-s2w', p2Stats.s2w);
+      if (p2Stats.bp) setTVal('t-p2-bp', p2Stats.bp);
+      if (p2Stats.sg) setTVal('t-p2-sg', p2Stats.sg);
+      if (p2Stats.aces) setTVal('t-p2-aces', p2Stats.aces);
+      if (p2Stats.df) setTVal('t-p2-df', p2Stats.df);
+    }
+
+    // 5. H2H
+    if (h2hData && h2hData.result && h2hData.result.H2H) {
+      var h2h = h2hData.result.H2H;
+      var p1wins = 0, p2wins = 0;
+      h2h.forEach(function(m) {
+        if (!m.event_winner) return;
+        if (m.event_winner === 'First Player') p1wins++;
+        else if (m.event_winner === 'Second Player') p2wins++;
+      });
+      setTVal('t-h2h-1', p1wins);
+      setTVal('t-h2h-2', p2wins);
+    }
+
+    var p1label = p1Player ? p1Player.player : p1Name;
+    var p2label = p2Player ? p2Player.player : p2Name;
+    setTennisStatus('✅ ' + p1label + ' vs ' + p2label + ' — stats chargées sur ' + surface, 'ok');
+
+  } catch(err) {
+    console.error('[tennis autofill]', err);
+    setTennisStatus('Erreur: ' + err.message, 'error');
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = '🎾 AUTO-REMPLIR'; }
+}
+
+function computeTennisStats(data, playerId, surface) {
+  if (!data || !data.result) return null;
+  var matches = data.result;
+  if (!Array.isArray(matches) || matches.length === 0) return null;
+
+  // Filtrer les matchs terminés sur la surface demandée (si dispo) - 12 derniers mois
+  var oneYearAgo = new Date(Date.now() - 365 * 86400000).toISOString().slice(0, 10);
+  var recent = matches.filter(function(m) {
+    return m.event_status === 'Finished' && m.event_date >= oneYearAgo;
+  });
+
+  // Surface mapping
+  var surfaceMap = { hard: 'hard', clay: 'clay', grass: 'grass', indoor: 'hard' };
+  var surfNorm = surfaceMap[surface] || 'hard';
+
+  // Filtrer par surface si possible
+  var surfMatches = recent.filter(function(m) {
+    var s = (m.event_surface || '').toLowerCase();
+    return s.indexOf(surfNorm) !== -1;
+  });
+  var useMatches = surfMatches.length >= 5 ? surfMatches : recent;
+  if (useMatches.length === 0) return null;
+
+  // Calculer les stats moyennes depuis les données disponibles
+  var wins = 0, total = 0;
+  var aces = [], df = [], s1in = [], s1w = [], s2w = [], bp = [], sg = [];
+
+  useMatches.slice(0, 20).forEach(function(m) {
+    total++;
+    // Déterminer si le joueur est J1 ou J2 dans ce match
+    var isFirst = String(m.first_player_key) === String(playerId);
+    var won = (isFirst && m.event_winner === 'First Player') || (!isFirst && m.event_winner === 'Second Player');
+    if (won) wins++;
+
+    // Stats de service si disponibles
+    var stats = isFirst ? m.first_player_stats : m.second_player_stats;
+    if (stats) {
+      if (stats.aces != null) aces.push(parseFloat(stats.aces));
+      if (stats.double_faults != null) df.push(parseFloat(stats.double_faults));
+      if (stats.first_serve_in != null) s1in.push(parseFloat(stats.first_serve_in));
+      if (stats.first_serve_won != null) s1w.push(parseFloat(stats.first_serve_won));
+      if (stats.second_serve_won != null) s2w.push(parseFloat(stats.second_serve_won));
+      if (stats.break_points_saved != null) bp.push(parseFloat(stats.break_points_saved));
+      if (stats.service_games_won != null) sg.push(parseFloat(stats.service_games_won));
+    }
+  });
+
+  var avg = function(arr) { return arr.length > 0 ? Math.round(arr.reduce(function(a,b){return a+b;},0)/arr.length*10)/10 : null; };
+
+  // Estimer le classement depuis le rang dans les tournois
+  var rank = null;
+  var rankMatch = useMatches.find(function(m) { return m.first_player_rank || m.second_player_rank; });
+  if (rankMatch) {
+    var isFirst = String(rankMatch.first_player_key) === String(playerId);
+    rank = isFirst ? rankMatch.first_player_rank : rankMatch.second_player_rank;
+  }
+
+  // Valeurs par défaut basées sur win rate si stats manquantes
+  var winRate = total > 0 ? wins / total : 0.5;
+
+  return {
+    rank: rank,
+    winRate: winRate,
+    s1in: avg(s1in) || Math.round(58 + winRate * 10),
+    s1w: avg(s1w) || Math.round(68 + winRate * 10),
+    s2w: avg(s2w) || Math.round(48 + winRate * 8),
+    bp: avg(bp) || Math.round(55 + winRate * 15),
+    sg: avg(sg) || Math.round(75 + winRate * 12),
+    aces: avg(aces) || Math.round(5 + winRate * 6),
+    df: avg(df) || Math.round(3 + (1-winRate) * 3)
+  };
+}
 // ═══════════════════════════════════════════════════════
 
 
@@ -3437,6 +3927,23 @@ function poissonP(lambda, k) {
   return r;
 }
 
+// ─── Correction Dixon-Coles ───────────────────────────────────────────────
+// Publiée par Dixon & Coles (1997) — Applied Statistics, vol. 46
+// Corrige la sous-estimation des scores faibles (0-0, 1-0, 0-1, 1-1)
+// par le modèle de Poisson indépendant standard.
+// rho = -0.13 : valeur validée empiriquement sur la Premier League anglaise.
+var DC_RHO = -0.13;
+
+function dixonColesCorrection(i, j, lH, lA) {
+  // Facteur tau appliqué uniquement aux scores faibles (i+j <= 1)
+  if (i === 0 && j === 0) return 1 - lH * lA * DC_RHO;
+  if (i === 1 && j === 0) return 1 + lA * DC_RHO;
+  if (i === 0 && j === 1) return 1 + lH * DC_RHO;
+  if (i === 1 && j === 1) return 1 - DC_RHO;
+  return 1; // pas de correction pour les scores plus élevés
+}
+// ─────────────────────────────────────────────────────────────────────────
+
 function runPoisson(hAtt, hDef, aAtt, aDef) {
   var avg = 1.35, homeAdv = 1.15;
   var lH = Math.max(0.3, Math.min(5, hAtt * aDef / avg * homeAdv));
@@ -3446,7 +3953,8 @@ function runPoisson(hAtt, hDef, aAtt, aDef) {
   var max = 8;
   for (var i = 0; i <= max; i++) {
     for (var j = 0; j <= max; j++) {
-      var p = poissonP(lH,i) * poissonP(lA,j);
+      // Correction Dixon-Coles appliquée sur les scores faibles
+      var p = poissonP(lH,i) * poissonP(lA,j) * dixonColesCorrection(i, j, lH, lA);
       if (i > j) win += p;
       else if (i === j) draw += p;
       else lose += p;
@@ -3454,6 +3962,13 @@ function runPoisson(hAtt, hDef, aAtt, aDef) {
       if (i+j > 2) over += p;
       if (p > 0.01) scores.push({h:i,a:j,p:p});
     }
+  }
+  // Normalisation : Dixon-Coles modifie légèrement la somme des probabilités
+  // On ramène win+draw+lose à 1.0 pour garder la cohérence mathématique
+  var total = win + draw + lose;
+  if (total > 0 && Math.abs(total - 1.0) > 0.001) {
+    win /= total; draw /= total; lose /= total;
+    btts /= total; over /= total;
   }
   scores.sort(function(a,b){return b.p-a.p;});
   // New markets
@@ -3464,7 +3979,7 @@ function runPoisson(hAtt, hDef, aAtt, aDef) {
   var ht_1=0, ht_x=0, ht_2=0;
   for (var i = 0; i <= max; i++) {
     for (var j = 0; j <= max; j++) {
-      var p = poissonP(lH,i) * poissonP(lA,j);
+      var p = poissonP(lH,i) * poissonP(lA,j) * dixonColesCorrection(i, j, lH, lA);
       if (i+j > 1) over15 += p;
       if (i+j < 2) under15 += p;
       if (i+j > 3) over35 += p;
@@ -3498,7 +4013,7 @@ function runPoisson(hAtt, hDef, aAtt, aDef) {
   };
   for (var i = 0; i <= max; i++) {
     for (var j = 0; j <= max; j++) {
-      var p = poissonP(lH,i) * poissonP(lA,j);
+      var p = poissonP(lH,i) * poissonP(lA,j) * dixonColesCorrection(i, j, lH, lA);
       if (i-j > 1) ah.h1 += p; // home wins by 2+ (covers -1)
       if (i-j > 2) ah.h2 += p; // home wins by 3+ (covers -2)
       if (j-i > -1) ah.a1 += p; // away +1: wins or draws (home wins by max 1)
@@ -3521,7 +4036,7 @@ function runPoisson(hAtt, hDef, aAtt, aDef) {
 
   for (var i = 0; i <= max; i++) {
     for (var j = 0; j <= max; j++) {
-      var p = poissonP(lH,i) * poissonP(lA,j);
+      var p = poissonP(lH,i) * poissonP(lA,j) * dixonColesCorrection(i, j, lH, lA);
       if(i+j>0) over05 += p;
       if(i+j>4) over45 += p;
       // Buts par équipe
@@ -3784,12 +4299,9 @@ function compute() {
     else if(betProb>=0.55){verdict='COTE BASSE';vc='var(--gold)';}
     else{verdict='ÉVITER';vc='var(--red)';}
   }
-  vbg = vc==='var(--green)'?'rgba(0,229,184,0.07)':vc==='var(--gold)'?'rgba(245,200,66,0.07)':'rgba(255,71,87,0.07)';
+  vbg = vc==='var(--green)'?'#081a12':vc==='var(--gold)'?'#1a1508':'#1a0808';
 
   var pct = function(v){return (v*100).toFixed(1)+'%';};
-  var bar = function(v,col){
-    return '<div class="prob-bar"><div class="prob-fill" style="width:'+pct(v)+';background:'+col+'"></div></div>';
-  };
 
   var betLabels = {
     '1':'Victoire '+home,'X':'Match Nul','2':'Victoire '+away,
@@ -3809,106 +4321,231 @@ function compute() {
     'ah_a1':'Handicap +1 '+away,'ah_a2':'Handicap +2 '+away
   };
   var betLabel = betLabels[betType] || betType;
+  var gc = function(v){ return v>=0.6?'var(--green)':v>=0.4?'var(--gold)':'var(--red)'; };
 
   var html = '';
 
-  // VERDICT
-  html += '<div class="verdict-card" style="background:'+vbg+';border:2px solid '+vc+'">';
-  html += '<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT PREDICT</div>';
-  html += '<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
-  html += '<div style="font-size:13px;color:var(--txt2)">'+betLabel+'</div>';
-  html += '<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">CONFIANCE '+conf+'</div>';
-  html += '<div style="font-size:10px;color:var(--txt2)">'+mods+' modèle'+(mods>1?'s':'')+' utilisé'+(mods>1?'s':'')+'</div></div></div>';
+  // ═══ BLOC 1 — HEADER MATCH + JAUGE ═══
+  var confVal = conf==='ÉLEVÉE'?85:conf==='BONNE'?65:conf==='MOYENNE'?45:30;
+  var confG1 = confVal>=70?'#10b981':confVal>=50?'#f5c842':'#ef4444';
+  var confG2 = confVal>=70?'#34d399':confVal>=50?'#fbbf24':'#f87171';
+  var circ = 2*Math.PI*28;
+  var dashOff = circ*(1-confVal/100);
 
-  // Bet proba
-  html += '<div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;margin-bottom:10px">';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  html += '<span style="font-size:12px;font-weight:700">'+betLabel+'</span>';
-  html += '<span style="font-family:Bebas Neue,cursive;font-size:26px;color:'+vc+'">'+pct(betProb)+'</span></div>';
-  if (odds) {
-    html += '<div style="display:flex;justify-content:space-between">';
-    html += '<span style="font-size:11px;color:var(--txt2)">Cote proposée : <strong style="color:var(--txt)">@'+odds+'</strong></span>';
-    html += '<span style="font-size:11px;color:var(--txt2)">Cote juste : <strong style="color:'+(isValue?'var(--green)':'var(--txt)')+'">@'+fairOdd+'</strong></span></div>';
-  }
+  html += '<div class="card" style="background:linear-gradient(135deg,#0d1f1a,#130d24);border-color:rgba(255,255,255,0.08);margin-bottom:12px">';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
+  html += '<div style="flex:1;min-width:0"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">DOMICILE</div>';
+  html += '<div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+home+'</div></div>';
+  html += '<div style="padding:5px 10px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:11px;color:var(--txt2);margin:0 8px;flex-shrink:0">VS</div>';
+  html += '<div style="flex:1;min-width:0;text-align:right"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">EXTÉRIEUR</div>';
+  html += '<div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+away+'</div></div>';
   html += '</div>';
+  html += '<div style="display:flex;align-items:center;gap:12px">';
+  html += '<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">PARI ANALYSÉ</div>';
+  html += '<div style="font-size:13px;font-weight:700">'+betLabel+'</div>';
+  if(odds){ html += '<div style="font-size:12px;color:var(--txt2);margin-top:2px">Cote <strong style="color:var(--gold)">@'+odds+'</strong></div>'; }
+  html += '</div>';
+  html += '<div style="flex-shrink:0">';
+  html += '<svg width="68" height="68" viewBox="0 0 68 68">';
+  html += '<circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"/>';
+  html += '<circle cx="34" cy="34" r="28" fill="none" stroke="url(#cg1)" stroke-width="6"';
+  html += ' stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+dashOff.toFixed(1)+'"';
+  html += ' stroke-linecap="round" transform="rotate(-90 34 34)"/>';
+  html += '<defs><linearGradient id="cg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="'+confG1+'"/><stop offset="100%" stop-color="'+confG2+'"/></linearGradient></defs>';
+  html += '<text x="34" y="30" text-anchor="middle" fill="white" font-size="14" font-weight="800" font-family="Bebas Neue,cursive">'+confVal+'%</text>';
+  html += '<text x="34" y="43" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="7" letter-spacing="1">CONF.</text>';
+  html += '</svg></div>';
+  html += '</div></div>';
 
-  // Edge
-  if (edge !== null) {
-    var ec = edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';
-    var ev = betProb*odds-1;
-    html += '<div class="grid2" style="margin-bottom:0">';
-    html += '<div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div><div class="stat-mini-l">EDGE</div></div>';
-    html += '<div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(ev>0?'+':'')+ev.toFixed(2)+'</div><div class="stat-mini-l">ESPÉRANCE</div></div>';
+  // ═══ BLOC 2 — HEATMAP + BARRES (2 colonnes) ═══
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+
+  // Heatmap
+  html += '<div class="card" style="padding:12px">';
+  html += '<div class="card-title" style="font-size:10px;margin-bottom:8px">⚽ HEATMAP SCORES</div>';
+  if(poi && poi.scores) {
+    var scoreMap = {};
+    var maxP = 0;
+    poi.scores.forEach(function(s){ scoreMap[s.h+'_'+s.a]=s.p; if(s.p>maxP) maxP=s.p; });
+    html += '<div style="display:grid;grid-template-columns:20px repeat(5,1fr);gap:2px;margin-bottom:2px">';
+    html += '<div style="font-size:8px;color:transparent">.</div>';
+    for(var ac=0;ac<5;ac++){ html += '<div style="text-align:center;font-size:8px;color:var(--txt2)">'+ac+'</div>'; }
+    html += '</div>';
+    for(var hi=0;hi<5;hi++){
+      html += '<div style="display:grid;grid-template-columns:20px repeat(5,1fr);gap:2px;margin-bottom:2px">';
+      html += '<div style="font-size:8px;color:var(--txt2);display:flex;align-items:center;justify-content:center">'+hi+'</div>';
+      for(var aj=0;aj<5;aj++){
+        var sp = scoreMap[hi+'_'+aj]||0;
+        var inten = maxP>0?sp/maxP:0;
+        var bgCol, txCol;
+        if(hi>aj){ bgCol='rgba(16,185,129,'+(0.07+inten*0.55).toFixed(2)+')'; txCol=inten>0.35?'#10b981':'rgba(255,255,255,0.4)'; }
+        else if(hi===aj){ bgCol='rgba(245,200,66,'+(0.07+inten*0.55).toFixed(2)+')'; txCol=inten>0.35?'#f5c842':'rgba(255,255,255,0.4)'; }
+        else { bgCol='rgba(239,68,68,'+(0.07+inten*0.55).toFixed(2)+')'; txCol=inten>0.35?'#ef4444':'rgba(255,255,255,0.4)'; }
+        var isBest = sp===maxP&&maxP>0;
+        html += '<div style="background:'+bgCol+';border-radius:4px;padding:3px 1px;text-align:center;border:1px solid '+(isBest?'rgba(255,255,255,0.25)':'transparent')+'">';
+        html += '<div style="font-size:8px;font-weight:'+(isBest?800:600)+';color:'+txCol+'">'+hi+'-'+aj+'</div>';
+        html += '<div style="font-size:6px;color:rgba(255,255,255,0.3)">'+(sp*100).toFixed(0)+'%</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    html += '<div style="display:flex;gap:8px;margin-top:6px;justify-content:center">';
+    html += '<div style="font-size:7px;color:rgba(16,185,129,0.8)">■ Dom</div>';
+    html += '<div style="font-size:7px;color:rgba(245,200,66,0.8)">■ Nul</div>';
+    html += '<div style="font-size:7px;color:rgba(239,68,68,0.8)">■ Ext</div>';
     html += '</div>';
   }
   html += '</div>';
 
-  // PROBAS 1X2
-  html += '<div class="card">';
-  html += '<div class="card-title">📊 PROBABILITÉS 1X2</div>';
-  html += '<div class="prob-row"><div class="prob-team">🏠 '+home+'</div>'+bar(cmb.win,'var(--green)')+'<div class="prob-lbl" style="color:var(--green)">'+pct(cmb.win)+'</div></div>';
-  html += '<div class="prob-row"><div class="prob-team">🤝 Nul</div>'+bar(cmb.draw,'var(--gold)')+'<div class="prob-lbl" style="color:var(--gold)">'+pct(cmb.draw)+'</div></div>';
-  html += '<div class="prob-row"><div class="prob-team">✈️ '+away+'</div>'+bar(cmb.lose,'var(--red)')+'<div class="prob-lbl" style="color:var(--red)">'+pct(cmb.lose)+'</div></div>';
-  html += '</div>';
-
-  // SCORES (Poisson)
-  if (poi && poi.scores.length) {
-    html += '<div class="card"><div class="card-title">⚽ SCORES LES PLUS PROBABLES</div>';
-    html += '<div class="score-grid">';
-    poi.scores.forEach(function(s){
-      var col = s.h>s.a?'var(--green)':s.h===s.a?'var(--gold)':'var(--red)';
-      html += '<div class="score-item"><div class="score-val" style="color:'+col+'">'+s.h+'-'+s.a+'</div><div class="score-pct">'+pct(s.p)+'</div></div>';
-    });
+  // Barres probabilités
+  html += '<div class="card" style="padding:12px">';
+  html += '<div class="card-title" style="font-size:10px;margin-bottom:8px">📊 PROBABILITÉS</div>';
+  var bars1x2 = [
+    {l:'🏠 '+home, v:cmb.win, c:'var(--green)', g:'#10b981,#34d399'},
+    {l:'🤝 Nul', v:cmb.draw, c:'var(--gold)', g:'#f5c842,#fbbf24'},
+    {l:'✈️ '+away, v:cmb.lose, c:'var(--red)', g:'#ef4444,#f87171'}
+  ];
+  bars1x2.forEach(function(b){
+    html += '<div style="margin-bottom:9px">';
+    html += '<div style="display:flex;justify-content:space-between;margin-bottom:3px">';
+    html += '<span style="font-size:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62%">'+b.l+'</span>';
+    html += '<span style="font-family:Bebas Neue,cursive;font-size:14px;color:'+b.c+'">'+pct(b.v)+'</span></div>';
+    html += '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">';
+    html += '<div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:3px"></div>';
     html += '</div></div>';
+  });
+  if(poi){
+    html += '<div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 0"></div>';
+    [{l:'Over 2.5',v:poi.over,g:'#3b82f6,#60a5fa'},{l:'Under 2.5',v:1-poi.over,g:'#8b5cf6,#a78bfa'},
+     {l:'BTTS Oui',v:poi.btts,g:'#f59e0b,#fbbf24'},{l:'BTTS Non',v:1-poi.btts,g:'#6b7280,#9ca3af'}
+    ].forEach(function(b){
+      html += '<div style="margin-bottom:7px">';
+      html += '<div style="display:flex;justify-content:space-between;margin-bottom:2px">';
+      html += '<span style="font-size:9px;color:var(--txt2)">'+b.l+'</span>';
+      html += '<span style="font-size:11px;font-weight:700;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div>';
+      html += '<div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">';
+      html += '<div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:2px"></div>';
+      html += '</div></div>';
+    });
+  }
+  html += '</div>';
+  html += '</div>'; // fin 2-col
+
+  // ═══ BLOC 3 — PODIUM TOP 3 SCORES ═══
+  if(poi && poi.scores && poi.scores.length >= 3){
+    html += '<div class="card" style="margin-bottom:12px">';
+    html += '<div class="card-title">🏆 TOP SCORES PROBABLES</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:8px;align-items:end;margin-bottom:10px">';
+    var podOrder = [1,0,2];
+    var podH = ['52px','68px','40px'];
+    var podBadge = ['🥈','🥇','🥉'];
+    podOrder.forEach(function(ri, idx){
+      var s = poi.scores[ri];
+      var sc = s.h>s.a?'var(--green)':s.h===s.a?'var(--gold)':'var(--red)';
+      var sg = s.h>s.a?'#10b981,#34d399':s.h===s.a?'#f5c842,#fbbf24':'#ef4444,#f87171';
+      html += '<div style="display:flex;flex-direction:column;align-items:center">';
+      html += '<div style="font-size:14px;margin-bottom:3px">'+podBadge[idx]+'</div>';
+      html += '<div style="font-family:Bebas Neue,cursive;font-size:20px;color:'+sc+'">'+s.h+' - '+s.a+'</div>';
+      html += '<div style="font-size:11px;font-weight:700;color:'+sc+'">'+pct(s.p)+'</div>';
+      html += '<div style="width:100%;height:'+podH[idx]+';background:linear-gradient(180deg,'+sg+');border-radius:6px 6px 0 0;opacity:0.65;margin-top:5px"></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    if(poi.scores.length > 3){
+      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)">';
+      poi.scores.slice(3,8).forEach(function(s){
+        var sc = s.h>s.a?'var(--green)':s.h===s.a?'var(--gold)':'var(--red)';
+        html += '<div style="flex:1;min-width:46px;background:rgba(255,255,255,0.04);border-radius:8px;padding:5px;text-align:center">';
+        html += '<div style="font-family:Bebas Neue,cursive;font-size:14px;color:'+sc+'">'+s.h+'-'+s.a+'</div>';
+        html += '<div style="font-size:10px;color:var(--txt2)">'+pct(s.p)+'</div></div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
   }
 
-  // BTTS / Over-Under
-  if (poi) {
-    var gc = function(v){ return v>0.6?'var(--green)':v>0.4?'var(--gold)':'var(--txt)'; };
-    html += '<div class="card"><div class="card-title">🎯 MARCHÉS BUTS</div>';
-    html += '<div class="grid2" style="margin-bottom:10px">';
-    html += '<div class="stat-mini"><div class="stat-mini-v" style="color:var(--gold)">'+poi.lH.toFixed(2)+'</div><div class="stat-mini-l">BUTS DOM. MOY.</div></div>';
-    html += '<div class="stat-mini"><div class="stat-mini-v" style="color:var(--gold)">'+poi.lA.toFixed(2)+'</div><div class="stat-mini-l">BUTS EXT. MOY.</div></div>';
+  // ═══ BLOC 4 — VALUE BET / COTE ═══
+  if(odds && edge !== null){
+    var ec = edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';
+    var ev = betProb*parseFloat(odds)-1;
+    var isPos = edge>0;
+    var rCol = isPos?'16,185,129':'239,68,68';
+    html += '<div class="card" style="background:linear-gradient(135deg,'+(isPos?'#0d1f17':'#1f0d0d')+',#0a0a0f);border-color:rgba('+rCol+',0.2);margin-bottom:12px">';
+    html += '<div class="card-title" style="color:'+(isPos?'var(--green)':'var(--red)')+'">💰 '+(isPos?'VALUE BET DÉTECTÉ ✅':'PAS DE VALUE ❌')+'</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">';
+    html += '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px">';
+    html += '<div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE LIVRE</div>';
+    html += '<div style="font-family:Bebas Neue,cursive;font-size:22px;color:var(--gold)">@'+odds+'</div></div>';
+    html += '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px">';
+    html += '<div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE JUSTE</div>';
+    html += '<div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+(isPos?'var(--green)':'var(--red)')+'">@'+fairOdd+'</div></div>';
+    html += '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px">';
+    html += '<div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">EDGE</div>';
+    html += '<div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div></div>';
     html += '</div>';
-    html += '<div style="display:flex;flex-direction:column;gap:6px">';
-    var mkts = [
-      {l:'+1.5 buts',v:poi.over15},{l:'-1.5 buts',v:1-poi.over15},
-      {l:'+2.5 buts',v:poi.over},{l:'-2.5 buts',v:1-poi.over},
-      {l:'+3.5 buts',v:poi.over35},{l:'-3.5 buts',v:1-poi.over35},
-      {l:'BTTS Oui',v:poi.btts},{l:'BTTS Non',v:1-poi.btts}
-    ];
-    mkts.forEach(function(m){
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px">';
+    var edgePct = Math.min(100, Math.abs(edge)*5);
+    html += '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt2);margin-bottom:3px">';
+    html += '<span>Espérance de valeur</span><span style="color:'+ec+'">'+(ev>0?'+':'')+ev.toFixed(3)+'</span></div>';
+    html += '<div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">';
+    html += '<div style="height:100%;width:'+edgePct+'%;background:linear-gradient(90deg,'+(isPos?'#10b981,#34d399':'#ef4444,#f87171')+');border-radius:3px"></div></div></div>';
+    html += '<div style="font-size:10px;color:var(--txt2)">Proba estimée : <strong style="color:var(--txt)">'+pct(betProb)+'</strong> vs bookmaker : <strong style="color:var(--txt)">'+pct(1/parseFloat(odds))+'</strong></div>';
+    html += '</div>';
+  } else if(!odds){
+    html += '<div class="card" style="margin-bottom:12px"><div class="card-title">📊 PROBABILITÉ DU PARI</div>';
+    html += '<div style="text-align:center;padding:6px 0">';
+    html += '<div style="font-family:Bebas Neue,cursive;font-size:48px;color:'+vc+'">'+pct(betProb)+'</div>';
+    html += '<div style="font-size:11px;color:var(--txt2)">'+betLabel+'</div></div></div>';
+  }
+
+  // ═══ BLOC 5 — VERDICT FINAL ═══
+  html += '<div class="verdict-card" style="background:'+vbg+';border:2px solid '+vc+';margin-bottom:12px">';
+  html += '<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between">';
+  html += '<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
+  html += '<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div>';
+  html += '<div style="font-size:10px;color:var(--txt2)">'+mods+' modèle'+(mods>1?'s':'')+'</div></div></div></div>';
+
+  // ═══ BLOC 6 — MARCHÉS DÉTAILLÉS ═══
+  if(poi){
+    html += '<div class="card" style="margin-bottom:10px"><div class="card-title">🎯 MARCHÉS BUTS</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">';
+    html += '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px;text-align:center">';
+    html += '<div style="font-size:9px;color:var(--txt2);margin-bottom:2px">BUTS DOM. MOY.</div>';
+    html += '<div style="font-family:Bebas Neue,cursive;font-size:20px;color:var(--gold)">'+poi.lH.toFixed(2)+'</div></div>';
+    html += '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px;text-align:center">';
+    html += '<div style="font-size:9px;color:var(--txt2);margin-bottom:2px">BUTS EXT. MOY.</div>';
+    html += '<div style="font-family:Bebas Neue,cursive;font-size:20px;color:var(--gold)">'+poi.lA.toFixed(2)+'</div></div>';
+    html += '</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:5px">';
+    [{l:'+1.5 buts',v:poi.over15},{l:'-1.5 buts',v:1-poi.over15},
+     {l:'+2.5 buts',v:poi.over},{l:'-2.5 buts',v:1-poi.over},
+     {l:'+3.5 buts',v:poi.over35},{l:'-3.5 buts',v:1-poi.over35},
+     {l:'BTTS Oui',v:poi.btts},{l:'BTTS Non',v:1-poi.btts}
+    ].forEach(function(m){
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:8px">';
       html += '<span style="font-size:12px;font-weight:600">'+m.l+'</span>';
       html += '<span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(m.v)+'">'+pct(m.v)+'</span></div>';
     });
     html += '</div></div>';
 
-    // CLEAN SHEET
-    html += '<div class="card"><div class="card-title">🧤 CLEAN SHEET</div>';
+    html += '<div class="card" style="margin-bottom:10px"><div class="card-title">🧤 CLEAN SHEET</div>';
     html += '<div class="grid2">';
     html += '<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(poi.cs_h)+'">'+pct(poi.cs_h)+'</div><div class="stat-mini-l">'+home.toUpperCase()+'</div></div>';
     html += '<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(poi.cs_a)+'">'+pct(poi.cs_a)+'</div><div class="stat-mini-l">'+away.toUpperCase()+'</div></div>';
     html += '</div></div>';
 
-    // HANDICAP
-    html += '<div class="card"><div class="card-title">⚖️ HANDICAP ASIATIQUE</div>';
-    html += '<div style="display:flex;flex-direction:column;gap:6px">';
-    [
-      {l:'Handicap -1 '+home, v:poi.ah.h1},
-      {l:'Handicap -2 '+home, v:poi.ah.h2},
-      {l:'Handicap +1 '+away, v:poi.ah.a1},
-      {l:'Handicap +2 '+away, v:poi.ah.a2}
+    html += '<div class="card" style="margin-bottom:10px"><div class="card-title">⚖️ HANDICAP ASIATIQUE</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:5px">';
+    [{l:'Handicap -1 '+home,v:poi.ah.h1},{l:'Handicap -2 '+home,v:poi.ah.h2},
+     {l:'Handicap +1 '+away,v:poi.ah.a1},{l:'Handicap +2 '+away,v:poi.ah.a2}
     ].forEach(function(m){
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:8px">';
       html += '<span style="font-size:12px;font-weight:600">'+m.l+'</span>';
       html += '<span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(m.v)+'">'+pct(m.v)+'</span></div>';
     });
     html += '</div></div>';
 
-    // MI-TEMPS
-    html += '<div class="card"><div class="card-title">⏱️ MI-TEMPS</div>';
+    html += '<div class="card" style="margin-bottom:10px"><div class="card-title">⏱️ MI-TEMPS</div>';
     html += '<div class="grid3" style="margin-bottom:10px">';
     html += '<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(poi.ht_1)+'">'+pct(poi.ht_1)+'</div><div class="stat-mini-l">DOM. GAGNE</div></div>';
     html += '<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(poi.ht_x)+'">'+pct(poi.ht_x)+'</div><div class="stat-mini-l">NUL</div></div>';
@@ -3916,63 +4553,57 @@ function compute() {
     html += '</div>';
     html += '<div style="font-size:9px;letter-spacing:2px;color:var(--txt2);font-weight:700;margin-bottom:8px">MI-TEMPS / FINAL</div>';
     html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">';
-    var htftCombos = [
-      {l:'Dom/Dom',k:'11'},{l:'Dom/Nul',k:'1x'},{l:'Dom/Ext',k:'12'},
-      {l:'Nul/Dom',k:'x1'},{l:'Nul/Nul',k:'xx'},{l:'Nul/Ext',k:'x2'},
-      {l:'Ext/Dom',k:'21'},{l:'Ext/Nul',k:'2x'},{l:'Ext/Ext',k:'22'}
-    ];
-    htftCombos.forEach(function(m){
-      var v = poi.ht_ft[m.k]||0;
+    [{l:'Dom/Dom',k:'11'},{l:'Dom/Nul',k:'1x'},{l:'Dom/Ext',k:'12'},
+     {l:'Nul/Dom',k:'x1'},{l:'Nul/Nul',k:'xx'},{l:'Nul/Ext',k:'x2'},
+     {l:'Ext/Dom',k:'21'},{l:'Ext/Nul',k:'2x'},{l:'Ext/Ext',k:'22'}
+    ].forEach(function(m){
+      var v=poi.ht_ft[m.k]||0;
       html += '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:7px;text-align:center">';
       html += '<div style="font-size:9px;color:var(--txt2);margin-bottom:2px">'+m.l+'</div>';
       html += '<div style="font-family:Bebas Neue,cursive;font-size:14px;color:'+gc(v)+'">'+pct(v)+'</div></div>';
     });
     html += '</div></div>';
 
-    // BTTS COMBINÉS
-    html += '<div class="card"><div class="card-title">🔗 BTTS COMBINÉS</div>';
-    html += '<div style="display:flex;flex-direction:column;gap:6px">';
-    [
-      {l:'BTTS + Victoire '+home, v:poi.btts*cmb.win},
-      {l:'BTTS + Match Nul', v:poi.btts*cmb.draw},
-      {l:'BTTS + Victoire '+away, v:poi.btts*cmb.lose},
-      {l:'BTTS Non + Victoire '+home, v:(1-poi.btts)*cmb.win}
+    html += '<div class="card" style="margin-bottom:10px"><div class="card-title">🔗 BTTS COMBINÉS</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:5px">';
+    [{l:'BTTS + Victoire '+home,v:poi.btts*cmb.win},
+     {l:'BTTS + Match Nul',v:poi.btts*cmb.draw},
+     {l:'BTTS + Victoire '+away,v:poi.btts*cmb.lose},
+     {l:'BTTS Non + Victoire '+home,v:(1-poi.btts)*cmb.win}
     ].forEach(function(m){
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:8px">';
       html += '<span style="font-size:11px;font-weight:600">'+m.l+'</span>';
       html += '<span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(m.v)+'">'+pct(m.v)+'</span></div>';
     });
     html += '</div></div>';
   }
 
-  // ELO
-  if (elo) {
-    html += '<div class="card"><div class="card-title" style="color:var(--gold)">⚡ ANALYSE ELO</div>';
+  // ═══ BLOC 7 — ELO + KELLY + MODÈLES ═══
+  if(elo){
+    html += '<div class="card" style="margin-bottom:10px"><div class="card-title" style="color:var(--gold)">⚡ ANALYSE ELO</div>';
     html += '<div style="display:flex;justify-content:space-between;margin-bottom:8px">';
     html += '<span style="font-size:12px;font-weight:700">'+home+'</span>';
     html += '<span style="font-family:Bebas Neue,cursive;font-size:18px;color:var(--gold)">'+hElo+' vs '+aElo+'</span>';
     html += '<span style="font-size:12px;font-weight:700">'+away+'</span></div>';
-    html += '<div style="font-size:11px;color:var(--txt2)">Écart : <strong style="color:'+(elo.diff>0?'var(--green)':'var(--red)')+'">'+( elo.diff>0?'+':'')+Math.round(elo.diff)+' pts</strong> → favorise '+(elo.diff>0?home:away)+'</div></div>';
+    html += '<div style="font-size:11px;color:var(--txt2)">Écart : <strong style="color:'+(elo.diff>0?'var(--green)':'var(--red)')+'">'+(elo.diff>0?'+':'')+Math.round(elo.diff)+' pts</strong> → favorise '+(elo.diff>0?home:away)+'</div></div>';
   }
 
-  // Kelly
-  if (kellyPct > 0) {
-    html += '<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2)">';
+  if(kellyPct>0){
+    html += '<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2);margin-bottom:10px">';
     html += '<div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div>';
     html += '<div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div>';
     html += '<div style="font-size:11px;color:var(--txt2);margin-top:4px">Basé sur la demi-Kelly pour limiter le risque</div></div>';
   }
 
-  // Models status
-  html += '<div class="card"><div class="card-title">🔬 MODÈLES UTILISÉS</div>';
-  html += '<div class="model-row"><span class="model-name">🎲 Poisson</span><span class="model-status" style="color:'+(hasP?'var(--green)':'var(--txt2)')+'">'+(hasP?'✅ Actif':'⚠️ Ajoute les moyennes de buts')+'</span></div>';
-  html += '<div class="model-row"><span class="model-name">⚡ Elo</span><span class="model-status" style="color:'+(hasE?'var(--green)':'var(--txt2)')+'">'+(hasE?'✅ Actif':'⚠️ Ajoute les scores Elo')+'</span></div>';
+  html += '<div class="card" style="margin-bottom:10px"><div class="card-title">🔬 MODÈLES UTILISÉS</div>';
+  html += '<div class="model-row"><span class="model-name">🎲 Poisson + Dixon-Coles</span><span class="model-status" style="color:'+(hasP?'var(--green)':'var(--txt2)')+'\">'+(hasP?'✅ Actif':'⚠️ Ajoute les moyennes de buts')+'</span></div>';
+  html += '<div class="model-row"><span class="model-name">⚡ Elo</span><span class="model-status" style="color:'+(hasE?'var(--green)':'var(--txt2)')+'\">'+(hasE?'✅ Actif':'⚠️ Ajoute les scores Elo')+'</span></div>';
   html += '<div class="model-row"><span class="model-name">📊 Régression logistique</span><span class="model-status" style="color:var(--green)">✅ Toujours actif</span></div>';
   html += '</div>';
 
-  // AI button
+  // ═══ BLOC 8 — BOUTON IA ═══
   html += '<button class="btn-ai" onclick="launchAI(\''+home.replace(/'/g,"\\'")+'\',' +
-    '\''+away.replace(/'/g,"\\'")+'\',\''+betType+'\','+odds+','+betProb.toFixed(4)+',\''+conf+'\','+
+    '\''+away.replace(/'/g,"\\'")+'\',\''+betType+'\','+odds+','+betProb.toFixed(4)+',\''+conf+'\',' +
     (edge!==null?edge.toFixed(2):'null')+',' +
     cmb.win.toFixed(4)+','+cmb.draw.toFixed(4)+','+cmb.lose.toFixed(4)+')">🤖 ANALYSE IA APPROFONDIE</button>';
   html += '<div id="ai-box"></div>';
@@ -3989,6 +4620,8 @@ function compute() {
     prob:betProb, edge:edge,
     kelly: kellyPct ? kellyPct.toFixed(1) : ''
   });
+  addShareButton('results-container', {sport:'football',home:home,away:away,betLabel:betLabel,odds:odds,verdict:verdict,prob:betProb,edge:edge});
+  addOddsComparator('results-container', home, away);
   goStep(4);
   window.scrollTo(0, 0);
 
@@ -4365,44 +4998,154 @@ function computeTennis() {
   var bar=function(v,col){return '<div class="prob-bar"><div class="prob-fill" style="width:'+pct(v)+';background:'+col+'"></div></div>';};
   var mktRow=function(l,v){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px"><span style="font-size:12px;font-weight:600">'+l+'</span><span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(v)+'">'+pct(v)+'</span></div>';};
 
+  var pct=function(v){return (v*100).toFixed(1)+'%';};
+  var gc=function(v){return v>=0.6?'var(--green)':v>=0.4?'var(--gold)':'var(--red)';};
+  var mktRow=function(l,v){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:4px">'
+      +'<span style="font-size:12px;font-weight:600">'+l+'</span>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<div style="width:60px;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct(v)+';background:'+gc(v)+';border-radius:2px"></div></div>'
+      +'<span style="font-family:Bebas Neue,cursive;font-size:15px;color:'+gc(v)+';min-width:40px;text-align:right">'+pct(v)+'</span>'
+      +'</div></div>';
+  };
+
   var html='';
-  html+='<div class="verdict-card" style="background:'+vbg+';border:2px solid '+vc+'">';
-  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT PREDICT TENNIS</div>';
+
+  // ═══ BLOC 1 — HEADER MATCH + JAUGE ═══
+  var confVal=conf==='ÉLEVÉE'?85:conf==='BONNE'?65:conf==='MOYENNE'?45:30;
+  var cg1=confVal>=70?'#10b981':confVal>=50?'#f5c842':'#ef4444';
+  var cg2=confVal>=70?'#34d399':confVal>=50?'#fbbf24':'#f87171';
+  var circ=2*Math.PI*28;
+  var dashOff=circ*(1-confVal/100);
+  var surfaceEmoji={'hard':'🔵','clay':'🟠','grass':'🟢','carpet':'🟣'}[surface]||'🎾';
+
+  html+='<div class="card" style="background:linear-gradient(135deg,#0d1520,#0a0d1a);border-color:rgba(255,255,255,0.08);margin-bottom:12px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
+  html+='<div style="flex:1;min-width:0">';
+  html+='<div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">JOUEUR 1</div>';
+  html+='<div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+p1+'</div>';
+  html+='</div>';
+  html+='<div style="text-align:center;padding:0 10px;flex-shrink:0">';
+  html+='<div style="font-size:9px;color:var(--txt3)">'+surfaceEmoji+' '+surface.toUpperCase()+'</div>';
+  html+='<div style="font-size:10px;color:var(--txt2);margin-top:2px">'+(format==='bo5'?'Best of 5':'Best of 3')+'</div>';
+  html+='</div>';
+  html+='<div style="flex:1;min-width:0;text-align:right">';
+  html+='<div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">JOUEUR 2</div>';
+  html+='<div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+p2+'</div>';
+  html+='</div>';
+  html+='</div>';
+  html+='<div style="display:flex;align-items:center;gap:12px">';
+  html+='<div style="flex:1">';
+  html+='<div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">PARI ANALYSÉ</div>';
+  html+='<div style="font-size:13px;font-weight:700">'+betLabel+'</div>';
+  if(odds){html+='<div style="font-size:12px;color:var(--txt2);margin-top:2px">Cote <strong style="color:var(--gold)">@'+odds+'</strong></div>';}
+  html+='</div>';
+  html+='<div style="flex-shrink:0">';
+  html+='<svg width="68" height="68" viewBox="0 0 68 68">';
+  html+='<circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"/>';
+  html+='<circle cx="34" cy="34" r="28" fill="none" stroke="url(#tcg)" stroke-width="6" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+dashOff.toFixed(1)+'" stroke-linecap="round" transform="rotate(-90 34 34)"/>';
+  html+='<defs><linearGradient id="tcg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="'+cg1+'"/><stop offset="100%" stop-color="'+cg2+'"/></linearGradient></defs>';
+  html+='<text x="34" y="30" text-anchor="middle" fill="white" font-size="14" font-weight="800" font-family="Bebas Neue,cursive">'+confVal+'%</text>';
+  html+='<text x="34" y="43" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="7" letter-spacing="1">CONF.</text>';
+  html+='</svg></div>';
+  html+='</div></div>';
+
+  // ═══ BLOC 2 — BARRES VICTOIRE + PROBABILITÉS SETS ═══
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+
+  // Victoire + 1er set
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:10px">🎾 VICTOIRE</div>';
+  [{l:p1,v:pWinP1,g:'#10b981,#34d399'},{l:p2,v:pWinP2,g:'#ef4444,#f87171'}].forEach(function(b){
+    html+='<div style="margin-bottom:10px">';
+    html+='<div style="display:flex;justify-content:space-between;margin-bottom:3px">';
+    html+='<span style="font-size:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">'+b.l+'</span>';
+    html+='<span style="font-family:Bebas Neue,cursive;font-size:14px;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div>';
+    html+='<div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">';
+    html+='<div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:3px"></div>';
+    html+='</div></div>';
+  });
+  html+='<div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 0"></div>';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:8px">⚡ 1ER SET</div>';
+  [{l:p1,v:pSetP1,g:'#10b981,#34d399'},{l:p2,v:1-pSetP1,g:'#ef4444,#f87171'}].forEach(function(b){
+    html+='<div style="margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;margin-bottom:2px">';
+    html+='<span style="font-size:9px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">'+b.l+'</span>';
+    html+='<span style="font-size:12px;font-weight:700;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div>';
+    html+='<div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">';
+    html+='<div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:2px"></div>';
+    html+='</div></div>';
+  });
+  html+='</div>';
+
+  // Scores de sets (podium)
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:8px">📊 SCORES SETS PROBABLES</div>';
+  var ssArr=Object.keys(setScores).map(function(k){return{k:k,v:setScores[k]};}).sort(function(a,b){return b.v-a.v;}).slice(0,5);
+  var maxSS=ssArr.length>0?ssArr[0].v:1;
+  ssArr.forEach(function(s,i){
+    var parts=s.k.split('-');
+    var p1Wins=parseInt(parts[0])>parseInt(parts[1]);
+    var col=p1Wins?'var(--green)':'var(--red)';
+    var barW=(s.v/maxSS*100).toFixed(0)+'%';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+    html+=(i===0?'<span style="font-size:12px">🥇</span>':i===1?'<span style="font-size:12px">🥈</span>':i===2?'<span style="font-size:12px">🥉</span>':'<span style="font-size:12px;opacity:0">  </span>');
+    html+='<span style="font-family:Bebas Neue,cursive;font-size:14px;color:'+col+';min-width:36px">'+s.k+'</span>';
+    html+='<div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">';
+    html+='<div style="height:100%;width:'+barW+';background:'+col+';border-radius:2px;opacity:0.7"></div></div>';
+    html+='<span style="font-size:11px;font-weight:700;color:'+col+';min-width:34px;text-align:right">'+pct(s.v)+'</span>';
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='</div>'; // fin 2-col
+
+  // ═══ BLOC 3 — VALUE BET ═══
+  if(odds&&edge!==null){
+    var ec=edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';
+    var ev=betProb*parseFloat(odds)-1;
+    var isPos=edge>0;
+    var rCol=isPos?'16,185,129':'239,68,68';
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba('+rCol+',0.06),rgba('+rCol+',0.02));border-color:rgba('+rCol+',0.2);margin-bottom:12px">';
+    html+='<div class="card-title" style="color:'+(isPos?'var(--green)':'var(--red)')+'">💰 '+(isPos?'VALUE BET DÉTECTÉ ✅':'PAS DE VALUE ❌')+'</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE LIVRE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:var(--gold)">@'+odds+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE JUSTE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+(isPos?'var(--green)':'var(--red)')+'">@'+fairOdd+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">EDGE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div></div>';
+    html+='</div>';
+    var edgePct=Math.min(100,Math.abs(edge)*5);
+    html+='<div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-bottom:6px">';
+    html+='<div style="height:100%;width:'+edgePct+'%;background:linear-gradient(90deg,'+(isPos?'#10b981,#34d399':'#ef4444,#f87171')+');border-radius:2px"></div></div>';
+    html+='<div style="font-size:10px;color:var(--txt2)">Proba estimée : <strong style="color:var(--txt)">'+pct(betProb)+'</strong> · Espérance : <strong style="color:'+ec+'">'+(ev>0?'+':'')+ev.toFixed(3)+'</strong></div>';
+    html+='</div>';
+  }
+
+  // ═══ BLOC 4 — VERDICT FINAL ═══
+  var vbgT=vc==='var(--green)'?'#081a12':vc==='var(--gold)'?'#1a1508':'#1a0808';
+  html+='<div class="verdict-card" style="background:'+vbgT+';border:2px solid '+vc+';margin-bottom:12px">';
+  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between">';
   html+='<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
-  html+='<div style="font-size:13px;color:var(--txt2)">'+betLabel+'</div>';
-  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">CONFIANCE '+conf+'</div>';
-  html+='<div style="font-size:10px;color:var(--txt2)">Barnett & Clarke</div></div></div>';
-  html+='<div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;margin-bottom:10px">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  html+='<span style="font-size:12px;font-weight:700">'+betLabel+'</span>';
-  html+='<span style="font-family:Bebas Neue,cursive;font-size:26px;color:'+vc+'">'+pct(betProb)+'</span></div>';
-  if(odds){html+='<div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--txt2)">Cote proposée : <strong>@'+odds+'</strong></span><span style="font-size:11px;color:var(--txt2)">Cote juste : <strong style="color:'+(isValue?'var(--green)':'var(--txt)')+'">@'+fairOdd+'</strong></span></div>';}
-  html+='</div>';
-  if(edge!==null){var ec=edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';var ev=betProb*odds-1;html+='<div class="grid2"><div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div><div class="stat-mini-l">EDGE</div></div><div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(ev>0?'+':'')+ev.toFixed(2)+'</div><div class="stat-mini-l">ESPÉRANCE</div></div></div>';}
-  html+='</div>';
-  html+='<div class="card"><div class="card-title">🎾 PROBABILITÉS DE VICTOIRE</div>';
-  html+='<div class="prob-row"><div class="prob-team">'+p1+'</div>'+bar(pWinP1,'var(--green)')+'<div class="prob-lbl" style="color:var(--green)">'+pct(pWinP1)+'</div></div>';
-  html+='<div class="prob-row"><div class="prob-team">'+p2+'</div>'+bar(pWinP2,'var(--red)')+'<div class="prob-lbl" style="color:var(--red)">'+pct(pWinP2)+'</div></div>';
-  if(odds){html+='<div style="font-size:11px;color:var(--txt2);margin-top:6px">Cote juste : '+p1+' @'+(1/pWinP1).toFixed(2)+' · '+p2+' @'+(1/pWinP2).toFixed(2)+'</div>';}
-  html+='</div>';
-  html+='<div class="card"><div class="card-title">📊 SCORES DE SETS</div><div style="display:flex;flex-direction:column;gap:6px">';
-  var ssArr=Object.keys(setScores).map(function(k){return{k:k,v:setScores[k]};}).sort(function(a,b){return b.v-a.v;});
-  ssArr.forEach(function(s){var parts=s.k.split('-');var col=parseInt(parts[0])>parseInt(parts[1])?'var(--green)':'var(--red)';html+=mktRow(p1+' '+s.k,s.v);});
+  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div>';
+  html+='<div style="font-size:10px;color:var(--txt2)">Barnett &amp; Clarke</div></div></div></div>';
+
+  // ═══ BLOC 5 — MARCHÉS DÉTAILLÉS ═══
+  html+='<div class="card" style="margin-bottom:10px"><div class="card-title">⚡ HANDICAP SETS</div><div style="display:flex;flex-direction:column;gap:4px">';
+  [{l:'Handicap -1.5 sets '+p1,v:pHdcp1},{l:'Handicap -1.5 sets '+p2,v:pHdcp2}].forEach(function(m){html+=mktRow(m.l,m.v);});
   html+='</div></div>';
-  html+='<div class="card"><div class="card-title">⚡ 1ER SET & HANDICAP</div><div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:'1er set '+p1,v:pSetP1},{l:'1er set '+p2,v:1-pSetP1},
-    {l:'Handicap -1.5 sets '+p1,v:pHdcp1},{l:'Handicap -1.5 sets '+p2,v:pHdcp2}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
-  html+='</div></div>';
-  html+='<div class="card"><div class="card-title">🎯 JEUX TOTAUX (~'+expTotalGames.toFixed(0)+')</div><div style="display:flex;flex-direction:column;gap:6px">';
+
+  html+='<div class="card" style="margin-bottom:10px"><div class="card-title">🎯 JEUX TOTAUX (~'+expTotalGames.toFixed(0)+')</div><div style="display:flex;flex-direction:column;gap:4px">';
   [{l:'+21.5 jeux',v:pO215},{l:'-21.5 jeux',v:1-pO215},{l:'+22.5 jeux',v:pO225},{l:'-22.5 jeux',v:1-pO225},{l:'+23.5 jeux',v:pO235},{l:'-23.5 jeux',v:1-pO235}].forEach(function(m){html+=mktRow(m.l,m.v);});
   html+='</div></div>';
-  html+='<div class="card"><div class="card-title">🔬 MARCHÉS AVANCÉS</div><div style="display:flex;flex-direction:column;gap:6px">';
+
+  html+='<div class="card" style="margin-bottom:10px"><div class="card-title">🔬 MARCHÉS AVANCÉS</div><div style="display:flex;flex-direction:column;gap:4px">';
   [{l:'Tiebreak dans le match',v:pTiebreak},{l:'Pas de tiebreak',v:1-pTiebreak},{l:'Victoire sans perdre un set',v:pStraight},{l:'Remontada',v:pComeback}].forEach(function(m){html+=mktRow(m.l,m.v);});
   html+='</div></div>';
-  if(kellyPct>0){html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2)"><div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div><div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div></div>';}
+
+  if(kellyPct>0){
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2);margin-bottom:10px">';
+    html+='<div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div>';
+    html+='<div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div></div>';
+  }
 
   window._tpd={p1:p1,p2:p2,surface:surface,format:format,betType:betType,odds:odds,betProb:betProb,pWinP1:pWinP1,conf:conf,edge:edge};
   html+='<button class="btn-ai" onclick="launchTennisAIFromState()">🤖 ANALYSE IA APPROFONDIE</button>';
@@ -4420,6 +5163,7 @@ function computeTennis() {
     prob:betProb,edge:edge,
     kelly: kellyPct ? kellyPct.toFixed(1) : ''
   });
+  addShareButton('tennis-results',{sport:'tennis',home:p1,away:p2,betLabel:betLabel,odds:odds,verdict:verdict,prob:betProb,edge:edge});
   tGoStep(4);
   window.scrollTo(0,0);
 }
@@ -4894,130 +5638,130 @@ function computeBasket() {
   var gc=function(v){return v>0.6?'var(--green)':v>0.4?'var(--gold)':'var(--txt)';};
   var bar=function(v,col){return '<div class="prob-bar"><div class="prob-fill" style="width:'+pct(v)+';background:'+col+'"></div></div>';};
 
+  var pct=function(v){return (v*100).toFixed(1)+'%';};
+  var gc=function(v){return v>=0.6?'var(--green)':v>=0.4?'var(--gold)':'var(--red)';};
+  var mktRow=function(l,v){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:4px">'
+      +'<span style="font-size:12px;font-weight:600">'+l+'</span>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<div style="width:60px;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct(v)+';background:'+gc(v)+';border-radius:2px"></div></div>'
+      +'<span style="font-family:Bebas Neue,cursive;font-size:15px;color:'+gc(v)+';min-width:40px;text-align:right">'+pct(v)+'</span>'
+      +'</div></div>';
+  };
+
   var html='';
 
-  // VERDICT
-  html+='<div class="verdict-card" style="background:'+vbg+';border:2px solid '+vc+'">';
-  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT PREDICT BASKET</div>';
-  html+='<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
-  html+='<div style="font-size:13px;color:var(--txt2)">'+betLabel+'</div>';
-  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">CONFIANCE '+conf+'</div>';
-  html+='<div style="font-size:10px;color:var(--txt2)">4 Facteurs Dean Oliver</div></div></div>';
-  html+='<div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;margin-bottom:10px">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  html+='<span style="font-size:12px;font-weight:700">'+betLabel+'</span>';
-  html+='<span style="font-family:Bebas Neue,cursive;font-size:26px;color:'+vc+'">'+pct(betProb)+'</span></div>';
-  if(odds){
-    html+='<div style="display:flex;justify-content:space-between">';
-    html+='<span style="font-size:11px;color:var(--txt2)">Cote proposée : <strong style="color:var(--txt)">@'+odds+'</strong></span>';
-    html+='<span style="font-size:11px;color:var(--txt2)">Cote juste : <strong style="color:'+(isValue?'var(--green)':'var(--txt)')+'">@'+fairOdd+'</strong></span></div>';
-  }
+  // ═══ BLOC 1 — HEADER MATCH + JAUGE ═══
+  var confVal=conf==='ÉLEVÉE'?85:conf==='BONNE'?65:conf==='MOYENNE'?45:30;
+  var cg1=confVal>=70?'#10b981':confVal>=50?'#f5c842':'#ef4444';
+  var cg2=confVal>=70?'#34d399':confVal>=50?'#fbbf24':'#f87171';
+  var circ=2*Math.PI*28; var dashOff=circ*(1-confVal/100);
+
+  html+='<div class="card" style="background:linear-gradient(135deg,#0d1520,#0a1020);border-color:rgba(255,255,255,0.08);margin-bottom:12px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
+  html+='<div style="flex:1;min-width:0"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">DOMICILE</div><div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+hTeam+'</div></div>';
+  html+='<div style="text-align:center;padding:0 10px;flex-shrink:0"><div style="font-size:9px;color:var(--txt3)">🏀 '+league.toUpperCase()+'</div><div style="font-size:10px;color:var(--txt2);margin-top:2px">~'+expPts.toFixed(0)+' pts attendus</div></div>';
+  html+='<div style="flex:1;min-width:0;text-align:right"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">EXTÉRIEUR</div><div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+aTeam+'</div></div>';
   html+='</div>';
-  if(edge!==null){
+  html+='<div style="display:flex;align-items:center;gap:12px">';
+  html+='<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">PARI ANALYSÉ</div><div style="font-size:13px;font-weight:700">'+betLabel+'</div>';
+  if(odds){html+='<div style="font-size:12px;color:var(--txt2);margin-top:2px">Cote <strong style="color:var(--gold)">@'+odds+'</strong></div>';}
+  html+='</div>';
+  html+='<svg width="68" height="68" viewBox="0 0 68 68">';
+  html+='<circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"/>';
+  html+='<circle cx="34" cy="34" r="28" fill="none" stroke="url(#bcg)" stroke-width="6" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+dashOff.toFixed(1)+'" stroke-linecap="round" transform="rotate(-90 34 34)"/>';
+  html+='<defs><linearGradient id="bcg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="'+cg1+'"/><stop offset="100%" stop-color="'+cg2+'"/></linearGradient></defs>';
+  html+='<text x="34" y="30" text-anchor="middle" fill="white" font-size="14" font-weight="800" font-family="Bebas Neue,cursive">'+confVal+'%</text>';
+  html+='<text x="34" y="43" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="7" letter-spacing="1">CONF.</text>';
+  html+='</svg>';
+  html+='</div></div>';
+
+  // ═══ BLOC 2 — VICTOIRE + OVER/UNDER ═══
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+
+  // Victoire + Quarts
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:10px">🏀 VICTOIRE</div>';
+  [{l:hTeam,v:pWinH,g:'#10b981,#34d399'},{l:aTeam,v:pWinA,g:'#ef4444,#f87171'}].forEach(function(b){
+    html+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">'+b.l+'</span><span style="font-family:Bebas Neue,cursive;font-size:14px;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div><div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:3px"></div></div></div>';
+  });
+  html+='<div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 0"></div>';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:8px">⏱️ QUARTS / MI-TEMPS</div>';
+  [{l:'1er quart '+hTeam,v:pQ1H,g:'#3b82f6,#60a5fa'},{l:'Mi-temps '+hTeam,v:pHTH,g:'#8b5cf6,#a78bfa'}].forEach(function(b){
+    html+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">'+b.l+'</span><span style="font-size:12px;font-weight:700;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:2px"></div></div></div>';
+  });
+  html+='</div>';
+
+  // Over/Under
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:8px">🎯 TOTAL POINTS (~'+expPts.toFixed(0)+')</div>';
+  [{l:'Over 195.5',v:pO195,g:'#f59e0b,#fbbf24'},{l:'Under 195.5',v:1-pO195,g:'#6b7280,#9ca3af'},
+   {l:'Over 205.5',v:pO205,g:'#f59e0b,#fbbf24'},{l:'Under 205.5',v:1-pO205,g:'#6b7280,#9ca3af'},
+   {l:'Over 215.5',v:pO215,g:'#f59e0b,#fbbf24'},{l:'Under 215.5',v:1-pO215,g:'#6b7280,#9ca3af'},
+   {l:'Over 225.5',v:pO225,g:'#f59e0b,#fbbf24'},{l:'Under 225.5',v:1-pO225,g:'#6b7280,#9ca3af'}
+  ].forEach(function(b){
+    html+='<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;color:var(--txt2)">'+b.l+'</span><span style="font-size:11px;font-weight:700;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:2px"></div></div></div>';
+  });
+  html+='</div>';
+  html+='</div>'; // fin 2-col
+
+  // ═══ BLOC 3 — ÉCARTS PROBABLES (DASHBOARD) ═══
+  html+='<div class="card" style="margin-bottom:12px">';
+  html+='<div class="card-title">📊 ÉCARTS PROBABLES</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:4px">';
+  var ecarts=[{l:'1-5 pts',v:pm1_5},{l:'6-10 pts',v:pm6_10},{l:'11-15 pts',v:pm11_15},{l:'15+ pts',v:pm15p}];
+  var maxE=Math.max.apply(null,ecarts.map(function(e){return e.v;}));
+  ecarts.forEach(function(e){
+    var isBest=e.v===maxE;
+    html+='<div style="background:rgba(255,255,255,0.03);border:1px solid '+(isBest?'rgba(245,200,66,0.3)':'transparent')+';border-radius:10px;padding:8px;text-align:center">';
+    html+='<div style="font-size:9px;color:var(--txt2);margin-bottom:4px">'+e.l+'</div>';
+    html+='<div style="font-family:Bebas Neue,cursive;font-size:16px;color:'+(isBest?'var(--gold)':'var(--txt)')+'">'+pct(e.v)+'</div>';
+    if(isBest){html+='<div style="font-size:8px;color:var(--gold);margin-top:2px">★ probable</div>';}
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--txt2);padding:4px 2px">Écart moyen prévu : <strong style="color:var(--txt)">'+Math.abs(expMargin).toFixed(1)+' pts</strong> en faveur de <strong style="color:'+(expMargin>0?'var(--green)':'var(--red)')+'">'+(expMargin>0?hTeam:aTeam)+'</strong></div>';
+  html+='</div>';
+
+  // ═══ BLOC 4 — VALUE BET ═══
+  if(odds&&edge!==null){
     var ec=edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';
-    var ev=betProb*odds-1;
-    html+='<div class="grid2" style="margin-bottom:0">';
-    html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div><div class="stat-mini-l">EDGE</div></div>';
-    html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(ev>0?'+':'')+ev.toFixed(2)+'</div><div class="stat-mini-l">ESPÉRANCE</div></div>';
+    var ev=betProb*parseFloat(odds)-1;
+    var isPos=edge>0;
+    var rCol=isPos?'16,185,129':'239,68,68';
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba('+rCol+',0.06),rgba('+rCol+',0.02));border-color:rgba('+rCol+',0.2);margin-bottom:12px">';
+    html+='<div class="card-title" style="color:'+(isPos?'var(--green)':'var(--red)')+'">💰 '+(isPos?'VALUE BET DÉTECTÉ ✅':'PAS DE VALUE ❌')+'</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE LIVRE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:var(--gold)">@'+odds+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE JUSTE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+(isPos?'var(--green)':'var(--red)')+'">@'+fairOdd+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">EDGE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div></div>';
+    html+='</div>';
+    html+='<div style="font-size:10px;color:var(--txt2)">Proba estimée : <strong>'+pct(betProb)+'</strong> · Espérance : <strong style="color:'+ec+'">'+(ev>0?'+':'')+ev.toFixed(3)+'</strong></div>';
     html+='</div>';
   }
-  html+='</div>';
 
-  // VICTOIRE
-  html+='<div class="card"><div class="card-title">🏀 PROBABILITÉS DE VICTOIRE</div>';
-  html+='<div class="prob-row"><div class="prob-team">🏠 '+home+'</div>'+bar(pWinH,'var(--green)')+'<div class="prob-lbl" style="color:var(--green)">'+pct(pWinH)+'</div></div>';
-  html+='<div class="prob-row"><div class="prob-team">✈️ '+away+'</div>'+bar(pWinA,'var(--red)')+'<div class="prob-lbl" style="color:var(--red)">'+pct(pWinA)+'</div></div>';
-  html+='<div style="font-size:11px;color:var(--txt2);margin-top:8px">📊 Score estimé : <strong style="color:var(--gold)">'+Math.round(hExpScore)+' - '+Math.round(aExpScore)+'</strong> · Écart : <strong style="color:'+(expMargin>0?'var(--green)':'var(--red)')+'">'+( expMargin>0?'+':'')+expMargin.toFixed(1)+' pts</strong></div></div>';
-
-  // TOTAL POINTS
-  html+='<div class="card"><div class="card-title">🎯 TOTAL DE POINTS ESTIMÉ : '+Math.round(expPts)+' pts</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [{l:'Over 195.5',v:pO195},{l:'Under 195.5',v:1-pO195},
-   {l:'Over 205.5',v:pO205},{l:'Under 205.5',v:1-pO205},
-   {l:'Over 215.5',v:pO215},{l:'Under 215.5',v:1-pO215},
-   {l:'Over 225.5',v:pO225},{l:'Under 225.5',v:1-pO225}
-  ].forEach(function(m){
-    html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px">';
-    html+='<span style="font-size:12px;font-weight:600">'+m.l+'</span>';
-    html+='<span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(m.v)+'">'+pct(m.v)+'</span></div>';
-  });
+  // ═══ BLOC 5 — VERDICT FINAL ═══
+  var vbgB=vc==='var(--green)'?'#081a12':vc==='var(--gold)'?'#1a1508':'#1a0808';
+  html+='<div class="verdict-card" style="background:'+vbgB+';border:2px solid '+vc+';margin-bottom:12px">';
+  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between">';
+  html+='<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
+  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">4 Facteurs Dean Oliver</div></div>';
   html+='</div></div>';
 
-  // HANDICAP
-  html+='<div class="card"><div class="card-title">⚖️ HANDICAP POINTS</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:home+' -3.5', v:pH_35},{l:away+' +3.5', v:1-pH_35},
-    {l:home+' -5.5', v:pH_55},{l:away+' +5.5', v:1-pH_55},
-    {l:home+' -7.5', v:pH_75},{l:away+' +7.5', v:1-pH_75},
-    {l:home+' -10.5',v:pH_105},{l:away+' +10.5',v:1-pH_105}
-  ].forEach(function(m){
-    html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px">';
-    html+='<span style="font-size:12px;font-weight:600">'+m.l+'</span>';
-    html+='<span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(m.v)+'">'+pct(m.v)+'</span></div>';
-  });
+  // ═══ BLOC 6 — HANDICAP ═══
+  html+='<div class="card" style="margin-bottom:10px"><div class="card-title">⚖️ HANDICAP</div><div style="display:flex;flex-direction:column;gap:4px">';
+  [{l:hTeam+' -3.5',v:pH_35},{l:hTeam+' -5.5',v:pH_55},{l:hTeam+' -7.5',v:pH_75},{l:hTeam+' -10.5',v:pH_105}].forEach(function(m){html+=mktRow(m.l,m.v);});
   html+='</div></div>';
 
-  // MARCHÉS
-  html+='<div class="card"><div class="card-title">⏱️ QUARTS & ÉCARTS</div>';
-  html+='<div class="grid2" style="margin-bottom:10px">';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(pQ1H)+'">'+pct(pQ1H)+'</div><div class="stat-mini-l">Q1 '+home.toUpperCase()+'</div></div>';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(1-pQ1H)+'">'+pct(1-pQ1H)+'</div><div class="stat-mini-l">Q1 '+away.toUpperCase()+'</div></div>';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(pHTH)+'">'+pct(pHTH)+'</div><div class="stat-mini-l">MI-TEMPS '+home.toUpperCase()+'</div></div>';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(1-pHTH)+'">'+pct(1-pHTH)+'</div><div class="stat-mini-l">MI-TEMPS '+away.toUpperCase()+'</div></div>';
-  html+='</div>';
-  html+='<div style="font-size:9px;color:var(--txt2);font-weight:700;letter-spacing:2px;margin-bottom:8px">ÉCART DE VICTOIRE</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:5px">';
-  [{l:'1-5 pts',v:pm1_5},{l:'6-10 pts',v:pm6_10},{l:'11-15 pts',v:pm11_15},{l:'15+ pts',v:pm15p}].forEach(function(m){
-    html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:8px">';
-    html+='<span style="font-size:12px;font-weight:600">Victoire par '+m.l+'</span>';
-    html+='<span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(m.v)+'">'+pct(m.v)+'</span></div>';
-  });
-  html+='</div></div>';
-
-  // 4 FACTEURS DISPLAY
-  if(hasStats){
-    var hFF=fourFactorScore(hEfg,hTov,hOrb,hFtr);
-    var aFF=fourFactorScore(aEfg,aTov,aOrb,aFtr);
-    html+='<div class="card"><div class="card-title">📊 4 FACTEURS DEAN OLIVER</div>';
-    html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
-    html+='<tr><th style="text-align:left;padding:6px;color:var(--txt2)">Facteur</th><th style="padding:6px;color:var(--green)">'+home+'</th><th style="padding:6px;color:var(--red)">'+away+'</th><th style="padding:6px;color:var(--txt2)">Poids</th></tr>';
-    var factors=[
-      {name:'eFG%',hv:hEfg,av:aEfg,w:'40%',higher:true},
-      {name:'TOV%',hv:hTov,av:aTov,w:'25%',higher:false},
-      {name:'ORB%',hv:hOrb,av:aOrb,w:'20%',higher:true},
-      {name:'FT Rate',hv:hFtr,av:aFtr,w:'15%',higher:true}
-    ];
-    factors.forEach(function(f){
-      var hWin=f.higher?(f.hv>f.av):(f.hv<f.av);
-      var aWin=f.higher?(f.av>f.hv):(f.av<f.hv);
-      html+='<tr style="border-top:1px solid var(--bdr)">';
-      html+='<td style="padding:8px;font-weight:700">'+f.name+'</td>';
-      html+='<td style="padding:8px;text-align:center;color:'+(hWin?'var(--green)':'var(--txt)')+'">'+f.hv+'</td>';
-      html+='<td style="padding:8px;text-align:center;color:'+(aWin?'var(--green)':'var(--txt)')+'">'+f.av+'</td>';
-      html+='<td style="padding:8px;text-align:center;color:var(--txt2)">'+f.w+'</td>';
-      html+='</tr>';
-    });
-    html+='<tr style="border-top:2px solid var(--bdr)">';
-    html+='<td style="padding:8px;font-weight:700">Score global</td>';
-    html+='<td style="padding:8px;text-align:center;color:'+(hFF>aFF?'var(--green)':'var(--red)')+'">'+hFF.toFixed(2)+'</td>';
-    html+='<td style="padding:8px;text-align:center;color:'+(aFF>hFF?'var(--green)':'var(--red)')+'">'+aFF.toFixed(2)+'</td>';
-    html+='<td></td></tr>';
-    html+='</table></div></div>';
-  }
-
-  // KELLY
   if(kellyPct>0){
-    html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2)">';
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2);margin-bottom:10px">';
     html+='<div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div>';
-    html+='<div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div>';
-    html+='</div>';
+    html+='<div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div></div>';
   }
 
-  // AI BUTTON
-  window._bpd={home:home,away:away,betType:betType,odds:odds,betProb:betProb,pWinH:pWinH,conf:conf,edge:edge,expPts:expPts,expMargin:expMargin};
-  html+='<button class="btn-ai" onclick="launchBasketAI()">🤖 ANALYSE IA APPROFONDIE</button>';
+  window._bkd={hTeam:hTeam,aTeam:aTeam,league:league,betType:betType,odds:odds,betProb:betProb,pWinH:pWinH,conf:conf,edge:edge,expPts:expPts,expMargin:expMargin};
+  html+='<button class="btn-ai" onclick="launchBasketAIFromState()">🤖 ANALYSE IA APPROFONDIE</button>';
   html+='<div id="bai-box"></div>';
 
   document.getElementById('basket-results').innerHTML=html;
@@ -5032,6 +5776,7 @@ function computeBasket() {
     prob:betProb,edge:edge,
     kelly: kellyPct ? kellyPct.toFixed(1) : ''
   });
+  addShareButton('basket-results',{sport:'basket',home:home,away:away,betLabel:betLabel,odds:odds,verdict:verdict,prob:betProb,edge:edge});
   bGoStep(4);
   window.scrollTo(0,0);
 }
@@ -5459,122 +6204,115 @@ function computeHockey() {
   var bar=function(v,col){return '<div class="prob-bar"><div class="prob-fill" style="width:'+pct(v)+';background:'+col+'"></div></div>';};
   var mktRow=function(l,v){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px"><span style="font-size:12px;font-weight:600">'+l+'</span><span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(v)+'">'+pct(v)+'</span></div>';};
 
+  var pct=function(v){return (v*100).toFixed(1)+'%';};
+  var gc=function(v){return v>=0.6?'var(--green)':v>=0.4?'var(--gold)':'var(--red)';};
+  var mktRow=function(l,v){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:4px">'
+      +'<span style="font-size:12px;font-weight:600">'+l+'</span>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<div style="width:60px;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct(v)+';background:'+gc(v)+';border-radius:2px"></div></div>'
+      +'<span style="font-family:Bebas Neue,cursive;font-size:15px;color:'+gc(v)+';min-width:40px;text-align:right">'+pct(v)+'</span>'
+      +'</div></div>';
+  };
+
   var html='';
 
-  // VERDICT
-  html+='<div class="verdict-card" style="background:'+vbg+';border:2px solid '+vc+'">';
-  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT PREDICT HOCKEY</div>';
-  html+='<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
-  html+='<div style="font-size:13px;color:var(--txt2)">'+betLabel+'</div>';
-  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">CONFIANCE '+conf+'</div>';
-  html+='<div style="font-size:10px;color:var(--txt2)">Poisson Hockey</div></div></div>';
-  html+='<div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;margin-bottom:10px">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  html+='<span style="font-size:12px;font-weight:700">'+betLabel+'</span>';
-  html+='<span style="font-family:Bebas Neue,cursive;font-size:26px;color:'+vc+'">'+pct(betProb)+'</span></div>';
-  if(odds){
-    html+='<div style="display:flex;justify-content:space-between">';
-    html+='<span style="font-size:11px;color:var(--txt2)">Cote proposée : <strong style="color:var(--txt)">@'+odds+'</strong></span>';
-    html+='<span style="font-size:11px;color:var(--txt2)">Cote juste : <strong style="color:'+(isValue?'var(--green)':'var(--txt)')+'">@'+fairOdd+'</strong></span></div>';
-  }
+  // ═══ BLOC 1 — HEADER + JAUGE ═══
+  var confVal=conf==='ÉLEVÉE'?85:conf==='BONNE'?65:conf==='MOYENNE'?45:30;
+  var cg1=confVal>=70?'#10b981':confVal>=50?'#f5c842':'#ef4444';
+  var cg2=confVal>=70?'#34d399':confVal>=50?'#fbbf24':'#f87171';
+  var circ=2*Math.PI*28; var dashOff=circ*(1-confVal/100);
+
+  html+='<div class="card" style="background:linear-gradient(135deg,#0a1520,#0d1520);border-color:rgba(255,255,255,0.08);margin-bottom:12px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
+  html+='<div style="flex:1;min-width:0"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">DOMICILE</div><div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+home+'</div></div>';
+  html+='<div style="text-align:center;padding:0 10px;flex-shrink:0"><div style="font-size:10px;color:var(--txt3)">🏒 HOCKEY</div><div style="font-size:10px;color:var(--txt2);margin-top:2px">~'+(lambdaH+lambdaA).toFixed(1)+' buts att.</div></div>';
+  html+='<div style="flex:1;min-width:0;text-align:right"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">EXTÉRIEUR</div><div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+away+'</div></div>';
   html+='</div>';
-  if(edge!==null){
-    var ec=edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';
-    var ev=betProb*odds-1;
-    html+='<div class="grid2"><div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div><div class="stat-mini-l">EDGE</div></div>';
-    html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(ev>0?'+':'')+ev.toFixed(2)+'</div><div class="stat-mini-l">ESPÉRANCE</div></div></div>';
-  }
+  html+='<div style="display:flex;align-items:center;gap:12px">';
+  html+='<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">PARI ANALYSÉ</div><div style="font-size:13px;font-weight:700">'+betLabel+'</div>';
+  if(odds){html+='<div style="font-size:12px;color:var(--txt2);margin-top:2px">Cote <strong style="color:var(--gold)">@'+odds+'</strong></div>';}
   html+='</div>';
-
-  // VICTOIRE 1X2
-  html+='<div class="card"><div class="card-title">🏒 PROBABILITÉS (TEMPS RÉGLEMENTAIRE)</div>';
-  html+='<div class="prob-row"><div class="prob-team">🏠 '+home+'</div>'+bar(poi.win,'var(--green)')+'<div class="prob-lbl" style="color:var(--green)">'+pct(poi.win)+'</div></div>';
-  html+='<div class="prob-row"><div class="prob-team">🤝 OT/TAB</div>'+bar(poi.tie,'var(--gold)')+'<div class="prob-lbl" style="color:var(--gold)">'+pct(poi.tie)+'</div></div>';
-  html+='<div class="prob-row"><div class="prob-team">✈️ '+away+'</div>'+bar(poi.lose,'var(--red)')+'<div class="prob-lbl" style="color:var(--red)">'+pct(poi.lose)+'</div></div>';
-  html+='<div style="margin-top:10px;display:flex;gap:8px">';
-  html+='<div style="flex:1;text-align:center;background:rgba(0,229,184,0.06);border-radius:10px;padding:8px">';
-  html+='<div style="font-size:9px;color:var(--txt2);font-weight:700;margin-bottom:2px">INCL. PROL.</div>';
-  html+='<div style="font-family:Bebas Neue,cursive;font-size:18px;color:var(--green)">'+pct(pWinHFull)+'</div><div style="font-size:10px;color:var(--txt2)">'+home+'</div></div>';
-  html+='<div style="flex:1;text-align:center;background:rgba(255,71,87,0.06);border-radius:10px;padding:8px">';
-  html+='<div style="font-size:9px;color:var(--txt2);font-weight:700;margin-bottom:2px">INCL. PROL.</div>';
-  html+='<div style="font-family:Bebas Neue,cursive;font-size:18px;color:var(--red)">'+pct(pWinAFull)+'</div><div style="font-size:10px;color:var(--txt2)">'+away+'</div></div></div>';
-  html+='<div style="font-size:11px;color:var(--txt2);margin-top:8px">📊 Total estimé : <strong style="color:var(--gold)">'+expTotal.toFixed(2)+' buts</strong> (Dom: '+lambdaH.toFixed(2)+' · Ext: '+lambdaA.toFixed(2)+')</div></div>';
-
-  // BUTS
-  html+='<div class="card"><div class="card-title">⚽ MARCHÉS BUTS</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:'Over 4.5 buts',v:poi.over45},{l:'Under 4.5 buts',v:1-poi.over45},
-    {l:'Over 5.5 buts',v:poi.over55},{l:'Under 5.5 buts',v:1-poi.over55},
-    {l:'Over 6.5 buts',v:poi.over65},{l:'Under 6.5 buts',v:1-poi.over65},
-    {l:'Les deux équipes marquent',v:poi.btts},{l:'Une seule équipe marque',v:1-poi.btts}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
+  html+='<svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"/><circle cx="34" cy="34" r="28" fill="none" stroke="url(#hcg)" stroke-width="6" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+dashOff.toFixed(1)+'" stroke-linecap="round" transform="rotate(-90 34 34)"/><defs><linearGradient id="hcg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="'+cg1+'"/><stop offset="100%" stop-color="'+cg2+'"/></linearGradient></defs><text x="34" y="30" text-anchor="middle" fill="white" font-size="14" font-weight="800" font-family="Bebas Neue,cursive">'+confVal+'%</text><text x="34" y="43" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="7" letter-spacing="1">CONF.</text></svg>';
   html+='</div></div>';
 
-  // BTTS COMBINÉS
-  html+='<div class="card"><div class="card-title">🔗 BTTS COMBINÉS</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:'BTTS + Victoire '+home,v:bttsWinH},
-    {l:'BTTS + Victoire '+away,v:bttsWinA},
-    {l:'BTTS + OT/TAB',v:poi.btts*poi.tie/(poi.win+poi.lose+poi.tie)}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
-  html+='</div></div>';
+  // ═══ BLOC 2 — VICTOIRE + HEATMAP SCORES ═══
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
 
-  // HANDICAP
-  html+='<div class="card"><div class="card-title">⚖️ HANDICAP BUTS</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:home+' -1.5',v:ah.h15},{l:away+' +1.5',v:ah.a15},
-    {l:home+' -2.5',v:ah.h25},{l:away+' +2.5',v:ah.a25}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
-  html+='</div></div>';
-
-  // SCORES EXACTS
-  html+='<div class="card"><div class="card-title">🎯 SCORES EXACTS LES PLUS PROBABLES</div>';
-  html+='<div class="score-grid">';
-  topScores.slice(0,9).forEach(function(s){
-    var parts=s.k.split('-');
-    var col=parseInt(parts[0])>parseInt(parts[1])?'var(--green)':parseInt(parts[0])===parseInt(parts[1])?'var(--gold)':'var(--red)';
-    html+='<div class="score-item"><div class="score-val" style="color:'+col+'">'+s.k+'</div><div class="score-pct">'+pct(s.v)+'</div></div>';
+  // Victoire + Méthode
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:10px">🏒 VICTOIRE (finale)</div>';
+  [{l:home,v:pWinHFull,g:'#10b981,#34d399'},{l:away,v:pWinAFull,g:'#ef4444,#f87171'}].forEach(function(b){
+    html+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">'+b.l+'</span><span style="font-family:Bebas Neue,cursive;font-size:14px;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div><div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:3px"></div></div></div>';
   });
-  html+='</div></div>';
-
-  // 1ÈRE PÉRIODE
-  html+='<div class="card"><div class="card-title">⏱️ 1ÈRE PÉRIODE</div>';
-  html+='<div class="grid3" style="margin-bottom:10px">';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(p1win)+'">'+pct(p1win)+'</div><div class="stat-mini-l">'+home.substring(0,6).toUpperCase()+'</div></div>';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(p1draw)+'">'+pct(p1draw)+'</div><div class="stat-mini-l">NUL</div></div>';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(p1lose)+'">'+pct(p1lose)+'</div><div class="stat-mini-l">'+away.substring(0,6).toUpperCase()+'</div></div>';
+  html+='<div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 0"></div>';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:8px">⏱️ MÉTHODE</div>';
+  [{l:'Victoire en temps réglementaire',v:pMethodReg,g:'#3b82f6,#60a5fa'},{l:'Prolongations',v:pMethodOT,g:'#8b5cf6,#a78bfa'},{l:'Tirs au but',v:pMethodSO,g:'#f59e0b,#fbbf24'}].forEach(function(b){
+    html+='<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;color:var(--txt2)">'+b.l+'</span><span style="font-size:11px;font-weight:700;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:2px"></div></div></div>';
+  });
   html+='</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  html+=mktRow('1ère période Over 1.5 buts',p1over15);
-  html+=mktRow('1ère période Under 1.5 buts',1-p1over15);
-  html+='</div></div>';
 
-  // MÉTHODE DE VICTOIRE
-  html+='<div class="card"><div class="card-title">🏆 MÉTHODE DE VICTOIRE</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:'Temps réglementaire',v:pMethodReg},
-    {l:'Prolongation',v:pMethodOT},
-    {l:'Tirs au but',v:pMethodSO}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
-  html+='</div></div>';
+  // Heatmap scores (4x4 pour hockey)
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:8px">🎯 SCORES PROBABLES</div>';
+  var topSc=scKeys.slice(0,8).filter(function(k){return poi.scores[k]>0;}).sort(function(a,b){return (poi.scores[b]||0)-(poi.scores[a]||0);});
+  var maxSc=topSc.length>0?(poi.scores[topSc[0]]||0):1;
+  topSc.forEach(function(k,i){
+    var p=poi.scores[k]||0;
+    var parts=k.split('-');
+    var homeWins=parseInt(parts[0])>parseInt(parts[1]);
+    var col=homeWins?'var(--green)':'var(--red)';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">';
+    html+=(i===0?'<span style="font-size:11px">🥇</span>':i===1?'<span style="font-size:11px">🥈</span>':i===2?'<span style="font-size:11px">🥉</span>':'<span style="font-size:11px;opacity:0"> </span>');
+    html+='<span style="font-family:Bebas Neue,cursive;font-size:13px;color:'+col+';min-width:30px">'+k+'</span>';
+    html+='<div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+(p/maxSc*100).toFixed(0)+'%;background:'+col+';border-radius:2px;opacity:0.7"></div></div>';
+    html+='<span style="font-size:10px;font-weight:700;color:'+col+';min-width:32px;text-align:right">'+pct(p)+'</span>';
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='</div>'; // fin 2-col
 
-  // KELLY
-  if(kellyPct>0){
-    html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2)">';
-    html+='<div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div>';
-    html+='<div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div>';
-    html+='<div style="font-size:11px;color:var(--txt2);margin-top:4px">Demi-Kelly pour limiter le risque</div></div>';
+  // ═══ BLOC 3 — VALUE BET ═══
+  if(odds&&edge!==null){
+    var ec=edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';
+    var ev=betProb*parseFloat(odds)-1;
+    var isPos=edge>0;
+    var rCol=isPos?'16,185,129':'239,68,68';
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba('+rCol+',0.06),rgba('+rCol+',0.02));border-color:rgba('+rCol+',0.2);margin-bottom:12px">';
+    html+='<div class="card-title" style="color:'+(isPos?'var(--green)':'var(--red)')+'">💰 '+(isPos?'VALUE BET DÉTECTÉ ✅':'PAS DE VALUE ❌')+'</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE LIVRE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:var(--gold)">@'+odds+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE JUSTE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+(isPos?'var(--green)':'var(--red)')+'">@'+fairOdd+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">EDGE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div></div>';
+    html+='</div></div>';
   }
 
-  // AI BUTTON
-  window._hpd={home:home,away:away,league:league,betType:betType,odds:odds,
-    betProb:betProb,pWinH:poi.win,pTie:poi.tie,pWinA:poi.lose,
-    expTotal:expTotal,conf:conf,edge:edge};
+  // ═══ BLOC 4 — VERDICT FINAL ═══
+  var vbgH=vc==='var(--green)'?'#081a12':vc==='var(--gold)'?'#1a1508':'#1a0808';
+  html+='<div class="verdict-card" style="background:'+vbgH+';border:2px solid '+vc+';margin-bottom:12px">';
+  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between"><div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
+  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">Poisson Hockey</div></div>';
+  html+='</div></div>';
+
+  // ═══ BLOC 5 — MARCHÉS ═══
+  html+='<div class="card" style="margin-bottom:10px"><div class="card-title">🏒 BUTS MATCH</div><div style="display:flex;flex-direction:column;gap:4px">';
+  html+=mktRow('Over 4.5 buts', poi.over45||0);
+  html+=mktRow('Under 4.5 buts', 1-(poi.over45||0));
+  html+=mktRow('Over 5.5 buts', poi.over55||0);
+  html+=mktRow('Under 5.5 buts', 1-(poi.over55||0));
+  html+=mktRow('BTTS (les 2 marquent)', poi.btts||0);
+  html+='</div></div>';
+
+  html+='<div class="card" style="margin-bottom:10px"><div class="card-title">⚖️ HANDICAP</div><div style="display:flex;flex-direction:column;gap:4px">';
+  html+=mktRow(home+' -1.5',ah.h15); html+=mktRow(home+' -2.5',ah.h25);
+  html+=mktRow(away+' +1.5',1-ah.h15); html+=mktRow(away+' +2.5',1-ah.h25);
+  html+='</div></div>';
+
+  if(kellyPct>0){
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2);margin-bottom:10px"><div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div><div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div></div>';
+  }
+
   html+='<button class="btn-ai" onclick="launchHockeyAI()">🤖 ANALYSE IA APPROFONDIE</button>';
   html+='<div id="hai-box"></div>';
 
@@ -5590,6 +6328,7 @@ function computeHockey() {
     prob:betProb,edge:edge,
     kelly: kellyPct ? kellyPct.toFixed(1) : ''
   });
+  addShareButton('hockey-results',{sport:'hockey',home:home,away:away,betLabel:betLabel,odds:odds,verdict:verdict,prob:betProb,edge:edge});
   hGoStep(4);
   window.scrollTo(0,0);
 }
@@ -6030,110 +6769,119 @@ function computeMMA() {
   var bar=function(v,col){return '<div class="prob-bar"><div class="prob-fill" style="width:'+pct(v)+';background:'+col+'"></div></div>';};
   var mktRow=function(l,v){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px"><span style="font-size:12px;font-weight:600">'+l+'</span><span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(v)+'">'+pct(v)+'</span></div>';};
 
+  var pct=function(v){return (v*100).toFixed(1)+'%';};
+  var gc=function(v){return v>=0.6?'var(--green)':v>=0.4?'var(--gold)':'var(--red)';};
+  var mktRow=function(l,v){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:4px">'
+      +'<span style="font-size:12px;font-weight:600">'+l+'</span>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<div style="width:60px;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct(v)+';background:'+gc(v)+';border-radius:2px"></div></div>'
+      +'<span style="font-family:Bebas Neue,cursive;font-size:15px;color:'+gc(v)+';min-width:40px;text-align:right">'+pct(v)+'</span>'
+      +'</div></div>';
+  };
+
   var html='';
 
-  // VERDICT
-  html+='<div class="verdict-card" style="background:'+vbg+';border:2px solid '+vc+'">';
-  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT PREDICT MMA</div>';
-  html+='<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
-  html+='<div style="font-size:13px;color:var(--txt2)">'+betLabel+'</div>';
-  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">CONFIANCE '+conf+'</div>';
-  html+='<div style="font-size:10px;color:var(--txt2)">Modèle MMA</div></div></div>';
-  html+='<div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;margin-bottom:10px">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  html+='<span style="font-size:12px;font-weight:700">'+betLabel+'</span>';
-  html+='<span style="font-family:Bebas Neue,cursive;font-size:26px;color:'+vc+'">'+pct(betProb)+'</span></div>';
-  if(odds){
-    html+='<div style="display:flex;justify-content:space-between">';
-    html+='<span style="font-size:11px;color:var(--txt2)">Cote proposée : <strong style="color:var(--txt)">@'+odds+'</strong></span>';
-    html+='<span style="font-size:11px;color:var(--txt2)">Cote juste : <strong style="color:'+(isValue?'var(--green)':'var(--txt)')+'">@'+fairOdd+'</strong></span></div>';
-  }
-  html+='</div>';
-  if(edge!==null){
-    var ec=edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';
-    var ev=betProb*odds-1;
-    html+='<div class="grid2"><div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div><div class="stat-mini-l">EDGE</div></div>';
-    html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(ev>0?'+':'')+ev.toFixed(2)+'</div><div class="stat-mini-l">ESPÉRANCE</div></div></div>';
-  }
-  html+='</div>';
+  // ═══ BLOC 1 — HEADER + JAUGE ═══
+  var confVal=conf==='ÉLEVÉE'?85:conf==='BONNE'?65:conf==='MOYENNE'?45:30;
+  var cg1=confVal>=70?'#10b981':confVal>=50?'#f5c842':'#ef4444';
+  var cg2=confVal>=70?'#34d399':confVal>=50?'#fbbf24':'#f87171';
+  var circ=2*Math.PI*28; var dashOff=circ*(1-confVal/100);
 
-  // VICTOIRE
-  html+='<div class="card"><div class="card-title">🥊 PROBABILITÉS DE VICTOIRE</div>';
-  html+='<div class="prob-row"><div class="prob-team">🔴 '+f1+'</div>'+bar(pWin1,'var(--red)')+'<div class="prob-lbl" style="color:var(--red)">'+pct(pWin1)+'</div></div>';
-  html+='<div class="prob-row"><div class="prob-team">🔵 '+f2+'</div>'+bar(pWin2,'var(--blue)')+'<div class="prob-lbl" style="color:var(--blue)">'+pct(pWin2)+'</div></div>';
-  if(odds){ html+='<div style="font-size:11px;color:var(--txt2);margin-top:6px">Cote juste : '+f1+' @'+(1/pWin1).toFixed(2)+' · '+f2+' @'+(1/pWin2).toFixed(2)+'</div>'; }
+  html+='<div class="card" style="background:linear-gradient(135deg,#1a0a0a,#0f0a15);border-color:rgba(255,255,255,0.08);margin-bottom:12px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
+  html+='<div style="flex:1;min-width:0"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">COMBATTANT 1</div><div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+f1+'</div></div>';
+  html+='<div style="text-align:center;padding:0 10px;flex-shrink:0"><div style="font-size:14px">🥊</div><div style="font-size:9px;color:var(--txt3);margin-top:2px">'+weightClass+'</div></div>';
+  html+='<div style="flex:1;min-width:0;text-align:right"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">COMBATTANT 2</div><div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+f2+'</div></div>';
   html+='</div>';
-
-  // MÉTHODE
-  html+='<div class="card"><div class="card-title">🎯 MÉTHODE DE FIN</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:"KO / TKO (n'importe qui)",v:pKoTotal},
-    {l:"Soumission (n'importe qui)",v:pSubTotal},
-    {l:'Décision des juges',v:pDec}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
+  html+='<div style="display:flex;align-items:center;gap:12px">';
+  html+='<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">PARI ANALYSÉ</div><div style="font-size:13px;font-weight:700">'+betLabel+'</div>';
+  if(odds){html+='<div style="font-size:12px;color:var(--txt2);margin-top:2px">Cote <strong style="color:var(--gold)">@'+odds+'</strong></div>';}
+  html+='</div>';
+  html+='<svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"/><circle cx="34" cy="34" r="28" fill="none" stroke="url(#mcg)" stroke-width="6" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+dashOff.toFixed(1)+'" stroke-linecap="round" transform="rotate(-90 34 34)"/><defs><linearGradient id="mcg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="'+cg1+'"/><stop offset="100%" stop-color="'+cg2+'"/></linearGradient></defs><text x="34" y="30" text-anchor="middle" fill="white" font-size="14" font-weight="800" font-family="Bebas Neue,cursive">'+confVal+'%</text><text x="34" y="43" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="7" letter-spacing="1">CONF.</text></svg>';
   html+='</div></div>';
 
-  // MÉTHODE PAR COMBATTANT
-  html+='<div class="card"><div class="card-title">🔍 MÉTHODE DÉTAILLÉE</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:'KO/TKO '+f1,v:pKo1},{l:'KO/TKO '+f2,v:pKo2},
-    {l:'Soumission '+f1,v:pSub1},{l:'Soumission '+f2,v:pSub2},
-    {l:'Décision '+f1,v:pDec1},{l:'Décision '+f2,v:pDec2}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
-  html+='</div></div>';
+  // ═══ BLOC 2 — VICTOIRE + MÉTHODE ═══
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
 
-  // ROUNDS
-  html+='<div class="card"><div class="card-title">⏱️ ROUNDS & DISTANCE</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">';
-  html+=mktRow('Combat va la distance',pDistance);
-  html+=mktRow('Fin avant la limite',pNotDistance);
-  if(rounds>=3){ html+=mktRow('Over 2.5 rounds',pOver25); html+=mktRow('Under 2.5 rounds',1-pOver25); }
-  if(rounds>=5){ html+=mktRow('Over 4.5 rounds',pOver45); html+=mktRow('Under 4.5 rounds',1-pOver45); }
-  html+='</div>';
-  html+='<div style="font-size:9px;color:var(--txt2);font-weight:700;letter-spacing:2px;margin-bottom:8px">FIN PAR ROUND</div>';
-  html+='<div class="score-grid">';
-  pR.forEach(function(p,i){
-    if(i<rounds){
-      html+='<div class="score-item"><div class="score-val" style="color:'+gc(p)+'">R'+(i+1)+'</div><div class="score-pct">'+pct(p)+'</div></div>';
-    }
+  // Victoire
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:10px">🥊 VICTOIRE</div>';
+  [{l:f1,v:pWin1,g:'#10b981,#34d399'},{l:f2,v:pWin2,g:'#ef4444,#f87171'}].forEach(function(b){
+    html+='<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">'+b.l+'</span><span style="font-family:Bebas Neue,cursive;font-size:14px;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div><div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:3px"></div></div></div>';
   });
-  html+='</div></div>';
+  html+='</div>';
 
-  // PAR ROUND + COMBATTANT
-  html+='<div class="card"><div class="card-title">🥊 VICTOIRE PAR ROUND</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  for(var r=0;r<Math.min(rounds,3);r++){
-    html+=mktRow(f1+' gagne R'+(r+1), pW1R[r]||0);
-    html+=mktRow(f2+' gagne R'+(r+1), pW2R[r]||0);
+  // Méthode de victoire
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:8px">⚡ MÉTHODE</div>';
+  var methods=[
+    {l:'KO/TKO '+f1,v:pKo1,g:'#ef4444,#f87171'},
+    {l:'KO/TKO '+f2,v:pKo2,g:'#f87171,#fca5a5'},
+    {l:'Soumission '+f1,v:pSub1,g:'#8b5cf6,#a78bfa'},
+    {l:'Soumission '+f2,v:pSub2,g:'#a78bfa,#c4b5fd'},
+    {l:'Décision '+f1,v:pDec1,g:'#3b82f6,#60a5fa'},
+    {l:'Décision '+f2,v:pDec2,g:'#60a5fa,#93c5fd'}
+  ];
+  var maxM=Math.max.apply(null,methods.map(function(m){return m.v;}));
+  methods.forEach(function(b){
+    html+='<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%">'+b.l+'</span><span style="font-size:11px;font-weight:700;color:'+(b.v===maxM?'var(--gold)':'var(--txt)')+'">'+pct(b.v)+'</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+(b.v/maxM*100).toFixed(0)+'%;background:linear-gradient(90deg,'+b.g+');border-radius:2px"></div></div></div>';
+  });
+  html+='</div>';
+  html+='</div>'; // fin 2-col
+
+  // ═══ BLOC 3 — ROUNDS ═══
+  if(pR&&pR.length>0){
+    html+='<div class="card" style="margin-bottom:12px">';
+    html+='<div class="card-title">⏱️ DURÉE DU COMBAT</div>';
+    html+='<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px">';
+    var roundLabels=['R1','R2','R3','R4','R5'];
+    var maxR=Math.max.apply(null,pR);
+    pR.forEach(function(p,i){
+      html+='<div style="flex:1;min-width:50px;text-align:center">';
+      html+='<div style="font-size:9px;color:var(--txt2);margin-bottom:4px">'+roundLabels[i]+'</div>';
+      html+='<div style="height:60px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;position:relative">';
+      html+='<div style="position:absolute;bottom:0;left:0;right:0;height:'+(p/maxR*100).toFixed(0)+'%;background:linear-gradient(180deg,#8b5cf6,#6d28d9);border-radius:6px 6px 0 0;opacity:0.8"></div>';
+      html+='</div>';
+      html+='<div style="font-size:10px;font-weight:700;color:var(--purple);margin-top:4px">'+pct(p)+'</div>';
+      html+='</div>';
+    });
+    html+='</div></div>';
   }
+
+  // ═══ BLOC 4 — VALUE BET ═══
+  if(odds&&edge!==null){
+    var ec=edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';
+    var ev=betProb*parseFloat(odds)-1;
+    var isPos=edge>0;
+    var rCol=isPos?'16,185,129':'239,68,68';
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba('+rCol+',0.06),rgba('+rCol+',0.02));border-color:rgba('+rCol+',0.2);margin-bottom:12px">';
+    html+='<div class="card-title" style="color:'+(isPos?'var(--green)':'var(--red)')+'">💰 '+(isPos?'VALUE BET DÉTECTÉ ✅':'PAS DE VALUE ❌')+'</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE LIVRE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:var(--gold)">@'+odds+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE JUSTE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+(isPos?'var(--green)':'var(--red)')+'">@'+fairOdd+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">EDGE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div></div>';
+    html+='</div></div>';
+  }
+
+  // ═══ BLOC 5 — VERDICT FINAL ═══
+  var vbgM=vc==='var(--green)'?'#081a12':vc==='var(--gold)'?'#1a1508':'#1a0808';
+  html+='<div class="verdict-card" style="background:'+vbgM+';border:2px solid '+vc+';margin-bottom:12px">';
+  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between"><div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
+  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">Modèle MMA</div></div>';
   html+='</div></div>';
 
-  // ANALYSE STYLE
-  var sAdv = styleMatchup(f1Style, f2Style);
-  var styleNames={striker:'Frappeur',wrestler:'Lutteur',grappler:'Grappler',balanced:'MMA complet',muay:'Muay Thai'};
-  html+='<div class="card"><div class="card-title">⚔️ ANALYSE DES STYLES</div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;margin-bottom:8px">';
-  html+='<div style="text-align:center"><div style="font-size:20px">🔴</div><div style="font-size:11px;font-weight:700;margin-top:4px">'+f1+'</div><div style="font-size:10px;color:var(--txt2)">'+styleNames[f1Style]+'</div></div>';
-  html+='<div style="text-align:center"><div style="font-family:Bebas Neue,cursive;font-size:13px;color:'+(sAdv>0?'var(--red)':sAdv<0?'var(--blue)':'var(--txt2)')+'">';
-  html+=(sAdv>0?f1+' AVANTAGÉ':sAdv<0?f2+' AVANTAGÉ':'ÉQUILIBRÉ')+'</div></div>';
-  html+='<div style="text-align:center"><div style="font-size:20px">🔵</div><div style="font-size:11px;font-weight:700;margin-top:4px">'+f2+'</div><div style="font-size:10px;color:var(--txt2)">'+styleNames[f2Style]+'</div></div>';
+  // Marchés Over/Under rounds
+  html+='<div class="card" style="margin-bottom:10px"><div class="card-title">⏱️ OVER/UNDER ROUNDS</div><div style="display:flex;flex-direction:column;gap:4px">';
+  html+=mktRow('Over 2.5 rounds',pOver25); html+=mktRow('Under 2.5 rounds',1-pOver25);
+  if(rounds>=5){html+=mktRow('Over 4.5 rounds',pOver45); html+=mktRow('Under 4.5 rounds',1-pOver45);}
   html+='</div></div>';
 
-  // KELLY
   if(kellyPct>0){
-    html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2)">';
-    html+='<div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div>';
-    html+='<div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div>';
-    html+='<div style="font-size:11px;color:var(--txt2);margin-top:4px">Demi-Kelly — variance élevée en MMA</div></div>';
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2);margin-bottom:10px"><div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div><div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div></div>';
   }
 
-  // AI
-  window._mpd={f1:f1,f2:f2,org:org,weight:weight,betType:betType,odds:odds,
-    betProb:betProb,pWin1:pWin1,pWin2:pWin2,pKoTotal:pKoTotal,pSubTotal:pSubTotal,
-    pDec:pDec,conf:conf,edge:edge,rounds:rounds,f1Style:f1Style,f2Style:f2Style};
   html+='<button class="btn-ai" onclick="launchMMAai()">🤖 ANALYSE IA APPROFONDIE</button>';
   html+='<div id="mai-box"></div>';
 
@@ -6149,6 +6897,7 @@ function computeMMA() {
     prob:betProb,edge:edge,
     kelly: kellyPct ? kellyPct.toFixed(1) : ''
   });
+  addShareButton('mma-results',{sport:'mma',home:home,away:away,betLabel:betLabel,odds:odds,verdict:verdict,prob:betProb,edge:edge});
   mGoStep(4);
   window.scrollTo(0,0);
 }
@@ -6576,116 +7325,100 @@ function computeRugby() {
   var bar=function(v,col){return '<div class="prob-bar"><div class="prob-fill" style="width:'+pct(v)+';background:'+col+'"></div></div>';};
   var mktRow=function(l,v){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px"><span style="font-size:12px;font-weight:600">'+l+'</span><span style="font-family:Bebas Neue,cursive;font-size:16px;color:'+gc(v)+'">'+pct(v)+'</span></div>';};
 
+  var pct=function(v){return (v*100).toFixed(1)+'%';};
+  var gc=function(v){return v>=0.6?'var(--green)':v>=0.4?'var(--gold)':'var(--red)';};
+  var mktRow=function(l,v){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:4px">'
+      +'<span style="font-size:12px;font-weight:600">'+l+'</span>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<div style="width:60px;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct(v)+';background:'+gc(v)+';border-radius:2px"></div></div>'
+      +'<span style="font-family:Bebas Neue,cursive;font-size:15px;color:'+gc(v)+';min-width:40px;text-align:right">'+pct(v)+'</span>'
+      +'</div></div>';
+  };
+
   var html='';
 
-  // VERDICT
-  html+='<div class="verdict-card" style="background:'+vbg+';border:2px solid '+vc+'">';
-  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT PREDICT RUGBY</div>';
-  html+='<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
-  html+='<div style="font-size:13px;color:var(--txt2)">'+betLabel+'</div>';
-  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">CONFIANCE '+conf+'</div>';
-  html+='<div style="font-size:10px;color:var(--txt2)">Modèle Rugby</div></div></div>';
-  html+='<div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;margin-bottom:10px">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  html+='<span style="font-size:12px;font-weight:700">'+betLabel+'</span>';
-  html+='<span style="font-family:Bebas Neue,cursive;font-size:26px;color:'+vc+'">'+pct(betProb)+'</span></div>';
-  if(odds){
-    html+='<div style="display:flex;justify-content:space-between">';
-    html+='<span style="font-size:11px;color:var(--txt2)">Cote proposée : <strong style="color:var(--txt)">@'+odds+'</strong></span>';
-    html+='<span style="font-size:11px;color:var(--txt2)">Cote juste : <strong style="color:'+(isValue?'var(--green)':'var(--txt)')+'">@'+fairOdd+'</strong></span></div>';
-  }
+  // ═══ BLOC 1 — HEADER + JAUGE ═══
+  var confVal=conf==='ÉLEVÉE'?85:conf==='BONNE'?65:conf==='MOYENNE'?45:30;
+  var cg1=confVal>=70?'#10b981':confVal>=50?'#f5c842':'#ef4444';
+  var cg2=confVal>=70?'#34d399':confVal>=50?'#fbbf24':'#f87171';
+  var circ=2*Math.PI*28; var dashOff=circ*(1-confVal/100);
+
+  html+='<div class="card" style="background:linear-gradient(135deg,#0a150d,#0d150a);border-color:rgba(255,255,255,0.08);margin-bottom:12px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
+  html+='<div style="flex:1;min-width:0"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">DOMICILE</div><div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+home+'</div></div>';
+  html+='<div style="text-align:center;padding:0 10px;flex-shrink:0"><div style="font-size:14px">🏉</div><div style="font-size:9px;color:var(--txt3);margin-top:2px">~'+expTotal.toFixed(0)+' pts</div></div>';
+  html+='<div style="flex:1;min-width:0;text-align:right"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:2px">EXTÉRIEUR</div><div style="font-family:Bebas Neue,cursive;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+away+'</div></div>';
   html+='</div>';
-  if(edge!==null){
+  html+='<div style="display:flex;align-items:center;gap:12px">';
+  html+='<div style="flex:1"><div style="font-size:10px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">PARI ANALYSÉ</div><div style="font-size:13px;font-weight:700">'+betLabel+'</div>';
+  if(odds){html+='<div style="font-size:12px;color:var(--txt2);margin-top:2px">Cote <strong style="color:var(--gold)">@'+odds+'</strong></div>';}
+  html+='</div>';
+  html+='<svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6"/><circle cx="34" cy="34" r="28" fill="none" stroke="url(#rcg)" stroke-width="6" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+dashOff.toFixed(1)+'" stroke-linecap="round" transform="rotate(-90 34 34)"/><defs><linearGradient id="rcg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="'+cg1+'"/><stop offset="100%" stop-color="'+cg2+'"/></linearGradient></defs><text x="34" y="30" text-anchor="middle" fill="white" font-size="14" font-weight="800" font-family="Bebas Neue,cursive">'+confVal+'%</text><text x="34" y="43" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="7" letter-spacing="1">CONF.</text></svg>';
+  html+='</div></div>';
+
+  // ═══ BLOC 2 — VICTOIRE + TOTAL POINTS ═══
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+
+  // Victoire
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:10px">🏉 RÉSULTAT</div>';
+  [{l:home,v:pWinH,g:'#10b981,#34d399'},{l:'Nul',v:pDraw,g:'#f5c842,#fbbf24'},{l:away,v:pWinA,g:'#ef4444,#f87171'}].forEach(function(b){
+    html+='<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">'+b.l+'</span><span style="font-family:Bebas Neue,cursive;font-size:14px;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div><div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:3px"></div></div></div>';
+  });
+  html+='<div style="padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;margin-top:6px;text-align:center">';
+  html+='<div style="font-size:9px;color:var(--txt2)">Écart prévu</div>';
+  html+='<div style="font-family:Bebas Neue,cursive;font-size:16px;color:'+(expMargin>0?'var(--green)':'var(--red)')+'">'+(expMargin>0?'+':'')+expMargin.toFixed(0)+' pts</div>';
+  html+='<div style="font-size:9px;color:var(--txt3)">faveur '+(expMargin>0?home:away)+'</div>';
+  html+='</div></div>';
+
+  // Total points Over/Under
+  html+='<div class="card" style="padding:12px">';
+  html+='<div class="card-title" style="font-size:10px;margin-bottom:8px">🎯 TOTAL (~'+expTotal.toFixed(0)+' pts)</div>';
+  [{l:'Over 35.5',v:pO35,g:'#f59e0b,#fbbf24'},{l:'Under 35.5',v:1-pO35,g:'#6b7280,#9ca3af'},
+   {l:'Over 40.5',v:pO40,g:'#f59e0b,#fbbf24'},{l:'Under 40.5',v:1-pO40,g:'#6b7280,#9ca3af'},
+   {l:'Over 45.5',v:pO45,g:'#f59e0b,#fbbf24'},{l:'Under 45.5',v:1-pO45,g:'#6b7280,#9ca3af'},
+   {l:'Over 50.5',v:pO50,g:'#f59e0b,#fbbf24'},{l:'Under 50.5',v:1-pO50,g:'#6b7280,#9ca3af'}
+  ].forEach(function(b){
+    html+='<div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;color:var(--txt2)">'+b.l+'</span><span style="font-size:11px;font-weight:700;color:'+gc(b.v)+'">'+pct(b.v)+'</span></div><div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct(b.v)+';background:linear-gradient(90deg,'+b.g+');border-radius:2px"></div></div></div>';
+  });
+  html+='</div>';
+  html+='</div>'; // fin 2-col
+
+  // ═══ BLOC 3 — VALUE BET ═══
+  if(odds&&edge!==null){
     var ec=edge>10?'var(--green)':edge>5?'var(--gold)':'var(--red)';
-    var ev=betProb*odds-1;
-    html+='<div class="grid2"><div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div><div class="stat-mini-l">EDGE</div></div>';
-    html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+ec+'">'+(ev>0?'+':'')+ev.toFixed(2)+'</div><div class="stat-mini-l">ESPÉRANCE</div></div></div>';
+    var ev=betProb*parseFloat(odds)-1;
+    var isPos=edge>0;
+    var rCol=isPos?'16,185,129':'239,68,68';
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba('+rCol+',0.06),rgba('+rCol+',0.02));border-color:rgba('+rCol+',0.2);margin-bottom:12px">';
+    html+='<div class="card-title" style="color:'+(isPos?'var(--green)':'var(--red)')+'">💰 '+(isPos?'VALUE BET DÉTECTÉ ✅':'PAS DE VALUE ❌')+'</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE LIVRE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:var(--gold)">@'+odds+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">COTE JUSTE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+(isPos?'var(--green)':'var(--red)')+'">@'+fairOdd+'</div></div>';
+    html+='<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:9px"><div style="font-size:8px;letter-spacing:2px;color:var(--txt2);margin-bottom:3px">EDGE</div><div style="font-family:Bebas Neue,cursive;font-size:22px;color:'+ec+'">'+(edge>0?'+':'')+edge.toFixed(1)+'%</div></div>';
+    html+='</div></div>';
   }
-  html+='</div>';
 
-  // VICTOIRE
-  html+='<div class="card"><div class="card-title">🏉 PROBABILITÉS DE VICTOIRE</div>';
-  html+='<div class="prob-row"><div class="prob-team">🏠 '+home+'</div>'+bar(pWinH,'var(--green)')+'<div class="prob-lbl" style="color:var(--green)">'+pct(pWinH)+'</div></div>';
-  html+='<div class="prob-row"><div class="prob-team">✈️ '+away+'</div>'+bar(pWinA,'var(--red)')+'<div class="prob-lbl" style="color:var(--red)">'+pct(pWinA)+'</div></div>';
-  html+='<div style="font-size:11px;color:var(--txt2);margin-top:8px">📊 Score estimé : <strong style="color:var(--gold)">'+Math.round(expH)+' - '+Math.round(expA)+'</strong> · Écart : <strong style="color:'+(expMargin>0?'var(--green)':'var(--red)')+'">'+( expMargin>0?'+':'')+expMargin.toFixed(1)+' pts</strong></div></div>';
-
-  // TOTAL POINTS
-  html+='<div class="card"><div class="card-title">🎯 TOTAL DE POINTS — Estimé : '+Math.round(expTotal)+' pts</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [{l:'Over 35.5 pts',v:pO35},{l:'Under 35.5 pts',v:1-pO35},
-   {l:'Over 40.5 pts',v:pO40},{l:'Under 40.5 pts',v:1-pO40},
-   {l:'Over 45.5 pts',v:pO45},{l:'Under 45.5 pts',v:1-pO45},
-   {l:'Over 50.5 pts',v:pO50},{l:'Under 50.5 pts',v:1-pO50}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
+  // ═══ BLOC 4 — VERDICT FINAL ═══
+  var vbgR=vc==='var(--green)'?'#081a12':vc==='var(--gold)'?'#1a1508':'#1a0808';
+  html+='<div class="verdict-card" style="background:'+vbgR+';border:2px solid '+vc+';margin-bottom:12px">';
+  html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between"><div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
+  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">Modèle Rugby</div></div>';
   html+='</div></div>';
 
-  // HANDICAP
-  html+='<div class="card"><div class="card-title">⚖️ HANDICAP POINTS</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:home+' -3.5',v:pH35},{l:away+' +3.5',v:1-pH35},
-    {l:home+' -5.5',v:pH55},{l:away+' +5.5',v:1-pH55},
-    {l:home+' -7.5',v:pH75},{l:away+' +7.5',v:1-pH75},
-    {l:home+' -10.5',v:pH105},{l:away+' +10.5',v:1-pH105},
-    {l:home+' -15.5',v:pH155},{l:away+' +15.5',v:1-pH155}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
+  // ═══ BLOC 5 — HANDICAP ═══
+  html+='<div class="card" style="margin-bottom:10px"><div class="card-title">⚖️ HANDICAP</div><div style="display:flex;flex-direction:column;gap:4px">';
+  html+=mktRow(home+' -3.5',pH35); html+=mktRow(home+' -5.5',pH55);
+  html+=mktRow(home+' -7.5',pH75); html+=mktRow(home+' -10.5',pH105);
+  html+=mktRow(home+' -15.5',pH155);
   html+='</div></div>';
 
-  // ESSAIS
-  html+='<div class="card"><div class="card-title">🏃 ESSAIS — Estimé : '+expTriesTotal.toFixed(1)+' essais</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">';
-  [{l:'Over 3.5 essais',v:pT3},{l:'Under 3.5 essais',v:1-pT3},
-   {l:'Over 4.5 essais',v:pT4},{l:'Under 4.5 essais',v:1-pT4},
-   {l:'Over 5.5 essais',v:pT5},{l:'Under 5.5 essais',v:1-pT5},
-   {l:'Les deux équipes marquent un essai',v:pBttsTries}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
-  html+='</div>';
-  html+='<div class="grid2">';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:var(--green)">'+expTriesH.toFixed(1)+'</div><div class="stat-mini-l">ESSAIS '+home.substring(0,8).toUpperCase()+'</div></div>';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:var(--red)">'+expTriesA.toFixed(1)+'</div><div class="stat-mini-l">ESSAIS '+away.substring(0,8).toUpperCase()+'</div></div>';
-  html+='</div></div>';
-
-  // MI-TEMPS
-  html+='<div class="card"><div class="card-title">⏱️ MI-TEMPS & COMBINÉS</div>';
-  html+='<div class="grid3" style="margin-bottom:10px">';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(pHtH)+'">'+pct(pHtH)+'</div><div class="stat-mini-l">'+home.substring(0,6).toUpperCase()+'</div></div>';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(pHtDraw)+'">'+pct(pHtDraw)+'</div><div class="stat-mini-l">ÉGALITÉ</div></div>';
-  html+='<div class="stat-mini"><div class="stat-mini-v" style="color:'+gc(pHtA)+'">'+pct(pHtA)+'</div><div class="stat-mini-l">'+away.substring(0,6).toUpperCase()+'</div></div>';
-  html+='</div>';
-  html+='<div style="font-size:9px;color:var(--txt2);font-weight:700;letter-spacing:2px;margin-bottom:8px">MI-TEMPS / FINAL</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [{l:'Dom/Dom',v:pHtFt.hh},{l:'Dom/Ext',v:pHtFt.ha},
-   {l:'Ext/Dom',v:pHtFt.ah},{l:'Ext/Ext',v:pHtFt.aa}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
-  html+='</div></div>';
-
-  // BONUS OFFENSIF & ÉCARTS
-  html+='<div class="card"><div class="card-title">🌟 BONUS OFFENSIF & ÉCARTS</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:6px">';
-  [
-    {l:'Bonus offensif '+home+' (4+ essais)',v:pBonusH},
-    {l:'Bonus offensif '+away+' (4+ essais)',v:pBonusA},
-    {l:'Au moins un bonus offensif',v:pBonusAny},
-    {l:'Victoire 1-12 pts',v:pMargin1_12},
-    {l:'Victoire 13+ pts',v:pMargin13p},
-    {l:'Double Chance '+home,v:pWinH+pDraw},
-    {l:'Double Chance '+away,v:pWinA+pDraw}
-  ].forEach(function(m){html+=mktRow(m.l,m.v);});
-  html+='</div></div>';
-
-  // KELLY
   if(kellyPct>0){
-    html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2)">';
-    html+='<div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div>';
-    html+='<div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div>';
-    html+='<div style="font-size:11px;color:var(--txt2);margin-top:4px">Demi-Kelly pour limiter le risque</div></div>';
+    html+='<div class="card" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.03));border-color:rgba(124,58,237,0.2);margin-bottom:10px"><div class="card-title" style="color:var(--gold)">💰 MISE OPTIMALE (KELLY)</div><div style="font-family:Bebas Neue,cursive;font-size:32px;color:var(--gold)">'+kellyPct.toFixed(1)+'% de ta bankroll</div></div>';
   }
 
-  // AI
-  window._rpd={home:home,away:away,comp:comp,betType:betType,odds:odds,
-    betProb:betProb,pWinH:pWinH,pWinA:pWinA,expH:expH,expA:expA,
-    expTotal:expTotal,expMargin:expMargin,conf:conf,edge:edge};
   html+='<button class="btn-ai" onclick="launchRugbyAI()">🤖 ANALYSE IA APPROFONDIE</button>';
   html+='<div id="rai-box"></div>';
 
@@ -6701,6 +7434,7 @@ function computeRugby() {
     prob:betProb,edge:edge,
     kelly: kellyPct ? kellyPct.toFixed(1) : ''
   });
+  addShareButton('rugby-results',{sport:'rugby',home:home,away:away,betLabel:betLabel,odds:odds,verdict:verdict,prob:betProb,edge:edge});
   rGoStep(4);
   window.scrollTo(0,0);
 }
@@ -6767,8 +7501,20 @@ var histFilter = 'all';
 var pendingResultId = null;
 
 function getHistory() {
-  try { return JSON.parse(localStorage.getItem('predict_history')||'[]'); }
-  catch(e) { return []; }
+  try {
+    // Source 1 : ancien historique predict_history
+    var old = JSON.parse(localStorage.getItem('predict_history') || '[]');
+    // Source 2 : nouveau historique sd_predict_historique
+    var newHist = JSON.parse(localStorage.getItem('sd_predict_historique') || '[]');
+    // Fusionner et dédupliquer par id
+    var merged = old.concat(newHist);
+    var seen = {};
+    return merged.filter(function(e) {
+      if (seen[e.id]) return false;
+      seen[e.id] = true;
+      return true;
+    });
+  } catch(e) { return []; }
 }
 
 function saveHistory(h) {
@@ -7021,6 +7767,593 @@ function addExportButton(containerId, data) {
   btn.innerHTML = '➕ AJOUTER CE PARI DANS SPORTSDÉCRYPTÉ';
   btn.onclick = function() { exportToSportsDecrypte(data); };
   container.appendChild(btn);
+}
+
+// ── BOUTON PARTAGE ────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════
+// MODULE HISTORIQUE DES ANALYSES PREDICT
+// ═══════════════════════════════════════════════════════
+
+var HIST_KEY = 'sd_predict_historique';
+var histSportFilter = 'all';
+var histVerdictFilter = 'all';
+
+function saveAnalyseHistorique(data) {
+  var hist = getHistorique();
+  var entry = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    sport: data.sport || 'football',
+    home: data.home || '',
+    away: data.away || '',
+    betLabel: data.betLabel || data.bet || '',
+    odds: data.odds || '',
+    prob: data.prob || 0,
+    edge: data.edge || null,
+    verdict: data.verdict || '',
+    kelly: data.kelly || ''
+  };
+  hist.unshift(entry); // Plus récent en premier
+  if (hist.length > 100) hist = hist.slice(0, 100); // Max 100 entrées
+  localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+}
+
+function getHistorique() {
+  try {
+    return JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+  } catch(e) { return []; }
+}
+
+function clearHistorique() {
+  if (!confirm('Vider tout l\'historique ?')) return;
+  localStorage.removeItem(HIST_KEY);
+  renderHistoriquePredict();
+  showToast('Historique vidé');
+}
+
+function filterHistorique(type, val, btn) {
+  if (type === 'sport') {
+    histSportFilter = val;
+    document.querySelectorAll('#hist-sport-filters .hist-filter').forEach(function(b) { b.classList.remove('active'); });
+  } else {
+    histVerdictFilter = val;
+    document.querySelectorAll('#hist-verdict-filters .hist-filter').forEach(function(b) { b.classList.remove('active'); });
+  }
+  if (btn) btn.classList.add('active');
+  renderHistoriquePredict();
+}
+
+function renderHistoriquePredict() {
+  var hist = getHistorique();
+  var today = new Date().toISOString().slice(0, 10);
+
+  // Stats
+  var totalValue = hist.filter(function(h) { return h.verdict && h.verdict.includes('VALUE'); }).length;
+  var todayCount = hist.filter(function(h) { return h.date && h.date.slice(0, 10) === today; }).length;
+  var statTotal = document.getElementById('hist-stat-total');
+  var statValue = document.getElementById('hist-stat-value');
+  var statToday = document.getElementById('hist-stat-today');
+  if (statTotal) statTotal.textContent = hist.length;
+  if (statValue) statValue.textContent = totalValue;
+  if (statToday) statToday.textContent = todayCount;
+
+  // Filtrer
+  var filtered = hist.filter(function(h) {
+    var sportOk = histSportFilter === 'all' || h.sport === histSportFilter;
+    var verdictOk = histVerdictFilter === 'all' ||
+      (histVerdictFilter === 'value' && h.verdict && h.verdict.includes('VALUE')) ||
+      (histVerdictFilter === 'edge' && h.verdict && h.verdict.includes('EDGE')) ||
+      (histVerdictFilter === 'eviter' && h.verdict && h.verdict.includes('ÉVITER'));
+    return sportOk && verdictOk;
+  });
+
+  var container = document.getElementById('hist-list-predict');
+  if (!container) return;
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--txt2);font-size:13px">' +
+      '<div style="font-size:40px;margin-bottom:12px">📋</div>' +
+      '<div style="font-weight:700;margin-bottom:6px">Aucune analyse</div>' +
+      '<div style="font-size:11px;opacity:0.6">Tes analyses apparaîtront ici automatiquement</div>' +
+      '</div>';
+    return;
+  }
+
+  var sportEmojis = {football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉'};
+  var html = '';
+
+  filtered.forEach(function(h) {
+    var verdictColor = h.verdict && h.verdict.includes('VALUE') ? 'var(--green)' :
+                       h.verdict && h.verdict.includes('ÉVITER') ? 'var(--red)' :
+                       h.verdict && h.verdict.includes('EDGE') ? 'var(--gold)' : 'var(--txt2)';
+    var verdictBg = h.verdict && h.verdict.includes('VALUE') ? 'rgba(0,229,184,0.08)' :
+                    h.verdict && h.verdict.includes('ÉVITER') ? 'rgba(255,71,87,0.08)' :
+                    h.verdict && h.verdict.includes('EDGE') ? 'rgba(245,200,66,0.08)' : 'rgba(255,255,255,0.03)';
+
+    var dateObj = new Date(h.date);
+    var dateStr = dateObj.toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var emoji = sportEmojis[h.sport] || '🏆';
+    var probPct = h.prob ? Math.round(h.prob * 100) + '%' : '—';
+    var edgeStr = h.edge !== null && h.edge !== undefined ? (h.edge > 0 ? '+' : '') + (h.edge * 100).toFixed(1) + '%' : '—';
+
+    html += '<div class="hist-card" style="background:' + verdictBg + ';border-color:' + verdictColor + '33;margin-bottom:10px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<span style="font-size:18px">' + emoji + '</span>' +
+          '<div>' +
+            '<div style="font-size:12px;font-weight:700;color:var(--txt)">' + escapeHtml(h.home) + ' vs ' + escapeHtml(h.away) + '</div>' +
+            '<div style="font-size:10px;color:var(--txt2)">' + dateStr + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:9px;font-weight:700;color:' + verdictColor + ';background:' + verdictBg + ';padding:3px 8px;border-radius:20px;border:1px solid ' + verdictColor + '44">' + (h.verdict || '—') + '</div>' +
+      '</div>' +
+      '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:8px 10px;margin-bottom:8px">' +
+        '<div style="font-size:11px;color:var(--txt2);margin-bottom:2px">PRONOSTIC</div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--txt)">' + escapeHtml(h.betLabel || '—') + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:6px">' +
+        '<div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:6px">' +
+          '<div style="font-size:8px;color:var(--txt2);font-weight:700;letter-spacing:1px;margin-bottom:2px">COTE</div>' +
+          '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:var(--gold)">@' + (h.odds || '—') + '</div>' +
+        '</div>' +
+        '<div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:6px">' +
+          '<div style="font-size:8px;color:var(--txt2);font-weight:700;letter-spacing:1px;margin-bottom:2px">CONFIANCE</div>' +
+          '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:' + verdictColor + '">' + probPct + '</div>' +
+        '</div>' +
+        '<div style="flex:1;text-align:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:6px">' +
+          '<div style="font-size:8px;color:var(--txt2);font-weight:700;letter-spacing:1px;margin-bottom:2px">EDGE</div>' +
+          '<div style="font-family:\'Bebas Neue\',cursive;font-size:16px;color:var(--txt)">' + edgeStr + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<button onclick=\'shareFromHistorique(' + JSON.stringify(h).replace(/'/g, "\\'") + ')\' style="width:100%;margin-top:8px;background:rgba(91,155,255,0.1);border:1px solid rgba(91,155,255,0.25);border-radius:10px;padding:8px;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer">📤 Repartager</button>' +
+    '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function shareFromHistorique(data) {
+  generateShareImage(data);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPARATEUR DE COTES BOOKMAKERS — The Odds API
+// ═══════════════════════════════════════════════════════
+
+var ODDS_SPORT_MAP = {
+  soccer_epl: 'Premier League',
+  soccer_spain_la_liga: 'La Liga',
+  soccer_germany_bundesliga: 'Bundesliga',
+  soccer_italy_serie_a: 'Serie A',
+  soccer_france_ligue_one: 'Ligue 1',
+  soccer_uefa_champs_league: 'Champions League',
+  soccer_uefa_europa_league: 'Europa League'
+};
+
+var BOOKIE_LOGOS = {
+  bet365: '🟢', unibet: '🟡', williamhill: '⚫', betfair: '🔵',
+  betclic: '🔴', winamax: '🟠', ladbrokes: '🟤', paddypower: '🟢',
+  pinnacle: '🔷', bwin: '🔵', betsson: '🟡', '1xbet': '⚪',
+  marathonbet: '🔴', betvictor: '🟢', coral: '🔵'
+};
+
+function addOddsComparator(containerId, home, away) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+
+  var wrap = document.createElement('div');
+  wrap.id = 'odds-comparator-wrap';
+  wrap.style.cssText = 'margin-top:10px';
+  wrap.innerHTML =
+    '<button onclick="loadOddsComparator(\'' + esc(home) + '\',\'' + esc(away) + '\')" ' +
+    'style="width:100%;background:rgba(91,155,255,0.1);border:1px solid rgba(91,155,255,0.25);' +
+    'border-radius:14px;padding:13px;font-family:\'Bebas Neue\',cursive;font-size:15px;' +
+    'letter-spacing:2px;color:var(--blue);cursor:pointer;transition:all 0.15s" ' +
+    'id="btn-odds-comparator">' +
+    '📊 COMPARER LES COTES BOOKMAKERS' +
+    '</button>' +
+    '<div id="odds-comparator-content" style="display:none;margin-top:10px"></div>';
+
+  container.appendChild(wrap);
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+async function loadOddsComparator(home, away) {
+  var btn = document.getElementById('btn-odds-comparator');
+  var content = document.getElementById('odds-comparator-content');
+  if (!btn || !content) return;
+
+  btn.textContent = '⏳ CHARGEMENT...';
+  btn.disabled = true;
+
+  try {
+    // Chercher dans toutes les ligues football européennes
+    var sports = ['soccer_epl','soccer_spain_la_liga','soccer_germany_bundesliga',
+                  'soccer_italy_serie_a','soccer_france_ligue_one',
+                  'soccer_uefa_champs_league','soccer_uefa_europa_league'];
+
+    var foundEvent = null;
+    var foundOdds = null;
+
+    for (var i = 0; i < sports.length; i++) {
+      var r = await fetch('/api/odds?sport=' + sports[i] + '&regions=eu,uk&markets=h2h');
+      if (!r.ok) continue;
+      var data = await r.json();
+      if (!Array.isArray(data)) continue;
+
+      var homeLow = home.toLowerCase();
+      var awayLow = away.toLowerCase();
+
+      var event = data.find(function(e) {
+        var h = (e.home_team || '').toLowerCase();
+        var a = (e.away_team || '').toLowerCase();
+        return (h.includes(homeLow.split(' ')[0]) || homeLow.includes(h.split(' ')[0])) &&
+               (a.includes(awayLow.split(' ')[0]) || awayLow.includes(a.split(' ')[0]));
+      });
+
+      if (event && event.bookmakers && event.bookmakers.length > 0) {
+        foundEvent = event;
+        foundOdds = event.bookmakers;
+        break;
+      }
+    }
+
+    if (!foundEvent || !foundOdds || foundOdds.length === 0) {
+      content.style.display = 'block';
+      content.innerHTML =
+        '<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:16px;text-align:center;color:var(--txt2);font-size:12px">' +
+        '📭 Match non trouvé chez les bookmakers.<br>' +
+        '<small style="color:var(--txt3)">Le match n\'est peut-être pas encore coté ou les noms diffèrent.</small>' +
+        '</div>';
+      btn.style.display = 'none';
+      return;
+    }
+
+    // Construire l'affichage
+    var homeTeam = foundEvent.home_team;
+    var awayTeam = foundEvent.away_team;
+    var matchDate = new Date(foundEvent.commence_time);
+    var dateStr = matchDate.toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+
+    // Calculer les meilleures cotes par issue
+    var bestHome = 0, bestDraw = 0, bestAway = 0;
+    var bestHomeBook = '', bestDrawBook = '', bestAwayBook = '';
+
+    foundOdds.forEach(function(bk) {
+      var market = bk.markets && bk.markets.find(function(m) { return m.key === 'h2h'; });
+      if (!market) return;
+      market.outcomes.forEach(function(o) {
+        if (o.name === homeTeam && o.price > bestHome) { bestHome = o.price; bestHomeBook = bk.title; }
+        else if (o.name === awayTeam && o.price > bestAway) { bestAway = o.price; bestAwayBook = bk.title; }
+        else if (o.name === 'Draw' && o.price > bestDraw) { bestDraw = o.price; bestDrawBook = bk.title; }
+      });
+    });
+
+    var html = '';
+
+    // Header
+    html += '<div style="background:var(--bg2);border:1px solid rgba(91,155,255,0.2);border-radius:20px;overflow:hidden">';
+    html += '<div style="padding:14px 16px;border-bottom:1px solid var(--bdr)">';
+    html += '<div style="font-size:9px;letter-spacing:3px;color:var(--blue);font-weight:700;margin-bottom:4px">📊 COTES EN DIRECT</div>';
+    html += '<div style="font-size:12px;font-weight:700">' + homeTeam + ' vs ' + awayTeam + '</div>';
+    html += '<div style="font-size:10px;color:var(--txt3)">' + dateStr + ' · ' + foundOdds.length + ' bookmakers</div>';
+    html += '</div>';
+
+    // Meilleures cotes
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--bdr)">';
+    var bestData = [
+      {label: '1 — ' + homeTeam.split(' ')[0], odds: bestHome, book: bestHomeBook},
+      {label: 'Nul', odds: bestDraw, book: bestDrawBook},
+      {label: '2 — ' + awayTeam.split(' ')[0], odds: bestAway, book: bestAwayBook}
+    ];
+    bestData.forEach(function(b) {
+      html += '<div style="background:var(--bg2);padding:12px 8px;text-align:center">';
+      html += '<div style="font-size:9px;color:var(--txt3);font-weight:700;letter-spacing:1px;margin-bottom:4px">' + b.label + '</div>';
+      html += '<div style="font-family:\'Bebas Neue\',cursive;font-size:26px;color:var(--green)">' + (b.odds ? b.odds.toFixed(2) : '—') + '</div>';
+      html += '<div style="font-size:9px;color:var(--txt3);margin-top:2px">' + (b.book || '—') + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    // Tableau par bookmaker
+    html += '<div style="padding:12px 16px;border-top:1px solid var(--bdr)">';
+    html += '<div style="font-size:9px;letter-spacing:2px;color:var(--txt3);font-weight:700;margin-bottom:10px">TOUS LES BOOKMAKERS</div>';
+
+    // Trier par meilleure cote domicile
+    var sorted = foundOdds.slice().sort(function(a, b) {
+      var getOdds = function(bk, team) {
+        var m = bk.markets && bk.markets.find(function(m) { return m.key === 'h2h'; });
+        if (!m) return 0;
+        var o = m.outcomes.find(function(o) { return o.name === team; });
+        return o ? o.price : 0;
+      };
+      return getOdds(b, homeTeam) - getOdds(a, homeTeam);
+    });
+
+    sorted.forEach(function(bk) {
+      var market = bk.markets && bk.markets.find(function(m) { return m.key === 'h2h'; });
+      if (!market) return;
+
+      var h = market.outcomes.find(function(o) { return o.name === homeTeam; });
+      var d = market.outcomes.find(function(o) { return o.name === 'Draw'; });
+      var a = market.outcomes.find(function(o) { return o.name === awayTeam; });
+
+      var logo = BOOKIE_LOGOS[bk.key] || '🎰';
+      var hOdds = h ? h.price.toFixed(2) : '—';
+      var dOdds = d ? d.price.toFixed(2) : '—';
+      var aOdds = a ? a.price.toFixed(2) : '—';
+
+      var isBestH = h && h.price === bestHome;
+      var isBestD = d && d.price === bestDraw;
+      var isBestA = a && a.price === bestAway;
+
+      html += '<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)">';
+      html += '<div style="flex:1;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px">' + logo + ' ' + bk.title + '</div>';
+      html += '<div style="display:flex;gap:8px">';
+
+      [
+        {odds: hOdds, best: isBestH},
+        {odds: dOdds, best: isBestD},
+        {odds: aOdds, best: isBestA}
+      ].forEach(function(o) {
+        var col = o.best ? 'var(--green)' : 'var(--txt2)';
+        var bg = o.best ? 'rgba(0,229,184,0.1)' : 'transparent';
+        var border = o.best ? '1px solid rgba(0,229,184,0.3)' : '1px solid transparent';
+        html += '<div style="width:48px;text-align:center;font-family:\'Bebas Neue\',cursive;font-size:16px;' +
+          'color:' + col + ';background:' + bg + ';border:' + border + ';border-radius:6px;padding:2px 0">' +
+          o.odds + '</div>';
+      });
+
+      html += '</div></div>';
+    });
+    html += '</div>';
+
+    // Note de marge
+    var totalProb = (bestHome ? 1/bestHome : 0) + (bestDraw ? 1/bestDraw : 0) + (bestAway ? 1/bestAway : 0);
+    var margin = totalProb > 0 ? ((totalProb - 1) * 100).toFixed(1) : '—';
+    html += '<div style="padding:10px 16px;border-top:1px solid var(--bdr);font-size:10px;color:var(--txt3);text-align:center">';
+    html += 'Marge bookmaker estimée : <strong style="color:var(--txt2)">' + margin + '%</strong> · ';
+    html += '<span style="color:var(--blue)">Cotes en temps réel</span>';
+    html += '</div>';
+
+    html += '</div>';
+
+    content.innerHTML = html;
+    content.style.display = 'block';
+    btn.style.display = 'none';
+
+  } catch(err) {
+    content.style.display = 'block';
+    content.innerHTML = '<div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:12px;padding:12px;font-size:12px;color:var(--red)">Erreur : ' + err.message + '</div>';
+    btn.disabled = false;
+    btn.textContent = '📊 COMPARER LES COTES BOOKMAKERS';
+  }
+}
+
+function addShareButton(containerId, data) {
+  // Sauvegarder automatiquement dans l'historique
+  saveAnalyseHistorique(data);
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var btn = document.createElement('button');
+  btn.className = 'btn-ai';
+  btn.style.cssText = 'background:linear-gradient(135deg,rgba(245,200,66,0.25),rgba(255,107,53,0.2));border:1px solid rgba(245,200,66,0.3);margin-top:8px;font-size:14px;letter-spacing:2px';
+  btn.innerHTML = '📤 PARTAGER CE PRONOSTIC';
+  btn.onclick = function() { generateShareImage(data); };
+  container.appendChild(btn);
+}
+
+function generateShareImage(data) {
+  var canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1080;
+  var ctx = canvas.getContext('2d');
+
+  // Fond sombre avec dégradé
+  var bgGrad = ctx.createLinearGradient(0, 0, 1080, 1080);
+  bgGrad.addColorStop(0, '#05050d');
+  bgGrad.addColorStop(1, '#0f0f20');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  // Ambient glow orange en haut
+  var glow1 = ctx.createRadialGradient(540, 0, 0, 540, 0, 500);
+  glow1.addColorStop(0, 'rgba(255,107,53,0.15)');
+  glow1.addColorStop(1, 'rgba(255,107,53,0)');
+  ctx.fillStyle = glow1;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  // Ambient glow violet en bas
+  var glow2 = ctx.createRadialGradient(1080, 1080, 0, 1080, 1080, 600);
+  glow2.addColorStop(0, 'rgba(124,58,237,0.12)');
+  glow2.addColorStop(1, 'rgba(124,58,237,0)');
+  ctx.fillStyle = glow2;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  // Bordure dorée
+  ctx.strokeStyle = 'rgba(245,200,66,0.3)';
+  ctx.lineWidth = 3;
+  roundRect(ctx, 20, 20, 1040, 1040, 32, false, true);
+
+  // ── HEADER : Logo ──
+  ctx.fillStyle = 'rgba(255,107,53,0.15)';
+  roundRect(ctx, 60, 60, 200, 70, 16, true, false);
+  ctx.font = 'bold 18px Arial';
+  ctx.fillStyle = '#ff6b35';
+  ctx.letterSpacing = '3px';
+  ctx.fillText('SPORTS', 80, 98);
+  ctx.fillStyle = '#f5c842';
+  ctx.fillText('DÉCRYPTÉ', 80, 118);
+
+  ctx.font = 'bold 13px Arial';
+  ctx.fillStyle = 'rgba(240,240,255,0.3)';
+  ctx.textAlign = 'right';
+  ctx.fillText('sportsdecrypte.vercel.app', 1020, 95);
+  ctx.textAlign = 'left';
+
+  // ── SÉPARATEUR ──
+  ctx.strokeStyle = 'rgba(245,200,66,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(60, 155); ctx.lineTo(1020, 155); ctx.stroke();
+
+  // ── SPORT BADGE ──
+  var sportColors = {football:'#10b981',tennis:'#3b82f6',basket:'#f59e0b',hockey:'#8b5cf6',mma:'#ef4444',rugby:'#06b6d4'};
+  var sportEmojis = {football:'⚽',tennis:'🎾',basket:'🏀',hockey:'🏒',mma:'🥊',rugby:'🏉'};
+  var sport = data.sport || 'football';
+  var sportColor = sportColors[sport] || '#f5c842';
+  var sportEmoji = sportEmojis[sport] || '🏆';
+
+  ctx.fillStyle = sportColor + '22';
+  roundRect(ctx, 60, 180, 160, 44, 22, true, false);
+  ctx.font = 'bold 14px Arial';
+  ctx.fillStyle = sportColor;
+  ctx.fillText(sportEmoji + '  ' + (sport.toUpperCase()), 82, 208);
+
+  // ── MATCH ──
+  var home = data.home || 'Équipe A';
+  var away = data.away || 'Équipe B';
+  ctx.font = 'bold 68px Arial';
+  ctx.fillStyle = '#f0f0ff';
+  ctx.textAlign = 'center';
+
+  // Adapter la taille si nom trop long
+  var matchText = home + '  vs  ' + away;
+  var maxW = 900;
+  var fontSize = 68;
+  ctx.font = 'bold ' + fontSize + 'px Arial';
+  while (ctx.measureText(matchText).width > maxW && fontSize > 32) {
+    fontSize -= 4;
+    ctx.font = 'bold ' + fontSize + 'px Arial';
+  }
+  ctx.fillText(home, 540, 320);
+  ctx.font = 'bold 28px Arial';
+  ctx.fillStyle = 'rgba(240,240,255,0.35)';
+  ctx.fillText('VS', 540, 390);
+  ctx.font = 'bold ' + fontSize + 'px Arial';
+  ctx.fillStyle = '#f0f0ff';
+  ctx.fillText(away, 540, 460);
+
+  // ── SÉPARATEUR ──
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(60, 510); ctx.lineTo(1020, 510); ctx.stroke();
+
+  // ── PRONOSTIC CARD ──
+  var verdictColor = data.verdict && data.verdict.includes('VALUE') ? '#00e5b8' :
+                     data.verdict && data.verdict.includes('ÉVITER') ? '#ff4757' : '#f5c842';
+
+  ctx.fillStyle = verdictColor + '18';
+  roundRect(ctx, 60, 540, 960, 200, 24, true, false);
+  ctx.strokeStyle = verdictColor + '55';
+  ctx.lineWidth = 2;
+  roundRect(ctx, 60, 540, 960, 200, 24, false, true);
+
+  ctx.font = 'bold 13px Arial';
+  ctx.fillStyle = verdictColor + 'aa';
+  ctx.textAlign = 'left';
+  ctx.fillText('PRONOSTIC RECOMMANDÉ', 100, 580);
+
+  ctx.font = 'bold 42px Arial';
+  ctx.fillStyle = '#f0f0ff';
+  var betLabel = data.betLabel || data.bet || 'Pronostic';
+  // Tronquer si trop long
+  if (ctx.measureText(betLabel).width > 600) betLabel = betLabel.slice(0, 30) + '...';
+  ctx.fillText(betLabel, 100, 640);
+
+  // Cote
+  ctx.font = 'bold 13px Arial';
+  ctx.fillStyle = 'rgba(240,240,255,0.5)';
+  ctx.fillText('COTE ESTIMÉE', 100, 690);
+  ctx.font = 'bold 52px Arial';
+  ctx.fillStyle = '#f5c842';
+  ctx.fillText('@' + (data.odds || '—'), 100, 730);
+
+  // Score de confiance
+  var prob = data.prob || 0;
+  var probPct = Math.round(prob * 100);
+  ctx.textAlign = 'right';
+  ctx.font = 'bold 13px Arial';
+  ctx.fillStyle = 'rgba(240,240,255,0.5)';
+  ctx.fillText('CONFIANCE', 1000, 690);
+  ctx.font = 'bold 80px Arial';
+  ctx.fillStyle = verdictColor;
+  ctx.fillText(probPct + '%', 1000, 770);
+
+  ctx.textAlign = 'left';
+
+  // ── VERDICT ──
+  ctx.fillStyle = verdictColor + '22';
+  roundRect(ctx, 60, 770, 960, 80, 20, true, false);
+  ctx.font = 'bold 36px Arial';
+  ctx.fillStyle = verdictColor;
+  ctx.textAlign = 'center';
+  ctx.fillText(data.verdict || 'ANALYSE', 540, 820);
+
+  // Edge si disponible
+  if (data.edge !== null && data.edge !== undefined) {
+    var edgeText = data.edge > 0 ? 'Edge : +' + (data.edge * 100).toFixed(1) + '%' : 'Edge : ' + (data.edge * 100).toFixed(1) + '%';
+    ctx.font = 'bold 18px Arial';
+    ctx.fillStyle = 'rgba(240,240,255,0.4)';
+    ctx.fillText(edgeText, 540, 855);
+  }
+
+  // ── FOOTER ──
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 14px Arial';
+  ctx.fillStyle = 'rgba(240,240,255,0.2)';
+  ctx.fillText('Analyse générée par SportsDecrypté · Pas de conseil financier', 540, 960);
+
+  ctx.font = 'bold 16px Arial';
+  ctx.fillStyle = 'rgba(245,200,66,0.5)';
+  ctx.fillText('sportsdecrypte.vercel.app', 540, 1000);
+
+  ctx.textAlign = 'left';
+
+  // ── PARTAGER ──
+  canvas.toBlob(function(blob) {
+    var file = new File([blob], 'pronostic-sportsdecrypte.png', { type: 'image/png' });
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        title: 'Pronostic SportsDecrypté',
+        text: (data.home||'') + ' vs ' + (data.away||'') + ' — ' + (data.betLabel||''),
+        files: [file]
+      }).catch(function(){});
+    } else {
+      // Fallback : télécharger l'image
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'pronostic-sportsdecrypte.png';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('📥 Image téléchargée !');
+    }
+  }, 'image/png');
+}
+
+function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  if (fill) ctx.fill();
+  if (stroke) ctx.stroke();
 }
 
 
@@ -8785,7 +10118,7 @@ function setSport(sport) {
   currentSport = sport;
 
   // ── Tabs ──
-  ['football','tennis','basket','hockey','mma','rugby','tendances','live','precision'].forEach(function(s) {
+  ['football','tennis','basket','hockey','mma','rugby','tendances','live','precision','historique'].forEach(function(s) {
     var tab = document.getElementById('tab-'+s);
     if (tab) tab.classList.toggle('active', s === sport);
   });
@@ -8851,6 +10184,11 @@ function setSport(sport) {
   if (precScreen) precScreen.style.display = sport==='precision' ? 'block' : 'none';
   if (sport==='precision') renderPrecisionScreen();
 
+  // ── HISTORIQUE ──
+  var histScreen = document.getElementById('historique-screen');
+  if (histScreen) histScreen.style.display = sport==='historique' ? 'block' : 'none';
+  if (sport==='historique') renderHistoriquePredict();
+
   // ── Header subtitle ──
   var sub = document.getElementById('hdr-sub');
   var labels = {
@@ -8862,7 +10200,8 @@ function setSport(sport) {
     rugby:    'MODÈLES PRÉDICTIFS RUGBY',
     tendances: '🔥 DÉTECTEUR DE TENDANCES',
     live:      '🔴 RECALCUL EN DIRECT',
-    precision: '🎯 PRÉCISION DES MODÈLES'
+    precision: '🎯 PRÉCISION DES MODÈLES',
+    historique: '📋 HISTORIQUE DES ANALYSES'
   };
   if (sub) sub.textContent = labels[sport] || 'MODÈLES PRÉDICTIFS';
 
