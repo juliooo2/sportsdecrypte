@@ -5126,7 +5126,7 @@ function computeTennis() {
   html+='<div style="display:flex;align-items:center;justify-content:space-between">';
   html+='<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
   html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div>';
-  html+='<div style="font-size:10px;color:var(--txt2)">Barnett &amp; Clarke</div></div></div></div>';
+  html+='<div style="font-size:10px;color:var(--txt2)">Barnett &amp; Clarke</div>'+getCalibrationBadge(betProb*100)+'</div></div></div>';
 
   // ═══ BLOC 5 — MARCHÉS DÉTAILLÉS ═══
   html+='<div class="card" style="margin-bottom:10px"><div class="card-title">⚡ HANDICAP SETS</div><div style="display:flex;flex-direction:column;gap:4px">';
@@ -5746,7 +5746,7 @@ function computeBasket() {
   html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
   html+='<div style="display:flex;align-items:center;justify-content:space-between">';
   html+='<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">4 Facteurs Dean Oliver</div></div>';
+  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">4 Facteurs Dean Oliver</div>'+getCalibrationBadge(betProb*100)+'</div>';
   html+='</div></div>';
 
   // ═══ BLOC 6 — HANDICAP ═══
@@ -6292,7 +6292,7 @@ function computeHockey() {
   html+='<div class="verdict-card" style="background:'+vbgH+';border:2px solid '+vc+';margin-bottom:12px">';
   html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
   html+='<div style="display:flex;align-items:center;justify-content:space-between"><div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">Poisson Hockey</div></div>';
+  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">Poisson Hockey</div>'+getCalibrationBadge(betProb*100)+'</div>';
   html+='</div></div>';
 
   // ═══ BLOC 5 — MARCHÉS ═══
@@ -6869,7 +6869,7 @@ function computeMMA() {
   html+='<div class="verdict-card" style="background:'+vbgM+';border:2px solid '+vc+';margin-bottom:12px">';
   html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
   html+='<div style="display:flex;align-items:center;justify-content:space-between"><div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">Modèle MMA</div></div>';
+  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">Modèle MMA</div>'+getCalibrationBadge(betProb*100)+'</div>';
   html+='</div></div>';
 
   // Marchés Over/Under rounds
@@ -7405,7 +7405,7 @@ function computeRugby() {
   html+='<div class="verdict-card" style="background:'+vbgR+';border:2px solid '+vc+';margin-bottom:12px">';
   html+='<div style="font-size:9px;letter-spacing:3px;color:'+vc+';font-weight:700;margin-bottom:6px">VERDICT FINAL</div>';
   html+='<div style="display:flex;align-items:center;justify-content:space-between"><div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
-  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">Modèle Rugby</div></div>';
+  html+='<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div><div style="font-size:10px;color:var(--txt2)">Modèle Rugby</div>'+getCalibrationBadge(betProb*100)+'</div>';
   html+='</div></div>';
 
   // ═══ BLOC 5 — HANDICAP ═══
