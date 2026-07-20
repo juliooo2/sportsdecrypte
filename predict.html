@@ -4503,7 +4503,7 @@ function compute() {
   html += '<div style="display:flex;align-items:center;justify-content:space-between">';
   html += '<div class="verdict-big" style="color:'+vc+'">'+verdict+'</div>';
   html += '<div style="text-align:right"><div style="font-size:9px;color:'+confCol+';font-weight:700;letter-spacing:2px">'+conf+'</div>';
-  html += '<div style="font-size:10px;color:var(--txt2)">'+mods+' modèle'+(mods>1?'s':'')+'</div></div></div></div>';
+  html += '<div style="font-size:10px;color:var(--txt2)">'+mods+' modèle'+(mods>1?'s':'')+'</div>'+getCalibrationBadge(betProb*100)+'</div></div></div>';
 
   // ═══ BLOC 6 — MARCHÉS DÉTAILLÉS ═══
   if(poi){
@@ -7500,6 +7500,25 @@ async function launchRugbyAI() {
 var histFilter = 'all';
 var pendingResultId = null;
 
+function getCalibrationBadge(confValue) {
+  try {
+    var p = parseFloat(confValue);
+    if (isNaN(p)) return '';
+    var h = getHistory().filter(function(e){ return e.result !== 'pending'; });
+    var min = p >= 80 ? 0.80 : p >= 70 ? 0.70 : p >= 60 ? 0.60 : p >= 50 ? 0.50 : 0;
+    var max = p >= 80 ? 1.00 : p >= 70 ? 0.80 : p >= 60 ? 0.70 : p >= 50 ? 0.60 : 0.50;
+    var bucket = h.filter(function(e){
+      var c = parseFloat(e.confidence||0)/100 || (e.odds>0?1/e.odds:0);
+      return c >= min && c < max;
+    });
+    if (bucket.length < 3) return '';
+    var won = bucket.filter(function(e){return e.result==='won';}).length;
+    var wr = (won/bucket.length*100).toFixed(0);
+    var col = parseFloat(wr) >= (min*100) ? 'var(--green)' : 'var(--red)';
+    return '<div style="font-size:9px;color:'+col+';margin-top:3px">✓ '+wr+'% réel sur '+bucket.length+' paris similaires</div>';
+  } catch(e) { return ''; }
+}
+
 function getHistory() {
   try {
     // Source 1 : ancien historique predict_history
@@ -9690,7 +9709,7 @@ function renderPrecisionScreen() {
   ];
   var hasProbData = false;
   probBuckets.forEach(function(b) {
-   b.bets = h.filter(function(e){
+    b.bets = settled.filter(function(e){
       var p = parseFloat(e.confidence||0)/100 || (e.odds>0?1/e.odds:0);
       return p >= b.min && p < b.max;
     });
