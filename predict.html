@@ -9690,7 +9690,7 @@ function renderPrecisionScreen() {
   ];
   var hasProbData = false;
   probBuckets.forEach(function(b) {
-    b.bets = settled.filter(function(e){
+   b.bets = h.filter(function(e){
       var p = parseFloat(e.confidence||0)/100 || (e.odds>0?1/e.odds:0);
       return p >= b.min && p < b.max;
     });
